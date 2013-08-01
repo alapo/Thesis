@@ -1,0 +1,75 @@
+% Use the University of Michigan thesis class.
+\documentclass[thesis]{thesis-umich}
+
+% Title of the thesis
+\title{Reduced Order Models for Calibration of Nuclear Reactor Simulation Codes}
+
+% Author name
+\author{Artem Yankov}
+
+% Department
+\department{Nuclear Engineering}
+
+% Year of completion
+\year=2013
+
+% Frontispiece
+%\frontispiece{\includegraphics[width=4in]{./pics/frontispiece.pdf}}
+
+% Default style for front pages
+\frontpagestyle{1}
+
+% Dedication
+\dedication{ %
+This dissertation is dedicated to...}
+
+% Acknowledgments
+\acknowledgments[6]{ %
+I would like to thank...}
+% This command sets the width of the acknowledgments area as a fraction
+% of the total width of the text area.
+\acknowledgmentswidth{0.8}
+
+% Committee
+\committee{ %
+Professor Thomas J. Downar, Chair \\
+Professor John C. Lee \\
+Professor John P. Boyd}
+
+% Chair must be entered separately for formatting reasons.
+\chair{Thomas J. Downar}
+
+% Commands to hide or show lists of figures, tables, etc.
+%\hidelistoftables
+%\showlistofprograms
+%\showlistofappendices
+
+% Definition of any abbreviations used.
+\abbreviations{
+ \acro{PDE}{partial differential equation}
+ \acro{SPDE}{stochastic partial differential equation}
+ \acro{HDMR}{high-dimensional model representation}
+ \acro{ANOVA}{analysis of variance}
+}
+
+% Some abstract text
+\abstract{
+Write abstract here!}
+%\hideabstractpagenumber
+
+%% DOCUMENT AREA
+\begin{document}
+
+% Introduction
+\chapter{Introduction}   \label{chap:intro}
+\input{./Chapter1/chapter1_main}
+
+% Reduced Order Models
+\chapter{Reduced Order Models for Computer Codes} \label{chap:rom}
+\input{./Chapter2/chapter2_main}
+
+% Bibliography
+\bibliographystyle{plain}
+\bibliography{./Bibliography/biblio}
+
+\end{document}

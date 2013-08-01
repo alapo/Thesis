@@ -1,0 +1,187 @@
+\section{Smolyak Sparse Grids} \label{sec:smolyak_sg}
+
+In order to create a reduced-order model for some objective function the anchored-\ac{ANOVA} decomposition plays a crucial role but more is needed \cite{Hesthaven_ANOVA}. Recall that the primary purpose for constructing a reduced-order model is to replace the presumably computationally intensive objective function with something that is trivial to evaluate. Consequently, in evaluating the anchored-\ac{ANOVA} decomposition at some point $\textbf{x}$ the projections in  \ref{projection_operator_dirac} must be trivial to evaluate as well. As it stands, evaluating the anchored-\ac{ANOVA} decomposition for some objective function is significantly more expensive than simply evaluting the function itself. To resolve this issue, a Smolyak sparse grid interpolant is created for each projection. While creating each such interpolant incurs some initial overhead, the payoff is the desired reduced order model. 
+
+\subsection{Motivation} \label{subsec:motivation}
+
+To describe multivariate function interpolation based on Smolyak sparse grids it makes sense to speak in the context of quadrature since a quadrature rule consists of interpolating a function using polynomials and then integrating the polynomials exactly. For the moment consider some smooth 1D function $f(x)$. The function $f(x)$ can be approximated arbitrarily well through the summation,
+\begin{equation} \label{eq:1D_interp}
+   f(x) \approx \sum_{i=1}^{P} f(x_i)C_i(x)
+\end{equation}
+where $C_i(x)$ are cardinal functions of degree $P$ with the property that $C_i(x_j)=\delta_{ij}$, $\delta_{ij}$ being the Kronecker $\delta$-function \cite{Boyd}. By the Weierstrass approximation theorem, smooth functions can be uniformly approximated as closely as desired by polynomial functions \cite{TrefethenApprox}. At the collocation points, or abscissas, in \ref{eq:1D_interp} the function $f(x)$ is interpolated exactly at $x_i$. The function $f(x)$ is comprised of various constant, linear, quadratic, cubic,..., etc terms and so exact integration of $f(x)$ amounts to integrating its monomial constituents.  
+
+Suppose that instead of interpolating a 1D function, a multivariate function of $d$ dimensions is to be interpolated. The naive approach to multivariate interpolation is to take a Cartesian product of 1D rules, such as in \ref{eq:1D_interp}, $d$ times. Consequently, the product grid will contain $P^d$ points, each of which requires a unique function evaluation. Such exponential growth is coined the "curse of dimensionality" \cite{LeMaitreKnio}. As a rule of thumb, exact integration of a monomial constituent comes at the cost of a single function evaluation \cite{Burkardt_SCALA2013}. Considering the space of $d$-dimensional, $P$-degree polynomials has some,
+\begin{equation} \label{eq:polynomial_space}
+    \binom{P+d}{d} \approx \frac{d^P}{P!} 
+\end{equation} 
+dimensions, for high dimensional problems the full Cartesian product approach integrates a superfluous number of monomials. Russian mathematician Sergei Smolyak was one of the first to realize the potential computational savings in his paper \cite{SmolyakOriginal}.
+
+\subsection{Algorithm Mechanics} \label{subsec:algorithm_mechanics}
+
+A Smolyak sparse grid is the set of collocation points used to build an interpolant for some multivariate objective function while the Smolyak algorithm is the whole procedure of building the interpolant. To begin, the Smolyak algorithm will be stated and pertinent notation will be introduced. Since indice tracking comprises the brunt of understanding the Smolyak algorithm, it is crucial to choose a clear notation. Consequently, the notation used here closely follows that of \cite{NovakRitter}.
+
+Slightly generalizing \ref{eq:1D_interp}, for the case of some smooth 1D function $f$, let $U^i$ be the interpolant of $f$ comprised of $m_i$ collocation points.
+\begin{equation} \label{eq:1D_interp2}
+    U^i = \sum_{j=1}^{m_i} 
+     f\left(x_j^i\right) a_j^i
+\end{equation}  
+In \ref{eq:1D_interp2}, $i \in \mathbb{N}$, and $a_j^i \in C(\left[-1,1\right])$ are basis functions imposing the demand that $U^i$ exactly be able to reproduce $f$ at the collocation points $x_j^i$. The notation $x_j^i \in \left[-1,1\right]$ refers to the $j^{th}$ collocation point of $m_i$ total points. Restricting the domain of the collocation points to $\left[-1,1\right]$ does not impose any limitations on being able to interpolate $f$ arbitrarily well since $\left[-1,1\right]$ can always be mapped to the parameter space of $f$.
+
+To generalize from 1D interpolation to multivariate interpolation 1D interpolation formulas, such as the one in \ref{eq:1D_interp2}, are combined using tensor products.
+\begin{equation} \label{eq:muitivariate_interp_fulltp}
+    \left(U^{i_1} \otimes\cdots\otimes U^{i_d}\right)\left(f\right) = 
+     \sum_{j_1=1}^{m_{i_1}} \cdots
+      \sum_{j_d=1}^{m_{i_d}} f\left(
+       x_{j_1}^{i_1},\cdots,x_{j_d}^{i_d}\right)\cdot
+        \left(a_{j_1}^{i_1}\otimes\cdots\otimes a_{j_d}^{i_d}\right)
+\end{equation}   
+Tensor products are a mathematical convenience used to represent all combinations of some entity, in this case $U^i$. The scheme in \ref{eq:muitivariate_interp_fulltp} suffers from the, "curse of dimensionality" since a total of,
+\begin{equation}
+    \prod_{k=1}^d m_{i_k}
+\end{equation}     
+function evaluations are needed to form the interpolant. The Smolyak algorithm is based on \ref{eq:muitivariate_interp_fulltp}, the only difference being not all the tensor products are used. In explicit form, the Smolyak formula for approximating the left-hand side of \ref{eq:muitivariate_interp_fulltp} is given as \cite{NovakRitter},
+\begin{equation} \label{eq:Smolyak_formula1}
+    A\left(q,d\right) = 
+     \sum_{q-d+1\leq \vert \textbf{i}\vert\leq q}
+      \left(-1\right)^{q-\vert\textbf{i}\vert}
+       \binom{d-1}{q-\vert\textbf{i}\vert}
+        \left(U^{i_1} \otimes\cdots\otimes U^{i_d}\right).
+\end{equation}
+Each entry $i_k$ in the vector $\textbf{i} \in \mathbb{N}^d$ contains the indice corresponding to the level of interpolation in dimension $k$. The more collocation points being utilized, the higher the level of interpolation since the interpolant becomes increasingly accurate. The magnitude of $\textbf{i}$ is $\vert\textbf{i}\vert = \vert i_1 +\cdots+ i_d\vert$. Since each $i_d \geq 1$, the variable $q \geq d$. The variable $q$ essentialy keeps track of the level of interpolation of the Smolyak algorithm. As $q$ is increased, more tensor product combinations are allowed. From \ref{eq:Smolyak_formula1} it is clear that the Smolyak algorithm is able to reduce the total number of tensor product components by limiting the entries of $\textbf{i}$.
+
+The Smolyak formula in \ref{eq:Smolyak_formula1} can be rewritten in several ways, all of which use the idea of the incremental interpolant $\Delta^i$ defined as,
+\begin{eqnarray} \label{eq:incremental_interpolant}
+    U^0 &=& 0 \nonumber \\
+    \Delta^i &=& U^i - U^{i-1}
+\end{eqnarray}
+The incremental interpolant operator is simply the difference between interpolants at two succesive levels. Using the notion of the incremental interpolant, the Smolyak formula can be rewritten as,
+\begin{equation} \label{eq:Smolyak_formula2}
+    A\left(q,d\right) =
+     \sum_{\vert\textbf{i}\vert\leq q}
+      \left(\Delta^{i_1}\otimes\cdots\otimes\Delta^{i_d}\right)
+\end{equation}   
+At first sight, \ref{eq:Smolyak_formula1} and \ref{eq:Smolyak_formula2} seem inefficient since neither exposes the recursiveness inherent in the Smolyak formula. In other words, when moving from index $q$ to $q+1$ the work done to get to level $q$ is not lost. Rewriting the Smolyak formula in a recursive fashion is advantageous for implemention on a computer.
+\begin{eqnarray}
+\label{eq:Smolyak_formula3a}
+    A(q,d) &=& A(q-1,d) + \Delta A(q,d) \\
+\label{eq:Smolyak_formula3b}
+    \Delta A(q,d) &=& \sum_{\vert\textbf{i}\vert = q}
+     \left(\Delta^{i_1}\otimes\cdots\otimes\Delta^{i_d}\right)
+\end{eqnarray}
+While the Smolyak algorithm representation in \ref{eq:Smolyak_formula3a} has the advantage of being represented recursively, it does not provide any type of indicator for when the Smolyak sparse grid should be refined. Collocation points should be added to a Smolyak sparse grid until the resulting interpolant is able to reproduce the objective function to some user-defined threshold. The authors in \cite{AHSGC} are able to rewrite \ref{eq:Smolyak_formula3b} in terms of what's referred to as a hierarchical surplus, 
+\begin{equation} \label{eq:hierarchical_surplus}
+    \Delta A(q,d) = \sum_{\vert\textbf{i}\vert=q}
+     \left(f(x_{j_1}^{i_1},...,x_{j_d}^{i_d}) - 
+      A(q-1,d)(x_{j_1}^{i_1},...,x_{j_d}^{i_d})\right)\cdot
+       \left(a_{j_1}^{i_1}\otimes\cdots\otimes a_{j_d}^{i_d}\right)
+\end{equation}
+which appears as the first term in the summation as the difference between the function value at the point $(x_{j_1}^{i_1},...,x_{j_d}^{i_d})$ and the Smolyak $q-1$ level interpolant value at the same point. Level $q$ of the Smolyak algorithm generally contains all the points comprising level $q-1$ plus some new collocation points. Consequently, the level $q$ Smolyak interpolant is expected to exactly evaluate any collocation points born in previous levels. The summation in \ref{eq:hierarchical_surplus} is taken over all the new points in level $q$ that have not appeared in level $q-1$ since the hierarchical surplus for these will be identically equal to zero. The hierarhchical surpluses provide an indicator for how well the Smolyak algorithm is interpolating some objective function. If the hierarchical surpluses are decreasing with each successive level then the Smolyak algorithm is converging.
+
+Following the notation in \cite{NovakRitter}, let $X^i=\lbrace x_1^i,...,x_{m_i}^i\rbrace$ be the collocation points comprising $U^i$. From \ref{eq:Smolyak_formula1}, the total number of collocation points in a Smolyak sparse grid can be written as,
+\begin{equation} \label{eq:numer_points_in_smolyak}
+    H(q,d) = \bigcup_{q-d+1\leq\vert\textbf{i}\vert\leq q}
+     \left(X^{i_1}\times\cdots\times X^{i_d}\right).
+\end{equation}     
+
+\subsection{Basis and Collocation Points} \label{subsec:basis_and_points}
+
+The exactness of the Smolyak algorithm is decided mainly by the choice of collocation points $x_{j_k}^{i_k}$ used to build $H(q,d)$. The basis functions $a_{j_k}^{i_k}$ work to weave the collocation points together. Gaussian quadrature is a favorite of many since with only $n+1$ collocation points, all polynomials of degree $2n+1$ or less can be integrated exactly \cite{NumAnyHenrici}. However, collocation points derived from Gaussian quadrature schemes are not nested in that $X^i \not\subset X^{i+1}$. Nestedness in the choice of collocation points is an essential feature for reducing the computational expense of applying the Smolyak algorithm. If nested collocation points are chosen for each $X^{i_k}$ then the Smolyak sparse grid will also be nested such that $H(q-1,d)\subset H(q,d)$ \cite{NovakRitter}. Consequently, when improving the Smolyak interpolant from level $q-1$ to level $q$ one will only have to evaluate the objective funtion at the points that are unique to $X^i$, which are given as $X_{\Delta}^{i} = X^i \setminus X^{i-1}$ \cite{AHSGC}.  The set of new points in level $q$ of a Smolyak sparse grid are given as,
+\begin{equation} \label{eq:unique_points_ssg}
+    \Delta H(q,d) = \bigcup_{\vert\textbf{i}\vert = q}
+     X_{\Delta}^{i_1} \times\cdots\times X_{\Delta}^{i_d}.
+\end{equation}   
+
+A viable alternative to Gaussian quadrature collocation points for the Smolyak algorithm is to use Clenshaw-Curtis collocation points, which consist of the extrema of Chebyshev polynomials. While $n+1$ Clenshaw-Curtis abscissas can only exactly integrate polynomials of degree $n$, they have the advantage of being nested. Accuracy is sacrificied for nestedness in the Smolyak algorithm, at least in theory. In practice it has been shown that for most functions Clenshaw-Curtis quadrature performs almost on par to Gaussian quadrature \cite{TrefethenQuadrature}. In other words, the double accuracy of Gaussian quadrature is rarely realized. For some level $i$ the Clenshaw-Curtis collocation points are given by,
+\begin{equation} \label{eq:cc_points}
+    x_{j}^{i} = \left\{
+     \begin{array}{cr}
+       \cos\frac{\pi(j-1)}{m_i-1}   & j=1,...,m_i \text{ if } i>1 \\
+       0   &  j=1 \text{ if } i=1
+     \end{array}
+   \right.
+\end{equation}
+In order for the level $i$ Clenshaw-Curtis abscissas to contain the level $i-1$    abscissas, a total of $2^{i-1}$ new points must be added. Consequently, the total number of abscissas appearing in the level $i$ Clenshaw-Curtis scheme is given as,
+\begin{equation} \label{eq:cc_numpoints}
+    m_i = \left\{
+     \begin{array}{cr}
+      2^{i-1}+1   & i>1 \\
+      1   & i=1
+     \end{array}
+    \right.
+\end{equation}
+
+Another alternative to the Gaussian and Clenshaw-Curtis abscissas is Gauss-Patterson. The Gauss-Patterson set of collocation points are nested and provide  a polynomial exactness of $(3n-1)/2$ with $n$ points, which is right in between the exactness of Clenshaw-Curtis and Gaussian sets. Obtaining the Gauss-Patterson abscissas involves a rather convoluted, iterative process and so the reader is referred to \cite{GaussPatterson} to review the methodology and obtain tables of the actual points. The growth rule for Gauss-Patterson goes as $2^i-1$, which is some factor of two greater than the growth rule for Clenshaw-Curtis. In \cite{HesthavenGaussPatt}, the authors conclude the Gauss-Patterson collocation points are competitive with Clenshaw-Curtis when comparing the cost and accuracy of computing quadratures using the same number of function evaluations.       
+
+To weave together the collocation points forming a Smolyak sparse grid, some type of basis function $a_{j}^i$ is needed, as defined in \ref{eq:1D_interp2}. Although the basis functions will be applied to multi-dimensional interpolation, the Smolyak algorithm conveniently scales 1D basis functions to multiple dimensions through the use of tensor products. One basis commonly used  in adaptive sparse grids is the linear hat basis function \cite{Agarwal}. For the scheme in \ref{eq:cc_numpoints} the linear hat functions are given as, 
+\begin{eqnarray} \label{eq:linear_hat_basis}
+    a_{1}^{1} &=& 1 \text{ for } i=1, \\
+    a_{j}^{i} &=& \left\{
+     \begin{array}{cc}
+      1-(m_i-1)\vert x-x_j^i\vert   & \text{ if }
+      \vert x-x_j^i\vert < 1/(m_i-1) \\
+       0   & \text{ else } \nonumber
+     \end{array}
+    \right.
+\end{eqnarray}
+for $i>1$ and $j=1,...,m_i$. While the linear hat functions have the advantage of local support they are limited to relatively slow convergence due to their lack of curvature. Offering faster error decay are the global Lagrange characteristic polynomials, 
+\begin{equation} \label{eq:lagrange_basis}
+    a_j^i = \left\{
+     \begin{array}{cc}
+      1   & \text{ if } i=1 \\
+      \displaystyle \prod_{\begin{subarray}{l}
+              k=1 \\
+              k \neq j
+             \end{subarray}}^{m_i}
+       \frac{x-x_k^i}{x_j^i-x_k^i}   & j=1,...,m_i \text{ for } i>1    
+     \end{array}
+    \right.
+\end{equation}  
+However, the Lagrange charcteristic polynomials are plagued by the fact that each evaluation of \ref{eq:1D_interp2} requires $\mathcal{O}(m_i^2)$ operations and  often the computation is numerically unstable \cite{BaryCentIntrp}. To remedy these concerns, the barycentric form of Lagrange characteristic polynomials is used to form a basis. The barycentric Lagrang basis is given as,
+\begin{equation} \label{eq:barycentric_basis}
+    a_j^i = \left\{
+     \begin{array}{cc}
+      1   & \text{ if } i=1 \\
+      \displaystyle \frac{\frac{w_j^i}{x-x_j^i} }
+       {\sum_{j=0}^{m_i} 
+        \frac{w_j^i}{x-x_j^i}}   & j=1,...,m_i \text{ for } i>1
+     \end{array}
+    \right.
+\end{equation} 
+where $w_j^i$ are barycentric weights defined by,
+\begin{equation} \label{eq:barycentric_weights}
+    w_j^i = \frac{1}
+     {\displaystyle \prod_{k \neq j}\left(x_j^i - x_k^i\right)}
+      \hspace{1 cm} j=1,...,m_i.
+\end{equation}
+For special collocation sets, such as Clenshaw-Curtis in \ref{eq:cc_points}, explicit forms exist for the barycentric weights. Generally, forming the weights is an $\mathcal{O}(m_i^2)$ operation and then evaluation of an interpolant based on the barycentic Lagrange basis is only a $\mathcal{O}(m_i)$ operation \cite{BaryCentIntrp}. With an explicit form in hand, evaluation of the barycentric Lagrange basis is significantly cheaper than the Lagrange basis. For the Clenshaw-Curtis collocation points in \ref{eq:cc_points}, the barycentric weights are given by \cite{ChebyType2},
+\begin{equation} \label{eq:barycentric_weights4_cc}
+    w_j^i = (-1)^{j+1}\delta_j^i \hspace{1 cm}
+     \delta_j^i = \left\{
+                   \begin{array}{cc}
+                    .5   & j=1 \text{ or } j=m_i \\
+                    1   & \text{ else }  
+				   \end{array}
+				  \right. .                   
+\end{equation}      
+From \ref{eq:barycentric_basis}, an apparent problem exists if the barycentric basis is to be evaluated at a collocation point. As \cite{BaryCentIntrp} explains, the problem can be circumvented by simply perturbing the value of $x$ by an $\epsilon$ on the order of machine precision. In this case, the numerator and denominator in \ref{eq:barycentric_basis} will effectively cancel each other such that $a_j^i=1$. The barycentric Lagrange basis is therefore numerically stable.  
+
+\subsection{Exactness and Error Bounds} \label{subsec:exactness_error}
+
+The exactness of the Smolyak algorithm is determined by the space of polynomials the algorithm is exact on. Since the 1D interpolation rules, on which the Smolyak algorithm is based on, can exactly interpolate certain polynomials it is not presumptuous to expect the Smolyak algorithm to exactly interpolate certain polynomial spaces. Using the collocation set in \ref{eq:cc_numpoints} and \ref{eq:cc_points} the Smolyak interpolant $A(q,d)$ is exact on \cite{NovakRitter},
+\begin{equation} \label{eq:polynomial_exactness}
+    \sum_{\vert\textbf{i}\vert = q}
+     \mathbb{P}(m_{i_1}-1,1)\otimes\cdots\otimes
+      \mathbb{P}(m_{i_d}-1,1)
+\end{equation} 
+where $\mathbb{P}(k,d)$ is the space of all polynomials in $d$ dimensions of total degree no greater than $k$. From \ref{eq:polynomial_exactness} it follows that the Smolyak interpolant for $q=d+P$ is exact for all polynomials of degree $P$. In other words, the effects of any monomials containing $x^l$ for $l\leq P$ will be captured by the Smolyak algorithm. Recall from \ref{eq:polynomial_space} that the degrees of freedom of $\mathbb{P}(P,d)$ goes as $d^P/P!$. Any method aiming to reproduce $\mathbb{P}$ requires at least this many function evaluations. Since the number of collocation points in a Smolyak grid for $A(d+P,d)$ goes as $2^{P}d^{P}/P!$, the dependence on dimension is said to be optimal \cite{NovakRitter}. However, the asymptotic growth of points also indicates that the Smolyak algorithm still requires excessive function evaluations to achieve polynomial exactness.     
+
+% WRITE ABOUT ERROR BOUNDS!!
+
+\subsection{Implementation Details} \label{subsec:implement_details}
+Discuss combinatorics routines needed, sampling
+
+%- Combinatorics routines
+%- All ways of writing algorithm
+%- Hierarchical surplus, best for computation
+%- 
+  

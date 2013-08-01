@@ -1,0 +1,138 @@
+\section{Function Decompositions} \label{sec:func_decomp}
+
+In order to reduce the dimensionality of some function there must exist a metric to determine the importance of each dimension with respect to the others. It's important to have a framework that isolates the effects of each dimension on the output of the function. The framework chosen to perform dimension reduction is formally known as \ac{HDMR}. In statistics, the \ac{ANOVA} decomposition is a special case of \ac{HDMR} where the Lesbegue measure is used to perform all integrations.
+
+\subsection{Dimension-wise Decompositions} \label{subsec:dim_wise_decomps}
+
+The dimension-wise \ac{HDMR} is algorithmically similar to Gram-Schmidt for matrix orthogonalization in that orthogonal components are systemtically removed to create a linearly independent basis. As in Gram-Schmidt, the essential operator in dimension-wise \ac{HDMR} is the projection operator. Before introducing the projection operator of interest in this thesis, define the $d$-dimensional product measure to be,
+\begin{equation} \label{eq:d_dimension_product_measure}
+    d\mu\left(\textbf{x}\right) = \prod_{j=1}^{d}
+                              d\mu_{j}\left(x_j\right) 
+\end{equation}
+where $\mu_j$ are probability measures defined over some $\Omega$. Two functions $f,g:\Omega^d \rightarrow \mathbb{R}$ are considered orthogonal with respect to the product measure defined in \ref{eq:d_dimension_product_measure} if the inner product,
+\begin{equation} \label{eq:inner_product}
+   \left(f,g\right)=\int_{\Omega^d} f(\textbf{x})g(\textbf{x})d\mu(\textbf{x})
+\end{equation} 
+is equal to zero. To introduce the projection operator $P_\textbf{u}$, the notation used in \cite{Holtz} is adopted. The operator $P_\textbf{u}$ projects from a $d$-dimensional space to a $\vert\textbf{u}\vert$-dimensional space for some set $\textbf{u}\subseteq \mathcal{D}$, where $\mathcal{D}=\lbrace 1,...,d\rbrace$ consists of the set of all coordinate indices in $\textbf{x}$. The projection on to $\textbf{u}$ is given as,
+\begin{equation} \label{eq:projection_operator}
+    P_\textbf{u}f\left(\textbf{x}_{\textbf{u}}\right) =
+     \int_{\Omega^{d-\vert\textbf{u}\vert}} 
+      f\left(\textbf{x}\right)d\mu_{\mathcal{D}\setminus\textbf{u}}
+       \left(\textbf{x}\right)
+\end{equation}
+where $\textbf{x}_\textbf{u}$ has length $\vert\textbf{u}\vert$ and consists of the $\textbf{x}$ coordinates specified in $\textbf{u}$. Also, the notation $\mathcal{D}\setminus\textbf{u}$ signifies all the coordinates in $\mathcal{D}$ not contained in $\textbf{u}$. From \ref{eq:projection_operator} it is clear that the projection operator works to integrate out all coordinate indices not contained in $\textbf{u}$ from $f$. For some coordinate indice sets $\textbf{u}$ and $\textbf{v}$, where $\textbf{u}\neq\textbf{v}$, the following orthogonality relation holds,
+\begin{equation} \label{eq:orthogonality_relation}
+    \left(f_\textbf{u},f_\textbf{v}\right) = 0.
+\end{equation}
+The notation $f_\textbf{u}$ is used to denote the function of only the coordinate indices contained in $\textbf{u}$. From \ref{eq:orthogonality_relation}, it follows that a function can be written in terms of its $2^d$ orthogonal components,
+\begin{equation} \label{eq:hdmr_decomp}
+    f\left(\textbf{x}\right) = 
+     \sum_{\textbf{u}\subseteq\mathcal{D}}
+      f_\textbf{u}\left(\textbf{x}_\textbf{u}\right)
+\end{equation}
+where the component functions $f_\textbf{u}$ are defined recursively as \cite{Holtz},
+\begin{equation} \label{eq:recurvsive_component_def}
+    f_\textbf{u}\left(\textbf{x}_\textbf{u}\right) = 
+     P_\textbf{u}f\left(\textbf{x}_\textbf{u}\right) -
+      \sum_{\textbf{v}\subset\textbf{u}}
+       f_\textbf{v}\left(\textbf{x}_\textbf{v}\right).  
+\end{equation}
+The recursive definition in \ref{eq:recurvsive_component_def} can be written explicitly as,
+\begin{equation} \label{eq:explicit_component_def}
+    f_\textbf{u}\left(\textbf{x}_\textbf{u}\right) =
+     \sum_{\textbf{v}\subseteq\textbf{u}}
+      \left(-1\right)^{\vline\textbf{u}\vline-\vline\textbf{v}\vline}
+       P_\textbf{v}f\left(\textbf{x}_\textbf{v}\right)    
+\end{equation}
+
+For most functions arising in engineering applications, especially if the function is a computer code, the decomposition in \ref{eq:hdmr_decomp} is not possible to obtain because each component function $f_\textbf{u}$ will require a high-dimensional integral to be performed. Of course, this statement assumes a Lebesgue measure in the definition of $d\mu$ in \ref{eq:d_dimension_product_measure}. Alternatively, if a Dirac measure is used then the computationally burdensom integral in \ref{eq:projection_operator} is reduced to a single function evaluation. In this case, the decomposition in \ref{eq:hdmr_decomp} is referred to as an anchored-\ac{ANOVA} decomposition, or CUT-\ac{HDMR} \cite{AHSGC_HighDimensions}.
+
+\subsection{Anchored-ANOVA Decomposition} \label{subsec:anchored_anova}
+
+Using the Dirac measure $\delta(\textbf{x}-\textbf{a})d\textbf{x}$ to evaluate the projection operator at a fixed point $\textbf{a} \in \left[0,1\right]^d$ in the hypercube, equation \ref{eq:projection_operator} becomes,
+\begin{equation} \label{eq:projection_operator_dirac}
+    P_\textbf{u}f\left(\textbf{x}_\textbf{u}\right) = 
+     f\left(\textbf{x}\right)\vert_{\textbf{x}=
+      \textbf{a}\setminus\textbf{x}_\textbf{u}}.
+\end{equation}
+The notation $\textbf{a}\setminus\textbf{x}_\textbf{u}$ is the anchor point $\textbf{a}$ except at the coordinate indices specified in $\textbf{u}$. At the coordinate indices $\textbf{u}$, the anchor point takes upon the corresponding values in $\textbf{x}$. Using the Dirac measure to evaluate the projections comprising \ref{eq:hdmr_decomp}, the objective function is expressed as a linear combination of its values along lines, faces, hyperplanes,..., etc \cite{Holtz}. As mentioned previously, using the Dirac measure to perform the projection operations in \ac{HDMR} results in enormous computational savings since high-dimensional integrals are replaced with single function evaluations.
+
+Given the structure of anchored-\ac{ANOVA}, it is not surprising to learn that there exists a close connection to multivariate Taylor series\cite{HDMR}. This connection provides insight into some of the properties of the anchored-\ac{ANOVA} decomposition. The multivariate Taylor series of $f(\textbf{x})$ about a point $\textbf{\=x}$ can be written as,
+\begin{equation} \label{eq:multivariate_Taylor_series}
+    f\left(\textbf{x}\right) = 
+     f\left(\bar{\textbf{x}}\right) +
+      \sum_{i=1}^{d} 
+       \frac{\partial f(\textbf{x})}{\partial x_i}\left(x_i - \bar{x}_i\right)
+        + \frac{1}{2!}\sum_{i,j=1}^{d}
+         \frac{\partial^2 f(\textbf{x})}{\partial x_i\partial x_j}
+          \left(x_i - \bar{x}_i\right) \left(x_j - \bar{x}_j\right) + ...
+\end{equation}       
+As an example, consider what happens if \ref{eq:multivariate_Taylor_series} is evaluated at $\textbf{x} = \textbf{a}\setminus x_i$,
+\begin{equation} \label{eq:Taylor_series_ex1}
+    f\left(\textbf{x}\right)\vert_{\textbf{x} = \textbf{a}\setminus x_i} = 
+     f\left(\bar{\textbf{x}}\right) +
+      \frac{\partial f(\textbf{x})}{\partial x_i}\left(x_i - \bar{x}_i\right)
+       + \frac{1}{2!} \frac{\partial^2 f(\textbf{x})}{\partial x_i^2}
+        \left(x_i - \bar{x}_i\right)^2 + ...
+\end{equation}
+Since $f_i\left(x_i\right) = f\left(\textbf{x}\right)\vert_{\textbf{x} = \textbf{a}\setminus x_i} - f\left(\bar{\textbf{x}}\right)$, 
+\begin{equation} \label{eq:Taylor_series_ex2}
+    f_i\left(x_i\right) =
+     \frac{\partial f(\textbf{x})}{\partial x_i}\left(x_i - \bar{x}_i\right)
+       + \frac{1}{2!} \frac{\partial^2 f(\textbf{x})}{\partial x_i^2}
+        \left(x_i - \bar{x}_i\right)^2 + ...      
+\end{equation}  
+Expression \ref{eq:Taylor_series_ex2} shows that the first-order component functions in anchored-\ac{ANOVA} consist of entire Taylor series expansions. Similarly, second-order component functions will consist of their respective entire Taylor series expansions and so on. Consequently, a truncated anchored-\ac{ANOVA} expansion will always provide a better approximation to a function than a truncated Taylor expansion \cite{HDMR}. 
+
+\subsubsection{Effective Dimensions} \label{subsec:effective_dims}
+
+The ultimate purpose of introducing an expansion such as anchored-\ac{ANOVA} is to truncate it and use the truncated portion as an approximation to the objective function. Of course, evaluation of the truncated anchored-\ac{ANOVA} expansion is expected to be much more computationally efficient than the objective function. When an anchored-\ac{ANOVA} decomposition is truncated, the loss incured becomes the components \ref{eq:recurvsive_component_def} that are not being represented. Of course, in practical construction the components not represented are calculated to contribute relatively trivially. Two notions exist for classifying the dimension of a truncated anchored-\ac{ANOVA} decomposition. Both notions depend on $\hat{\sigma}(f)$, which is the sum of the absolute values of the integrals of all anchored-\ac{ANOVA} terms \cite{Holtz}
+\begin{equation} \label{eq:sum_all_integrated_components}
+    \hat{\sigma}\left(f\right) = 
+     \sum_{\begin{subarray}
+     \textbf{u} \subseteq \mathcal{D} \\
+     \textbf{u} \neq \emptyset
+     \end{subarray}}
+      \vert If_\textbf{u} \vert \approx
+       \sum_{\begin{subarray}
+       \textbf{u} \subseteq \mathcal{D} \\
+       \textbf{u} \neq \emptyset
+       \end{subarray}}
+        \vert q_\textbf{u} \vert .
+\end{equation}
+The notation $I\cdot$ represents an exact integral but, in practice the integral will be evaluated using some multivariate quadrature scheme and so the exact integral's approximation is denoted by $q_\textbf{u} \approx If_\textbf{u}$. For some user-defined threshold $\alpha \in \left[0,1\right]$ the truncation and superposition dimensions of a truncated anchored-\ac{ANOVA} expansion can be defined. The truncation dimension attempts to quantify the importance of a certain number of dimensions $d_t$. Mathematically, the truncation dimension is the smallest integer $d_t$ such that,
+\begin{equation} \label{eq:trunc_dimension}
+    \sum_{
+     \begin{subarray}{c}
+     \textbf{u} \subseteq \lbrace1,...,d_t\rbrace \\
+     \textbf{u} \neq \emptyset
+     \end{subarray}
+    } 
+     \vert q_\textbf{u} \vert \geq \alpha \hat{\sigma}(f). \nonumber
+\end{equation}
+Contrastingly, the superposition dimension attempts to quantify the order of important dimensions $d_s$. Mathematically, the superposition dimension is the smallest dimension $d_s$ such that,
+\begin{equation} \label{eq:sup_dimension}
+    \sum_{
+     \begin{subarray}{c}
+     \vert\textbf{u}\vert \leq d_s \\
+     \textbf{u} \neq \emptyset
+     \end{subarray}
+    } 
+     \vert q_\textbf{u} \vert \geq \alpha \hat{\sigma}(f). \nonumber
+\end{equation}
+       
+Both definitions for the effective definition of a truncated anchored-\ac{ANOVA} expansion can be directly related to the exact integral of the objective function $If$. Specifically, for the truncation dimension the following relation holds \cite{Holtz},
+\begin{equation} \label{eq:trunc_dim_error}
+    \vert If -  
+     \sum_{\textbf{u} \subseteq \lbrace 1,...,d_t\rbrace}
+      If_\textbf{u} 
+    \vert \leq \left(1-\alpha\right) \hat{\sigma}\left(f\right).
+\end{equation}
+Similarly, for the superposition dimension the following inequality holds,
+\begin{equation} \label{eq:superpos_dim_error}
+    \vert If -  
+     \sum_{\vert \textbf{u} \vert \leq d_s}
+      If_\textbf{u} 
+    \vert \leq \left(1-\alpha\right) \hat{\sigma}\left(f\right).
+\end{equation}
+Ineqalities \ref{eq:trunc_dim_error} and \ref{eq:superpos_dim_error} suggest that if all the anchored-\ac{ANOVA} terms are used then the exact integral of the objective function can be reproduced. However, in general the set of effective dimensions as determined by anchored-\ac{ANOVA} will not be equal to the set determined by a classic \ac{ANOVA} decomposition. The choice of the anchor point $\textbf{a}$ has a direct influence on the accuracy and truncation dimension of the anchored-\ac{ANOVA} expansion \cite{Hesthaven_AnchorPoint}. In \cite{Hesthaven_AnchorPoint} the authors argue that choosing the anchor point to be the centroid of the parameter space is an excellent choice for most applications. As such, in this thesis the anchor point is always chosen to be the centroid of the working parameter space $\Omega^d$.    

@@ -1,0 +1,6 @@
+% Reduced-Order Models
+
+% Function decompositions
+\input{./reduced_order_models/function_decomps}
+% Smolyak Sparse Grids
+\input{./reduced_order_models/smolyak_grids}

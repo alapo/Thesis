@@ -1,0 +1,96 @@
+\section{Stochastic Partial Differential Equations} \label{sec:spdes}
+
+A \ac{SPDE} is similar in flavor to the better known \ac{PDE}, the main difference being the presence of input uncertainties in the former's parameter space. If the parameters in some \ac{PDE} are probabalistic and the affects of those variable parameters on the outputs are of interest, then the \ac{PDE} must be reforumulated into a \ac{SPDE}. The following example aims to elucidate the difference between \ac{PDE}s and \ac{SPDE}s and to motivate a discussion of the unique features characteristic to \ac{SPDE}s. While these features form the mathematical back-bone for this thesis they are somewhat abstract and not crucial to develping an understanding of the subject matter. 
+
+Consider the \ac{PDE} describing one-speed diffusion of neutron flux in a slab nuclear reactor \cite{Duderstadt}:
+% one-speed diffusion theory pde
+\begin{eqnarray} \label{eq:one_group_diff_eqn} 
+% PDE
+   \frac{1}{v} \frac{\partial\phi}{\partial t} 
+    - D	\frac{\partial^2\phi}{\partial x^2}
+     + \Sigma_{a}\phi(x,t)
+      = \nu\Sigma_{f}\phi(x,t) \\
+% IC
+   \phi(x,0) = \phi_{0}(x) \nonumber \\
+% BC
+   \phi(a,t) = \phi(-a,t) = 0 \nonumber
+\end{eqnarray}
+The \ac{PDE} in \ref{eq:one_group_diff_eqn} can be solved for the flux $\phi$ as a function of both space $x$ and time $t$. However, such a solution assumes that the parameters in the \ac{PDE}, namely $v$, $D$, $\Sigma_a$ and $\nu\Sigma_f$, are fixed values. What would happen to the flux if these parameters were described by probability distributions? The flux would be influenced by perturbations to any of the parameters and so the initial two-dimensional problem is converted to a six-dimensional problem, uncertainty in intial and boundary conditions aside. How would the solution to this \ac{SPDE} be found? A few preliminaries are in order.
+
+\subsection{Preliminaries} \label{subsec:SPDEs_prelims}
+
+Most of the language used to describe \ac{SPDE}s comes from the field of probability theory, which is based on the ideas of sets, fields, and events. The notation and definitions described here come mainly from \cite{PrbThryPrlms}. The ultimate purpose of introducing the proceeding ideas from probability theory is to be able to understand random variables and the Doob-Dynkin Lemma. Some of the jargon used to describe sets will also be utilized when discussing dimension-wise function decompositions. A \textit{set} is simply a collection of objects while a \textit{subset} is a collection of objects contained within the larger set. A \textit{sample space} is the set of all outcomes of an experiment and is usually denoted by $\Omega$. For example, if the experiment is flipping a fair coin then the sample space is $\Omega = \left\lbrace	H,T\right\rbrace$. Subsets of $\Omega$ are referred to as \textit{events}. If $\Omega = \left\lbrace\omega_1, \omega_2, ..., \omega_N\right\rbrace$ then the total number of subsets of $\Omega$ is $2^N$, where both the empty set $\emptyset$ and all of $\Omega$ are included in the count.
+
+A few definitions from set algebra are required before moving on to the Doob-Dynkin Lemma. A \textit{union}, or sum, of two sets $A$ and $B$ is the set of elements that are in at least $A$ or $B$ and is denoted by $A\cup B$. The \textit{intersection} of sets $A$ and $B$ consists of all the elements belonging to both $A$ and $B$ and is denoted by $A\cap B$. Finally, the \textit{complement} of a set $A$, denoted by $A^C$, consists of all the elements not in $A$. From these definition, it follows that $A\cup A^C = \Omega$ and $A\cap A^C = \emptyset$.
+
+Now, let's use the ideas of sets, unions, and intersections to define what is meant by a field and sigma field. Let $A$ and $B$ be subsets of the set $\Omega$. The subsets $A$ and $B$ form a \textit{field} $M$ if,
+\begin{itemize}
+   \item $\emptyset\in M$, $\Omega\in M$
+   \item If $A\in M$ and $B\in M$ then $A\cup B\in M$ and $A\cap B\in M$
+   \item If $A\in M$ then $A^C\in M$ 
+\end{itemize}
+A \textit{sigma field} $\mathcal{F}$ is a field that is closed under any countably infinite set of unions and intersections. In other words if subsets $A_1,...,A_n,...$ belong to $\mathcal{F}$ then so do $\bigcup_{i=1}^{\infty} A_i$ and $\bigcap_{i=1}^{\infty} A_i$. Consider the sample space $\Omega= \left\lbrace 1,2,3\right\rbrace$. Following the definition of a sigma field, $\mathcal{F} = \left\lbrace \emptyset, \Omega,\left\lbrace 1\right\rbrace, \left\lbrace 2,3\right\rbrace \right\rbrace$ 
+is a sigma field while $\mathcal{G} = \left\lbrace \emptyset,\Omega \left\lbrace2\right\rbrace \right\rbrace$ is not. Rather, the correct sigma field of $\mathcal{G}$ is $\sigma\left(\mathcal{G}\right) = \left\lbrace \emptyset, \Omega, \left\lbrace2\right\rbrace, \left\lbrace 1,3\right\rbrace\right\rbrace$. The notation $\sigma\left(\mathcal{U}\right)$ is used to denote the smallest sigma field containing $\mathcal{U}$, where $\mathcal{U}$ is a collection of subsets of $\Omega$. In general, such a sigma field can be constructed by,
+% Construction of sigma algebra
+\begin{equation} \label{eq:construct_sigma_algebra}
+   \sigma\left(\mathcal{U}\right) = \bigcap_{\mathcal{A}}
+     \left\lbrace \mathcal{U} \subset \mathcal{A} 
+     \textrm{:} \mathcal{A} \textrm{ is a sigma field} \right\rbrace 
+\end{equation}        
+A \textit{Borel sigma algebra} is $\mathcal{B} = \sigma\left( \mathcal{U}\right)$ where $\mathcal{U}$ consists of all the open sets in $\mathbb{R}^N$.
+
+Combining the ideas described above, a \textit{probability space} $\left(\Omega,\mathcal{F},P \right)$ consists of a sample space $\Omega$, a sigma field $\mathcal{F}$ of subsets of $\Omega$, and a probability function $P$ on $\left(\Omega,\mathcal{F}\right)$. The probability function must satisfy the three axioms of probability, which are given as:
+\begin{enumerate}
+   \item $P(A)\geq 0$
+   \item $P\left(\Omega\right)=1$
+   \item $P\left(A\cup B\right)=P\left(A\right)+P\left(B\right)$ if
+      $A\cap B=\emptyset$
+\end{enumerate} 
+An example will help make some of these abstract concepts more concrete. Consider the experiment of tossing a fair coin. The sample space is $\Omega =\left\lbrace H,T\right\rbrace$  and the sigma field of events is  $\mathcal{F}=\left\{\left\{H\right\},\left\{T\right\}, \Omega,\emptyset\right\}$. Probabilities of events in $\mathcal{F}$ are $P\left({H}\right) = P\left({T}\right)=1/2$, $P\left(\Omega\right) = 1$ and $P\left(\emptyset\right) = 0$.
+
+At this point, enough background has been given to describe a \textit{random variable} in general terms. Uncertainty quantification pioneer Gianluca Iaccarino writes, "Random variables are the building blocks for studying uncertainties in a probabilistic framework" \cite{Iaccarino_quote}. In the simplest terms, a random variable takes events and assigns them a real number. Let $X$ be a random variable. Then $X$ takes an event $\omega$ from the event space $\Omega$ and maps it to a number on the real line $X\left(\omega\right): \Omega \rightarrow \mathbb{R}$. Under such a mapping a whole region $A_B \in \Omega$ gets mapped to an interval $B$ on the real line. A more formal definition of a random variable can be made using the language of set theory. Let $\left(\Omega,\mathcal{F},P\right)$ be a probability space. A mapping $X:\Omega \rightarrow \mathbb{R}^N$ measurable with respect to $\mathcal{F}$ is a random variable. In other words, for any open set $A$ in $\mathbb{R}^N$, $X^{-1}\left(A\right) \in \mathcal{F}$ is a random variable.
+
+As an example, consider the event space $\Omega=\left\{1,2,3\right\}$ and the sigma field \ $\mathcal{F}=\left\{\emptyset, \Omega, \left\{1\right\}, \left\{2,3\right\}\right\}$. Then if we define $Y\left(1\right)=1$, $Y\left(2\right)=0$, and $Y\left(3\right)=-1$ then $Y$ is not a random variable because $\left\{3\right\}\notin \mathcal{F}$. Now, if we define $Z\left(1\right)=1$, and $Z\left(2\right)=Z\left(3\right)=0$ then $Z$ is a random variable because $\left\{1\right\}$ and $\left\{2,3\right\}$ are both in $\mathcal{F}$. This example serves to demonsrate the interconnectedness between  sigma fields and event spaces.
+
+The purpose of the preceeding discussion was to build a sufficient framework to be able to state the Doob-Dynkin lemma. Let $X:\Omega \rightarrow \mathbb{R}^N$ be a random variable and let $\mathcal{B}$ be the Borel sigma algebra. The sigma algebra generated by $X$ is $\sigma\left(X\right)=\left\{X^{-1}\left(F\right):F\in\mathcal{B}\right\}$. The Doob-Dynkin lemma describes the relationship between a random variable and the sigma field it generates. Let $X,Y:\Omega \rightarrow \mathbb{R}^N$ be two functions. Then $Y$ is $\sigma\left(X\right)$ measurable if and only if there exists a Borel measurable function $g:\mathbb{R}^N \rightarrow \mathbb{R}^N$ (for any $A\in \mathcal{B},g^{-1}\left(A\right)\in\mathcal{B}$) such that $Y=g(X)$. To say that $Y$ is "$\sigma\left(X\right)$ measurable" means that if $X$ is known then  $Y$ is known as well \cite{PrbThryPrlms}. When a \ac{PDE} is transformed into a \ac{SPDE} by treating the parameters as random variables it is appropriate to question whether the solution of the \ac{SPDE} can be described in terms of the same random variables \cite{AHSGC}. The Doob-Dynkin lemma answers this question with a resounding yes.
+          
+\subsection{Application to Engineering Systems} \label{subsec:spde_apps2engineering} 
+ 
+In this section, the theory of \ac{SPDE}s is applied to the types of problems that typically arise in nuclear engineering. Much of the notation used in the proceeding discussion is borrowed from \cite{KarLoeXiu}. First, define the physical domain as $\mathcal{D} \subset \mathbb{R}^{d}$ where $d$ can be $1$, $2$, or $3$ depending on the number of spatial dimensions being considered. The boundary of the domain is designated as $\partial\mathcal{D}$. Any coordinate living in the spatial domain can be described by some vector $\textbf{x}=\left(x_1,...,x_d\right)$. The most general mathematical systems that are of interest can be written as,
+% General PDEs with random parameters we are trying to solve
+\begin{eqnarray} 
+\label{eq:pde_general1}
+% domain
+    \mathcal{L}\left(\textbf{x},\omega;u\right)=f\left(\textbf{x},\omega\right)
+        \hspace{1 cm} \textbf{x} \in \mathcal{D}  \\
+\label{eq:pde_general2}    \mathcal{B}\left(\textbf{x};u\right)=g\left(\textbf{x}\right) 
+        \hspace{1 cm} \textbf{x} \in \partial\mathcal{D}.
+\end{eqnarray}
+Ultimately, $u:\Omega \times \mathcal{D}\rightarrow \mathbb{R}$ is sought after since $u$ is the solution to \ref{eq:pde_general1} and \ref{eq:pde_general2}, where $\mathcal{L}$ is a linear/non-linear differential operator, $\mathcal{B}$ is a boundary operator, and $f$ and $g$ are driving terms. The system in \ref{eq:pde_general1} and \ref{eq:pde_general2} is defined over a complete probability space $\left(\Omega,\mathcal{F},P\right)$ with $\omega \in \Omega$, as defined previously. Of course, \ref{eq:pde_general1} and \ref{eq:pde_general2} must be well-posed in the sense of Hadamard \cite{Hadamard}. In Hadamard's definition, well-posed mathematical models of physical phenomena satisfy three conditions:
+\begin{enumerate}
+    \item Existence of a solution
+    \item Uniqueness of the solution
+    \item The solution is not sensitive to small perturbations in initial conditions 
+\end{enumerate} 
+Generally, well-posed problems can be solved using stable computer algorithms. However, it is important not to confuse posedness with conditioning as the two describe very different things. Problems that are typically not well-posed, such as inverse problems, can be formulated as well-posed problems through regularization.     
+
+The problem in \ref{eq:pde_general1} and \ref{eq:pde_general2} is continuous and as such, will not have an analytic solution for practical problems in engineering applications. An infinite number of random variables are needed to fully describe the stochastic process. Since modeling such a process on a computer is impossible, the infinite-dimensional probability space must be reduced to a finite-dimensional space. The procedure to do this is referred to as the "finite-dimensional noise assumption". The Karhunen-Loeve expansion of the stochastic space achieves this reduction in dimensionality with the benefit of being able to fully model the full stochastic space if desired \cite{KarLoeXiu}.
+
+Applying the Karhunen-Loeve expansion to \ref{eq:pde_general1}, the random inputs can be characterized by a set of $N$ random variables as,
+\begin{equation} \label{eq:rand_pde_general}
+    \mathcal{L}\left(\textbf{x},Y_{1}(\omega),...,Y_{N}(\omega);u\right) = 
+     f\left(\textbf{x},Y_{1}(\omega),...,Y_{N}(\omega)\right)
+\end{equation}
+where $\left\{Y_i(\omega)\right\}_{i=1}^N$ are uncorrelated random variables. By the Doob-Dynkin lemma, the solution of \ref{eq:pde_general1} and \ref{eq:pde_general2} can be expressed in terms of the same random variables $\left\{Y_i(\omega)\right\}_{i=1}^N$. Hence, the solution to the \ac{SPDE} can be written as $u\left(\textbf{x},\omega\right)=u\left(\textbf{x},Y_{1}(\omega),...,Y_{N}(\omega)\right)$. Equations \ref{eq:pde_general1} and \ref{eq:pde_general2} with a discrete stochastic space can be restated as, 
+% SPDEs with discrte stochastic space
+\begin{eqnarray}
+\label{eq:rand_pde_general1}
+    \mathcal{L}\left(\textbf{x},\textbf{Y};u\right) = 
+     f\left(\textbf{x},\textbf{Y}\right) \hspace{1 cm} \left(\textbf{x},
+      \textbf{Y}\right)\in D \times \Gamma \\
+\label{eq:rand_pde_general2}
+    \mathcal{B}\left(\textbf{x},\textbf{Y};u\right) = 
+     g\left(\textbf{x},\textbf{Y}\right) \hspace{1 cm} \left(\textbf{x}, 
+      \textbf{Y}\right)\in \partial D \times \Gamma 
+\end{eqnarray} 
+where $\Gamma_i$ is the image of the independent random variables $Y_i\left(\omega\right)$. Without loss of generality $\Gamma_i$ can be restricted to $\left[0,1\right]$ for $i=1,...,N$. Consequently, the bounded stochastic space, or support, is an $N$-hypercube $\Gamma=\left[0,1\right]^N$. No limits have really been imposed on the stochastic space since any bounded region can be mapped to the unit hypercube. In \ref{eq:rand_pde_general1} and \ref{eq:rand_pde_general2} what remains is a set of independent, deterministic equations in space that can be solved using any deterministic discretization technique. The stochastic problem has essentialy been decoupled from the spatial problem.          
