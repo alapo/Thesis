@@ -89,5 +89,46 @@ Code for enumerating all components of a tensor product. The input is a $d$ dime
 
 \subsubsection{Sampling Sparse Grid Interpolant of Correlated Variables} \label{subsubsec:sampling_smolyak}
 
-ROM is just a collected of sparse grids. Built on assumption they are independent. How to sample with covariance matrix when they are not independent. Easy to evaluate so sampling should be very quick. Make sure in bounds. 
+The reduced order model in \ref{eq:decomp_smol3} consists of linear coombinations of Smolyak interpolants. Evaluation of the reduced order model is equivalent to finding the value at several Smolyak interpolants and summing the results. However, recall that in the Smolyak algorithm for building the interpolants described in \ref{subsec:algorithm_mechanics} each dimension in the sparse grid is built orthogonal to the others. Implicit in this construction is the assumption that the random variables comprising the objective function are independent. In fact, in many computer codes the random variables forming the parameter space are correlated. The degree of correlation among the random variables is generally described using a covariance matrix. 
 
+With the availability of a covariance matrix for the input random variables it is possible to sample the reduced order model hundreds or thousands of times to get accurate and precise statistical moments. Evaluating a Smolyak interpolant is relatively cheap and fast so this is not a computational problem. To produce correlated  random variables from a Gaussian population the Kaiser-Dichman method can be applied \cite{KaiserDichman}. Say some inputs to a computer code are normally distributed with mean $\mu$ and covariance $\Sigma$. To produce a random sample $\mu'$ from $\Sigma$ one can apply,
+\begin{equation} \label{eq:sample_covariance}
+   \mu' = \mu + U^T\pi
+\end{equation} 
+where $U^T$ is the lower triangular matrix arising from the Cholesky decomposition of $\Sigma$ and $\pi$ is a standard normal random vector. 
+
+The Cholesky decomposition of a covariance matrix $C=U^{T}U$ is the equivalent to taking the square root of a matrix. A Cholesky matrix transform, or left multiplication by $U^T$, maps uncorrelated variables into correlated variables with covariance matrix $\Sigma$. Consequently, in \ref{eq:sample_covariance} $\mu'$ is normally distributed with mean $\mu$ and covariance $\Sigma$. A statistically significant number of instances of $\mu'$ should be calculated and evaluated at the reduced order model. Even though the model is built assuming independent variables this method takes into account any correlations when calculating statistical moments. When evaluating any Smolyak interpolant at a number of sampled points one must always make sure all the sampled points lay inside the bounds of the hypercube forming the sparse grid.
+
+\subsubsection{Dimension Truncation} \label{subsubsec:dimension_truncation}
+
+By definition a reduced order model contains less dimensions than the original model whose reduction is intended. Consequently, a methodology for identifying important dimensions is necessary. For the purposes of this thesis, the importance of a random input variable on some objective function is determined by its contribution to the function's variance. While there are methods for exactly calculating the truncation and superposition dimensions of a function \cite{Holtz}, these methods require the computation of all $2^d$ component functions in an \ac{ANOVA} decomposition. For typical computer codes used in engineering this requirement is not feasible and so the effective dimensions of a function must be estimated adaptively. 
+
+To this end, construction of a reduced order model based on the anchored-\ac{ANOVA} decomposition begins with calculation of the zeroth-order and all first-order components. The zeroth-order component function is simply the function evaluated at the anchor point,
+\begin{equation} \label{eq:zeroth_component}
+   f_{\left\{\emptyset\right\}} = f(\overline{\textbf{x}}).  
+\end{equation}  
+From the recursive definition of the anchored-\ac{ANOVA} decomposition in \ref{eq:recurvsive_component_def}, the $i^{\text{th}}$ component function is given as,
+\begin{equation} \label{eq:first_component}
+   f_{\left\{i\right\}} = f(\textbf{x})\vert_{
+    \textbf{x}\setminus x_i} - f_{\left\{\emptyset\right\}}. 
+\end{equation} 
+The first order components solely measure the affect of the $i^{\text{th}}$ random variable on the function output. Therefore, for each of $d$ random variables contributing to a function's variability a sensitivity coefficient can be calculated as \cite{AHSGC_HighDimensions},
+\begin{equation} \label{eq:anova_sensitivity}
+   \eta_i = \frac{
+    \int_{\Omega_i}
+     \left[f(\textbf{x})\vert_{
+     \textbf{x}=\overline{\textbf{x}}\setminus x_i}
+      -f(\textbf{x}) \right]\rho(x_i)dx_i}
+       {
+       f_{\left\{\emptyset\right\}}}
+\end{equation}
+where $\rho(x_i)$ is the probability density of $x_i$. The greater the affect of the $i^{\text{th}}$ random variable on the function output, the greater the sensitivity coefficient.
+
+One all the first order anchored-\ac{ANOVA} components are calculated the sensitivity coefficients in \ref{eq:anova_sensitivity} can be used to identify the important dimensions. To start, each $\eta_i$ should be normalized by the sum of all $\eta_i$. The important dimensions can then be obtained by taking all $i$ variables such that $\eta_i > \theta_1$. A value of $\theta_1 = .02$ has been shown to be effective for many problems \cite{Hesthaven_ANOVA}. At the very least, the reduced order model described here will consists of the zeroth order and all first order anchored-\ac{ANOVA} components, giving it a superposition dimension of one. To improve accuracy higher order components can be included. Higher order components should only be built using combinations of the dimensions deemed important.    
+      % Elaborate here!!!!!!!
+
+%identify important dimensions, when to truncate decomposition. Talk about truncation dimension, superposition dimension.  
+
+\subsubsection{Algorithm for Building a Reduced Order Model} \label{subsubsec:full_algorithm}
+
+          
