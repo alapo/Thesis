@@ -1,3 +1,93 @@
-\section{Combining Decomposition and Interpolation} \label{sec:decomp_and_interp}
+\section{Combining Decomposition and Smolyak's Algorithm} \label{sec:decomp_and_interp}
 
-Write how functional decomposition and interpolation combine to create reduced order model...
+As hinted at in the beginning of chapter \ref{chap:rom}, the Smolyak algorithm combines with the anchored-\ac{ANOVA} decomposition to create a reduced order model for any well behaving computer code. To see how the Smolyak algorithm fits into the functional decomposition described in this chapter, begin by substituting \ref{eq:explicit_component_def} into \ref{eq:hdmr_decomp} to get,
+\begin{equation} \label{eq:decomp_smol1}
+   f(\textbf{x}) = 
+    \sum_{\textbf{u}\subseteq\mathcal{D}}
+     \sum_{\textbf{v}\subseteq\textbf{u}} 
+      (-1)^{\vert\textbf{u}\vert - \vert\textbf{v}\vert}
+       P_{\textbf{v}} f(\textbf{x}_{\textbf{v}}).
+\end{equation} 
+Now, insert the Dirac projection operator from \ref{eq:projection_operator_dirac} into \ref{eq:decomp_smol1} to arrive at,  
+\begin{equation} \label{eq:decomp_smol2}
+   f(\textbf{x}) = 
+    \sum_{\textbf{u}\subseteq\mathcal{D}}
+     \sum_{\textbf{v}\subseteq\textbf{u}} 
+      (-1)^{\vert\textbf{u}\vert - \vert\textbf{v}\vert}
+       f(\textbf{x})\vert_{  
+        \textbf{x}=\textbf{a}\setminus\textbf{x}_{\textbf{v}} }.   
+\end{equation}
+To create a reduced order model the set $\mathcal{D}$ is ultimately shrunk to only contain a subset of all the variables of $f$ but this is discussed later. The important aspect of \ref{eq:decomp_smol2} to realize is that in order to evaluate $ f(\textbf{x}) \vert_{\textbf{x} = \textbf{a} \setminus \textbf{x}_{\textbf{v}}}$ evaluation of the expensive computer code $f(\textbf{x})$ is required. Consequently, the desireable property of reduced order models, that of rapid evaluation, is not achieved in \ref{eq:decomp_smol2}. The remedy is to approximate each $ f(\textbf{x}) \vert_{\textbf{x} = \textbf{a} \setminus \textbf{x}_{\textbf{v}}}$ using Smolyak interpolants. Substituting \ref{eq:Smolyak_formula2} into \ref{eq:decomp_smol2}, the formulation for creating a reduced order model of $f$ is complete. 
+\begin{equation} \label{eq:decomp_smol3}
+   f(\textbf{x}) = 
+    \sum_{\textbf{u}\subseteq\mathcal{D}}
+     \sum_{\textbf{v}\subseteq\textbf{u}} 
+      (-1)^{\vert\textbf{u}\vert - \vert\textbf{v}\vert}
+       \sum_{\vert\textbf{i}\vert\leq q}\left(
+        \Delta^{i_1}\otimes\cdots\otimes\Delta^{i_{\vert\textbf{v}\vert}}
+         \right)  
+\end{equation}
+While there is initial overhead to create an interpolant for each component in \ref{eq:decomp_smol2} the result is quick evaluation of the reduced order model. Details regarding the implementation and application of \ref{eq:decomp_smol3} will be discussed in the proceeding sections.               
+ 
+\subsection{Implementation Details} \label{subsec:implement_details}
+%Discuss combinatorics routines needed(2, list in appendix), algorithm, sampling, identify important dimensions, when to truncate decomposition. Low order smolyak grids needed is has been shown. First order should be good most of time...especially in nuclear applications where adjoints have been so successful.
+
+\subsubsection{Combinatorics Routines} \label{subsubsec:combinatorics_routines}
+
+In order to implement \ref{eq:decomp_smol3} on a computer several enumeration routines need to be available. Unfortunately, these routines are not available in most numerical math libraries containing combinatorics routines. The first routine of interest solves the problem of how to enumerate all the ways $d$ positive integers can be summed to equal another integer. In other words, what are all the sets $\left\{i_1,...,i_d\right\}$ such that $i_1 + i_2 + ... + i_d = q$? This problem inserts itself in \ref{eq:decomp_smol3} in the summation index for Smolyak interpolation. As the Smolyak interpolant becomes refined from level to level---$q$ is increased by one in each refinement---the Smolyak algorithm must newly account for all $\textbf{i}$ such that $\vert\textbf{i}\vert=q$. The following enumeration algorithm, a slight modification of the original algorithm found in \cite{Holtz}, finds all the desired indice sets:        
+\begin{program} 
+\begin{code}
+# Initialize
+p = 0
+m = q - d + 1 
+k = [0,1,...,1]   # vector of length d
+kh = [m,m,...,m]  # vector of length d
+
+# Begin algorithm...
+repeat until k = [0,...,0]:
+   k(p) = k(p) + 1
+   if k(p) > kh(p):
+      if p == d:
+         All indices enumerated!
+      else:
+         k(p) = 1
+         p = p + 1
+   else:
+      for j in range(p):
+         kh(j) = kh(p) - k(p) + 1
+      k(0) = kh(0)
+      p = 1
+      Return valid index set k!
+\end{code}
+\caption{\label{code:enumeration1} 
+For postitive integers $d$ and $q$ this code outputs all sets $\left\{i_1,i_2,...,i_d\right\}$ such that $i_1+i_2+...+i_d=q$.}  
+\end{program}
+
+With all the index sets for some Smolyak level $q$ available through the code segment in \ref{code:enumeration1}, the tensor product appearing in \ref{eq:Smolyak_formula2} can be evaluated with the aid of an additional enumeration routine. Each indice in an index set $\left\{i_1+i_2+...+i_d\right\}$ corresponds to certain number of knots, which for example, is given by \ref{eq:cc_numpoints} for Clenshaw-Curtis. All the components in the tensor product can be given by the following enumeration algorithm, which is based on the algorithm in \cite{Holtz}. Input to the algorithm in code \ref{code:enumeration2} should be based on output from code \ref{code:enumeration1}. Specifically for some index set $\left\{i_1,i_2,...,i_d\right\}$ returned by code \ref{code:enumeration1}, each indice should be converted to a corresponding number of knots and input to code \ref{code:enumeration2}.     
+\begin{program} 
+\begin{code}
+   # Initialize
+   p = 0
+   s = [0,1,1,...,1]  # vector of length d 
+
+   # Begin algorithm...
+   repeat until s == m: 
+      s(p) = s(p) + 1
+      if s(p) > m(p):
+         if p == d-1:
+            All indices enumerated!
+         else:
+            s(p) = 1
+            p = p + 1
+      else:
+         p = 0
+         Return valid enumeration set!
+\end{code}
+\caption{\label{code:enumeration2} 
+Code for enumerating all components of a tensor product. The input is a $d$ dimensional vector $m$ where each entry $m_j$ corresponds to the number of knots in a collocation scheme of level $i_j$.}  
+\end{program}
+
+\subsubsection{Sampling Sparse Grid Interpolant of Correlated Variables} \label{subsubsec:sampling_smolyak}
+
+ROM is just a collected of sparse grids. Built on assumption they are independent. How to sample with covariance matrix when they are not independent. Easy to evaluate so sampling should be very quick. Make sure in bounds. 
+

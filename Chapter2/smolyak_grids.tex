@@ -1,6 +1,6 @@
 \section{Smolyak Sparse Grids} \label{sec:smolyak_sg}
 
-In order to create a reduced-order model for some objective function the anchored-\ac{ANOVA} decomposition plays a crucial role but more is needed \cite{Hesthaven_ANOVA}. Recall that the primary purpose for constructing a reduced-order model is to replace the presumably computationally intensive objective function with something that is trivial to evaluate. Consequently, in evaluating the anchored-\ac{ANOVA} decomposition at some point $\textbf{x}$ the projections in  \ref{projection_operator_dirac} must be trivial to evaluate as well. As it stands, evaluating the anchored-\ac{ANOVA} decomposition for some objective function is significantly more expensive than simply evaluting the function itself. To resolve this issue, a Smolyak sparse grid interpolant is created for each projection. While creating each such interpolant incurs some initial overhead, the payoff is the desired reduced order model. 
+In order to create a reduced-order model for some objective function the anchored-\ac{ANOVA} decomposition plays a crucial role but more is needed \cite{Hesthaven_ANOVA}. Recall that the primary purpose for constructing a reduced-order model is to replace the presumably computationally intensive objective function with something that is trivial to evaluate. Consequently, in evaluating the anchored-\ac{ANOVA} decomposition at some point $\textbf{x}$ the projections in  \ref{eq:projection_operator_dirac} must be trivial to evaluate as well. As it stands, evaluating the anchored-\ac{ANOVA} decomposition for some objective function is significantly more expensive than simply evaluting the function itself. To resolve this issue, a Smolyak sparse grid interpolant is created for each projection. While creating each such interpolant incurs some initial overhead, the payoff is the desired reduced order model. 
 
 \subsection{Motivation} \label{subsec:motivation}
 
@@ -173,15 +173,12 @@ The exactness of the Smolyak algorithm is determined by the space of polynomials
      \mathbb{P}(m_{i_1}-1,1)\otimes\cdots\otimes
       \mathbb{P}(m_{i_d}-1,1)
 \end{equation} 
-where $\mathbb{P}(k,d)$ is the space of all polynomials in $d$ dimensions of total degree no greater than $k$. From \ref{eq:polynomial_exactness} it follows that the Smolyak interpolant for $q=d+P$ is exact for all polynomials of degree $P$. In other words, the effects of any monomials containing $x^l$ for $l\leq P$ will be captured by the Smolyak algorithm. Recall from \ref{eq:polynomial_space} that the degrees of freedom of $\mathbb{P}(P,d)$ goes as $d^P/P!$. Any method aiming to reproduce $\mathbb{P}$ requires at least this many function evaluations. Since the number of collocation points in a Smolyak grid for $A(d+P,d)$ goes as $2^{P}d^{P}/P!$, the dependence on dimension is said to be optimal \cite{NovakRitter}. However, the asymptotic growth of points also indicates that the Smolyak algorithm still requires excessive function evaluations to achieve polynomial exactness.     
+where $\mathbb{P}(k,d)$ is the space of all polynomials in $d$ dimensions of total degree no greater than $k$. From \ref{eq:polynomial_exactness} it follows that the Smolyak interpolant for $q=d+P$ is exact for all polynomials of degree $P$. In other words, the effects of any monomials containing $x^l$ for $l\leq P$ will be captured by the Smolyak algorithm. Recall from \ref{eq:polynomial_space} that the degrees of freedom of $\mathbb{P}(P,d)$ goes as $d^P/P!$. Any method aiming to reproduce $\mathbb{P}$ requires at least this many function evaluations. Since the number of collocation points in a Smolyak grid for $A(d+P,d)$ goes as $2^{P}d^{P}/P!$ the dependence on dimension is said to be optimal \cite{NovakRitter}. However, the asymptotic growth of points also indicates that the Smolyak algorithm requires still excessive function evaluations to achieve polynomial exactness.     
 
-% WRITE ABOUT ERROR BOUNDS!!
-
-\subsection{Implementation Details} \label{subsec:implement_details}
-Discuss combinatorics routines needed, sampling
-
-%- Combinatorics routines
-%- All ways of writing algorithm
-%- Hierarchical surplus, best for computation
-%- 
+Since the Smolyak algorithm is constructed using one-dimensional interpolation formulas, which all have error bounds, it is also possible to derive error bounds for a Smolyak interpolant $A(q=d+P,d)$. While the reader is instructed to consult \cite{NovakRitter} for a detailed derivation of the error bounds, they will nevertheless be stated here. Consider some $d$-variable function $f$ with continuous derivatives of order $P$ in each variable. The error in using a Smolyak interpolant to approximate $f$ can be given as,
+\begin{equation} \label{eq:smolyak_error}
+    \Vert f-A(d+P,d)(f)\Vert_{\infty} \leq 
+     c_{d,P} M^{-P} (\log M)^{(P+2)(d-1)+1}
+\end{equation}
+where $M$ is the total number of knots used by $A(d+P,d)$ and $c_{d,P}$ is a constant depending on both $d$ and $P$. From \ref{eq:smolyak_error}, the error in the Smolyak interpolant heavily depends on the smoothness of the function being interpolated and on the total number of collocation points used to form the interpolant.       
   
