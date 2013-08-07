@@ -30,7 +30,6 @@ To create a reduced order model the set $\mathcal{D}$ is ultimately shrunk to on
 While there is initial overhead to create an interpolant for each component in \ref{eq:decomp_smol2} the result is quick evaluation of the reduced order model. Details regarding the implementation and application of \ref{eq:decomp_smol3} will be discussed in the proceeding sections.               
  
 \subsection{Implementation Details} \label{subsec:implement_details}
-%Discuss combinatorics routines needed(2, list in appendix), algorithm, sampling, identify important dimensions, when to truncate decomposition. Low order smolyak grids needed is has been shown. First order should be good most of time...especially in nuclear applications where adjoints have been so successful.
 
 \subsubsection{Combinatorics Routines} \label{subsubsec:combinatorics_routines}
 
@@ -122,13 +121,17 @@ The first order components solely measure the affect of the $i^{\text{th}}$ rand
        {
        f_{\left\{\emptyset\right\}}}
 \end{equation}
-where $\rho(x_i)$ is the probability density of $x_i$. The greater the affect of the $i^{\text{th}}$ random variable on the function output, the greater the sensitivity coefficient.
+where $\rho(x_i)$ is the probability density of $x_i$. If $f$ is a function of spatial coordinates then the $L_2$ norm can be applied to \ref{eq:anova_sensitivity}. The greater the affect of the $i^{\text{th}}$ random variable on the function output, the greater the sensitivity coefficient.
 
-One all the first order anchored-\ac{ANOVA} components are calculated the sensitivity coefficients in \ref{eq:anova_sensitivity} can be used to identify the important dimensions. To start, each $\eta_i$ should be normalized by the sum of all $\eta_i$. The important dimensions can then be obtained by taking all $i$ variables such that $\eta_i > \theta_1$. A value of $\theta_1 = .02$ has been shown to be effective for many problems \cite{Hesthaven_ANOVA}. At the very least, the reduced order model described here will consists of the zeroth order and all first order anchored-\ac{ANOVA} components, giving it a superposition dimension of one. To improve accuracy higher order components can be included. Higher order components should only be built using combinations of the dimensions deemed important.    
-      % Elaborate here!!!!!!!
+Once all the first order anchored-\ac{ANOVA} components are calculated the sensitivity coefficients in \ref{eq:anova_sensitivity} can be used to identify the important dimensions. To start, each $\eta_i$ should be normalized by the sum of all $\eta_i$. The important dimensions can then be obtained by taking all $i$ variables such that $\eta_i > \theta_1$. A value of $\theta_1 = .02$ has been shown to be effective for many problems \cite{Hesthaven_ANOVA}. At the very least, the reduced order model described here will consists of the zeroth order and all first order anchored-\ac{ANOVA} components, giving it a superposition dimension of one. The variance and mean of the reduced order model with superposition dimension one should be obtained through sampling using \ref{eq:sample_covariance}.  
 
-%identify important dimensions, when to truncate decomposition. Talk about truncation dimension, superposition dimension.  
+To improve accuracy higher order components can be included. Higher order components should only be built using combinations of the dimensions deemed important. If all dimensions were to be included construction of a reduced order model based on the \ac{ANOVA} decomposition would quickly become intractable for most engineering problems. It can be argued that if a set of random variables independently affect a function then their interactions will likely also affect the function. Say all first order components have been constructed and the important dimensions have been added to a set $\mathcal{T}$. The next step in creating a higher order model is to construct anchored-\ac{ANOVA} components utilizing dimensions $t$ such that $t\subset\mathcal{T}$ and $\vert t\vert=2$. In total there should be $C(\vert\mathcal{T}\vert,2)$ such components. In general, the number of $p$ order components can be given as,
+\begin{equation} \label{eq:num_components_rom_order_p}
+   C(\vert\mathcal{T}\vert,p) = \frac{\vert\mathcal{T}\vert!}{
+    (p!)(\vert\mathcal{T}\vert-p)!}.
+\end{equation}
+To determine whether additional orders need to be included in the reduced order model, the mean of the current reduced order model should be compared to the mean of the previous order model. If the relative change in mean doesn't exceed some threshold $\theta_2$ then the reduced order model is considered converged. Otherwise, higher order components should be added. In this manner, a reduced order model for a computer code can be constructed adaptively.    
 
 \subsubsection{Algorithm for Building a Reduced Order Model} \label{subsubsec:full_algorithm}
 
-          
+%Low order smolyak grids needed is has been shown. First order should be good most of time...especially in nuclear applications where adjoints have been so successful.          
