@@ -181,4 +181,38 @@ Since the Smolyak algorithm is constructed using one-dimensional interpolation f
      c_{d,P} M^{-P} (\log M)^{(P+2)(d-1)+1}
 \end{equation}
 where $M$ is the total number of knots used by $A(d+P,d)$ and $c_{d,P}$ is a constant depending on both $d$ and $P$. From \ref{eq:smolyak_error}, the error in the Smolyak interpolant heavily depends on the smoothness of the function being interpolated and on the total number of collocation points used to form the interpolant.       
-  
+
+\subsection{Computer Implementation} \label{subsec:smolyak_implementation}
+
+To implement Smolyak's algorithm on a computer equations \ref{eq:Smolyak_formula3a} and \ref{eq:hierarchical_surplus} should be utilized since together they provide a recursive definition. Much of the implementation efforts are concerned with indice book keeping. Although the pseudocode for Smolyak's algorithm used in this thesis is provided here, the reader is directed to \cite{Klimke_Wohlmuth} for more elaborate details. Efficiency of the algorithm can be increased by pre-calculating the desired abscissas as in \ref{eq:cc_points}, the number of ascissas at a given level as in \ref{eq:cc_numpoints}, and corresponding barycentric weights as in \ref{eq:barycentric_weights4_cc}. A data structure for quick retrieval of the desired values is also necessary. Abscissa information is constantly being reused in Smolyak's algorithm and so it is inefficient to have to recalculate values each time.   
+\begin{algorithm}
+\caption{\label{code:smolyak_algorithm} Smolyak's algorithm for creating an interpolant for a function $f$ of $d$ dimensions. The algorithm will exit if the maximum Smolyak level is reached or if one of the convergence criteria is met.}  
+\begin{algorithmic}[1]
+\State {Create data structure that stores indice coordinates and hierarchical surplus.}
+\For{$q=0,\text{maximum level}$}
+   \For{$(i_1,...,i_d)$ in enumerations of $i_1+...+i_d=q+d$}
+   \Comment{See Alg. \ref{code:enumeration1}}
+      \For{$(j_1,...,j_d)$ in enumerations of $(i_1,...,i_d)$}
+      \Comment{See Alg. \ref{code:enumeration2}}   
+         \State {Turn each $(j_1,...,j_d)$ into a knot.} 
+         \State {Categorize as either processed or unprocessed knot.}    
+      \EndFor
+      \State Evaluate $f(\text{unprocessed knots})$.
+      \State Calculate hierarchical surplus at unprocessed knots. 
+      \Comment{Eq. \ref{eq:hierarchical_surplus}}
+      \State Archive newly processed knots.
+   \EndFor
+   \State Check for convergence.
+\EndFor 
+\end{algorithmic}
+\end{algorithm}
+
+The pseudocode for Smolyak's algorithm in algorithm \ref{code:smolyak_algorithm} will now be discussed in some detail. To initialize the algorithm a data structure must be created to store all information for each index in the sparse grid. For level $q$ of the Smolyak algorithm the summation in \ref{eq:Smolyak_formula3a} is over all sets $(i_1,i_2,...,i_d)$ such that $i_1 + i_2 + ... + i_d = q+d$. Each such set corresponds to a knot $(x^{i_1}_{j_{i_1}}, ..., x^{i_d}_{j_{i_d}})$ in the random space defined by the hypercube $\left[-1,1\right]^d$. The knot, function value at the knot, and the corresponding hierarchical surplus should all be stored in the data structure. 
+
+The first loop in the pseudocode tells the code to keep increasing the interpolation level in the Smolyak algorithm until some maximum level is reached, which is specified by the user. The purpose of this loop is to make sure the algorithm ends eventually. Of course, other convergence criteria are in place in hope that the algorithm terminates long before the maximum level is reached. The second loop goes through all the enumerations of $(i_1,i_2,...,i_d)$ such that $i_1 + i_2 + ... + i_d = q+d$. The algorithm for producing such enumerations is provided in algorithm \ref{code:enumeration1}. The third loop takes each enumeration and again enumerates over each index to obtain each component in the tensor product appearing in the Smolyak formulation. An algorithm to execute this enumeration is provided in algorithm \ref{code:enumeration2}.
+
+In the main body of the pseudocode each output from algorithm \ref{code:enumeration2} is first converted to a knot $(x^{i_1}_{j_{i_1}}, ..., x^{i_d}_{j_{i_d}})$. Each potential knot must then be sorted into one of two categories. The motivation for the two categories arises from the fact that the same knot may be expressed in several ways. Since each knot corresponds to a function value and hierarchical surplus, significant computational savings can be incurred by not reevaluating the objective function at the same knots. Consequently, each potential knot is binned into either a category of knots that have already been evaluated at $f$ or a category of unevaluated knots.
+
+Once all components in the tensor product for a given $(i_1,i_2,...,i_d)$ have been converted and sorted, the unevaluated knots are processed. In this step of the algorithm the previously unevaluated knots should be evaluated at $f$ in parallel if possible since each evaluation is completely independent. The resulting functions values should then be used to compute the hierarchical surplus in \ref{eq:hierarchical_surplus} for each knot. Once the function value and hierarchical surplus is available for each new knot the results should be archived in the indice data structure.     
+
+Finally, once the second loop is complete, the level of the Smolyak interpolant has been effectively increased and it's time to check whether additional levels are required based on user-defined convergence criteria. Perhaps the best indicator of a Smolyak interpolant's convergence is the maximum hierarchical surplus calculated for all newly processed knots at the current interpolation level. The hierarchical surplus is a measure of how well the interpolant is able to match the objective function and therefore, if the hierarchial surpluses being calculated are decreasing with each level the interpolant is converging. An additional convergence criteria includes comparison of the relative change in computed mean and variance between two successive interpolation levels. For this thesis, the Smolyak algorithm is terminated only after the maximum hierarchical surplus is below a certain threshold, the relative change in interpolant mean is below a threshold, and the relative change in variance does not exceed a threshold. 

@@ -34,57 +34,58 @@ While there is initial overhead to create an interpolant for each component in \
 \subsubsection{Combinatorics Routines} \label{subsubsec:combinatorics_routines}
 
 In order to implement \ref{eq:decomp_smol3} on a computer several enumeration routines need to be available. Unfortunately, these routines are not available in most numerical math libraries containing combinatorics routines. The first routine of interest solves the problem of how to enumerate all the ways $d$ positive integers can be summed to equal another integer. In other words, what are all the sets $\left\{i_1,...,i_d\right\}$ such that $i_1 + i_2 + ... + i_d = q$? This problem inserts itself in \ref{eq:decomp_smol3} in the summation index for Smolyak interpolation. As the Smolyak interpolant becomes refined from level to level---$q$ is increased by one in each refinement---the Smolyak algorithm must newly account for all $\textbf{i}$ such that $\vert\textbf{i}\vert=q$. The following enumeration algorithm, a slight modification of the original algorithm found in \cite{Holtz}, finds all the desired indice sets:        
-\begin{program} 
-\begin{code}
-# Initialize
-p = 0
-m = q - d + 1 
-k = [0,1,...,1]   # vector of length d
-kh = [m,m,...,m]  # vector of length d
-
-# Begin algorithm...
-repeat until k = [0,...,0]:
-   k(p) = k(p) + 1
-   if k(p) > kh(p):
-      if p == d:
-         All indices enumerated!
-      else:
-         k(p) = 1
-         p = p + 1
-   else:
-      for j in range(p):
-         kh(j) = kh(p) - k(p) + 1
-      k(0) = kh(0)
-      p = 1
-      Return valid index set k!
-\end{code}
+\begin{algorithm}
 \caption{\label{code:enumeration1} 
-For postitive integers $d$ and $q$ this code outputs all sets $\left\{i_1,i_2,...,i_d\right\}$ such that $i_1+i_2+...+i_d=q$.}  
-\end{program}
+For postitive integers $d$ and $q$ this code outputs all sets $\left\{i_1,i_2,...,i_d\right\}$ such that $i_1+i_2+...+i_d=q$.} 
+\begin{algorithmic}[1]
+\State $p = 0$
+\State $m = q - d + 1$ 
+\State $k = \left[0,1,...,1\right]$   \Comment{vector of length d}
+\State $\hat{k} = \left[m,m,...,m\right]$  \Comment{vector of length d}
+\Repeat 
+   \State $k(p) = k(p) + 1$
+   \If {$k(p) > \hat{k}(p)$}
+      \If {p=d}
+         \State All indices enumerated!
+      \Else
+         \State $k(p) = 1$
+         \State $p = p + 1$ 
+      \EndIf
+   \Else
+      \For {$j=0:p$}
+         \State $\hat{k}(j) = \hat{k}(p) - k(p) + 1$
+      \EndFor
+      \State $k(0) = \hat{k}(0)$
+      \State $p = 1$
+      \State Return valid index set k!
+   \EndIf
+\Until{$k = \left[0,...,0\right]$}
+\end{algorithmic}
+\end{algorithm}
 
-With all the index sets for some Smolyak level $q$ available through the code segment in \ref{code:enumeration1}, the tensor product appearing in \ref{eq:Smolyak_formula2} can be evaluated with the aid of an additional enumeration routine. Each indice in an index set $\left\{i_1+i_2+...+i_d\right\}$ corresponds to certain number of knots, which for example, is given by \ref{eq:cc_numpoints} for Clenshaw-Curtis. All the components in the tensor product can be given by the following enumeration algorithm, which is based on the algorithm in \cite{Holtz}. Input to the algorithm in code \ref{code:enumeration2} should be based on output from code \ref{code:enumeration1}. Specifically for some index set $\left\{i_1,i_2,...,i_d\right\}$ returned by code \ref{code:enumeration1}, each indice should be converted to a corresponding number of knots and input to code \ref{code:enumeration2}.     
-\begin{program} 
-\begin{code}
-   # Initialize
-   p = 0
-   s = [0,1,1,...,1]  # vector of length d 
-
-   # Begin algorithm...
-   repeat until s == m: 
-      s(p) = s(p) + 1
-      if s(p) > m(p):
-         if p == d-1:
-            All indices enumerated!
-         else:
-            s(p) = 1
-            p = p + 1
-      else:
-         p = 0
-         Return valid enumeration set!
-\end{code}
+With all the index sets for some Smolyak level $q$ available through the code segment in \ref{code:enumeration1}, the tensor product appearing in \ref{eq:Smolyak_formula2} can be evaluated with the aid of an additional enumeration routine. Each indice in an index set $\left\{i_1+i_2+...+i_d\right\}$ corresponds to certain number of knots, which for example, is given by \ref{eq:cc_numpoints} for Clenshaw-Curtis. All the components in the tensor product can be given by the following enumeration algorithm, which is based on the algorithm in \cite{Holtz}. Input to algorithm \ref{code:enumeration2} should be based on output from algorithm \ref{code:enumeration1}. Specifically for some index set $\left\{i_1,i_2,...,i_d\right\}$ returned by algorithm \ref{code:enumeration1}, each indice should be converted to a corresponding number of knots and input to algorithm \ref{code:enumeration2}.     
+\begin{algorithm}
 \caption{\label{code:enumeration2} 
-Code for enumerating all components of a tensor product. The input is a $d$ dimensional vector $m$ where each entry $m_j$ corresponds to the number of knots in a collocation scheme of level $i_j$.}  
-\end{program}
+Code for enumerating all components of a tensor product. The input is a $d$ dimensional vector $m$ where each entry $m_j$ corresponds to the number of knots in a collocation scheme of level $i_j$.} 
+\begin{algorithmic}[1]
+\State $p = 0$
+\State $s = \left[0,1,1,...,1\right]$  \Comment{vector of length d}
+\Repeat 
+   \State $s(p) = s(p) + 1$
+   \If{$s(p) > m(p)$}
+      \If{$p = d-1$}
+         \State All indices enumerated!
+      \Else
+         \State $s(p) = 1$
+         \State $p = p + 1$
+      \EndIf
+   \Else
+      \State $p = 0$
+      \State Return valid enumeration set!
+   \EndIf
+\Until{$s = m$} 
+\end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Sampling Sparse Grid Interpolant of Correlated Variables} \label{subsubsec:sampling_smolyak}
 
@@ -132,6 +133,6 @@ To improve accuracy higher order components can be included. Higher order compon
 \end{equation}
 To determine whether additional orders need to be included in the reduced order model, the mean of the current reduced order model should be compared to the mean of the previous order model. If the relative change in mean doesn't exceed some threshold $\theta_2$ then the reduced order model is considered converged. Otherwise, higher order components should be added. In this manner, a reduced order model for a computer code can be constructed adaptively.    
 
-\subsubsection{Algorithm for Building a Reduced Order Model} \label{subsubsec:full_algorithm}
+\subsection{Algorithm for Building a Reduced Order Model} \label{subsec:full_algorithm}
 
 %Low order smolyak grids needed is has been shown. First order should be good most of time...especially in nuclear applications where adjoints have been so successful.          
