@@ -29,9 +29,7 @@ To create a reduced order model the set $\mathcal{D}$ is ultimately shrunk to on
 \end{equation}
 While there is initial overhead to create an interpolant for each component in \ref{eq:decomp_smol2} the result is quick evaluation of the reduced order model. Details regarding the implementation and application of \ref{eq:decomp_smol3} will be discussed in the proceeding sections.               
  
-\subsection{Implementation Details} \label{subsec:implement_details}
-
-\subsubsection{Combinatorics Routines} \label{subsubsec:combinatorics_routines}
+\subsection{Combinatorics Routines} \label{subsec:combinatorics_routines}
 
 In order to implement \ref{eq:decomp_smol3} on a computer several enumeration routines need to be available. Unfortunately, these routines are not available in most numerical math libraries containing combinatorics routines. The first routine of interest solves the problem of how to enumerate all the ways $d$ positive integers can be summed to equal another integer. In other words, what are all the sets $\left\{i_1,...,i_d\right\}$ such that $i_1 + i_2 + ... + i_d = q$? This problem inserts itself in \ref{eq:decomp_smol3} in the summation index for Smolyak interpolation. As the Smolyak interpolant becomes refined from level to level---$q$ is increased by one in each refinement---the Smolyak algorithm must newly account for all $\textbf{i}$ such that $\vert\textbf{i}\vert=q$. The following enumeration algorithm, a slight modification of the original algorithm found in \cite{Holtz}, finds all the desired indice sets:        
 \begin{algorithm}
@@ -87,7 +85,7 @@ Code for enumerating all components of a tensor product. The input is a $d$ dime
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Sampling Sparse Grid Interpolant of Correlated Variables} \label{subsubsec:sampling_smolyak}
+\subsection{Sampling Sparse Grid Interpolant of Correlated Variables} \label{subsec:sampling_smolyak}
 
 The reduced order model in \ref{eq:decomp_smol3} consists of linear coombinations of Smolyak interpolants. Evaluation of the reduced order model is equivalent to finding the value at several Smolyak interpolants and summing the results. However, recall that in the Smolyak algorithm for building the interpolants described in \ref{subsec:algorithm_mechanics} each dimension in the sparse grid is built orthogonal to the others. Implicit in this construction is the assumption that the random variables comprising the objective function are independent. In fact, in many computer codes the random variables forming the parameter space are correlated. The degree of correlation among the random variables is generally described using a covariance matrix. 
 
@@ -99,7 +97,7 @@ where $U^T$ is the lower triangular matrix arising from the Cholesky decompositi
 
 The Cholesky decomposition of a covariance matrix $C=U^{T}U$ is the equivalent to taking the square root of a matrix. A Cholesky matrix transform, or left multiplication by $U^T$, maps uncorrelated variables into correlated variables with covariance matrix $\Sigma$. Consequently, in \ref{eq:sample_covariance} $\mu'$ is normally distributed with mean $\mu$ and covariance $\Sigma$. A statistically significant number of instances of $\mu'$ should be calculated and evaluated at the reduced order model. Even though the model is built assuming independent variables this method takes into account any correlations when calculating statistical moments. When evaluating any Smolyak interpolant at a number of sampled points one must always make sure all the sampled points lay inside the bounds of the hypercube forming the sparse grid.
 
-\subsubsection{Dimension Truncation} \label{subsubsec:dimension_truncation}
+\subsection{Dimension Truncation} \label{subsec:dimension_truncation}
 
 By definition a reduced order model contains less dimensions than the original model whose reduction is intended. Consequently, a methodology for identifying important dimensions is necessary. For the purposes of this thesis, the importance of a random input variable on some objective function is determined by its contribution to the function's variance. While there are methods for exactly calculating the truncation and superposition dimensions of a function \cite{Holtz}, these methods require the computation of all $2^d$ component functions in an \ac{ANOVA} decomposition. For typical computer codes used in engineering this requirement is not feasible and so the effective dimensions of a function must be estimated adaptively. 
 
@@ -131,8 +129,30 @@ To improve accuracy higher order components can be included. Higher order compon
    C(\vert\mathcal{T}\vert,p) = \frac{\vert\mathcal{T}\vert!}{
     (p!)(\vert\mathcal{T}\vert-p)!}.
 \end{equation}
-To determine whether additional orders need to be included in the reduced order model, the mean of the current reduced order model should be compared to the mean of the previous order model. If the relative change in mean doesn't exceed some threshold $\theta_2$ then the reduced order model is considered converged. Otherwise, higher order components should be added. In this manner, a reduced order model for a computer code can be constructed adaptively.    
+To determine whether additional orders need to be included in the reduced order model, the mean of the current reduced order model should be compared to the mean of the previous order model. If the relative change in mean doesn't exceed some threshold $\theta_2$ then the reduced order model is considered converged. Otherwise, higher order components should be added. In this manner, a reduced order model for a computer code can be constructed adaptively. The procedure for adaptively creating a reduced order model is summarized in algorithm \ref{code:rom_algorithm}.    
+\begin{algorithm}
+\caption{\label{code:rom_algorithm} Adaptively creates a reduced order model for some function $f$ of $d$ dimensions.}  
+\begin{algorithmic}[1]
+\State Create zeroth-order component function. \Comment{Eq. \ref{eq:zeroth_component}}
+\For{$i=1,d$}
+   \State Construct 1D Smolyak interpolant for $P_{\lbrace i \rbrace}f$.
+   \Comment{Eq. \ref{eq:projection_operator_dirac}}
+   \State Create first-order anchored-\ac{ANOVA} component $f_{\lbrace i\rbrace}$.
+   \Comment{Eq. \ref{eq:first_component}}  
+\EndFor
+\State Identify important dimensions and put into set $\mathcal{T}$.
+\Comment{Eq. \ref{eq:anova_sensitivity}}
+\For{$p=2,d$}
+   \For{$t\subset\mathcal{T}$ s.t. $\vert t\vert=p$}
+      \State Construct $p$-dimensional Smolyak interpolant for 
+      $P_{t}f$.
+      \Comment{Eq. \ref{eq:projection_operator_dirac}} 
+      \State Create $p$-order anchored-\ac{ANOVA} component $f_t$.
+      \Comment{Eq. \ref{eq:recurvsive_component_def}}     
+   \EndFor
+   \State Check for convergence of reduced order model.
+\EndFor  
+\end{algorithmic}
+\end{algorithm}
 
-\subsection{Algorithm for Building a Reduced Order Model} \label{subsec:full_algorithm}
-
-%Low order smolyak grids needed is has been shown. First order should be good most of time...especially in nuclear applications where adjoints have been so successful.          
+%Low order smolyak grids needed is has been shown. First order should be good most of time...especially in nuclear applications where adjoints have been so successful.
