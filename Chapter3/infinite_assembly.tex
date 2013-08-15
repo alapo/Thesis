@@ -104,41 +104,42 @@ Convergence study of a five dimensional sparse grid interpolant for the  multipl
 
 From Fig. \ref{fig:kinf_sg_convergence} the Clenshaw-Curtis and Gauss-Patterson schemes perform similarly in terms of level to level convergence. However, observe that at each interpolation level the Gauss-Patterson scheme requires significantly more nodes in exchange for a small increase in convergence speed. Both schemes converge to the threshold around level five although the Gauss-Patterson scheme requires more than twice as many function evaluations to get there than Clenshaw-Curtis. Based on the graphical determination of order of convergence \cite{Boyd}, it is clear from \ref{fig:kinf_sg_convergence} that the Smolyak interpolant for $k_{\infty}$ converges geometrically.
 
+With the Smolyak interpolation routines working as expected it's safe to apply them to an anchored-\ac{ANOVA} decomposition of $k_{\infty}$. To start, only the first order components will be built and analyzed. The first order components are relatively cheap to produce and often collectively produce very accurate reduced order models \cite{AHSGC_HighDimensions}. Afterwards, all higher order components will be added in order to show that the full anchored-\ac{ANOVA} decomposition can fully reproduce the objective function. Since $k_{\infty}$ is a function of only five random variables there is no point in adaptively constructing the reduced order model as described in Section \ref{subsec:dimension_truncation}.        
 
-% Full HDMR should exactly replicate . first order  
-
-\begin{figure}
-\caption{ \label{fig:kinf_numknots}
-Cummultative number of knots required at each level of an anchored-\ac{ANOVA} decomposition of the multiplication factor of an infinite TMI lattice.}
- \begin{center}
-  \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_numknots.png}
- \end{center}
-\end{figure}
-
-
-\begin{table}[!htb] 
+As a first comparison between all the models developed for quantifying the uncertainty in $k_{\infty}$ the mean and variance values of each model will be compared. With the exception of the variance obtained using the Sandwich Equation, each model's variance was obtained by propagating 1000 samples of Eq. $\ref{eq:sample_covariance}$ through the model. All samples produced for each model were seeded identically and so the same random numbers were drawn. The mean and variance results, along with 99\% confidence intervals, are summarized in Table \ref{table:kinf_mean_variance}. 
+    
+\begin{table} 
 \caption{\label{table:kinf_mean_variance} 
 Mean and variance data for the multiplication factor of an infinite TMI lattice. Wherever sampling was utilized the same random numbers were used.}
 \centering
 \small
 \begin{tabular}{||c|c|c|c|c||} 
 \hline \hline
-\textbf{Method} & \textbf{Mean} & \textbf{95\% CI} & \textbf{Standard Dev.} & \textbf{95\% CI} \\ \hline
-5D Sparse Grid CC      & 1.41562 & (1.41524, 1.41600) & 0.006168 & (0.005909, 0.006451) \\ \hline
-5D Sparse Grid GP      & 1.41562 & (1.41524, 1.41600) & 0.006168 & (0.005909, 0.006451) \\ \hline
-1D HDMR CC  & 1.41560 & (1.41522, 1.41598) & 0.006168 & (0.005909, 0.006451) \\ \hline
-All HDMR CC & 1.41562 & (1.41524, 1.41600) & 0.006168 & (0.005909, 0.006451) \\ \hline
-1D HDMR GP  & 1.41560 & (1.41522, 1.41598) & 0.006168 & (0.005909, 0.006451) \\ \hline
-All HDMR GP & 1.41562 & (1.41524, 1.41600) & 0.006168 & (0.005909, 0.006451) \\ \hline
-Monte Carlo            & 1.41562 & (1.41524, 1.41600) & 0.006168 & (0.005909, 0.006451) \\ \hline
+\textbf{Method} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} & \textbf{99\% CI} \\ \hline
+5D Sparse Grid CC      & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005909, 0.006544) \\ \hline
+5D Sparse Grid GP      & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+1D ANOVA CC  & 1.41560 & (1.41510, 1.41610) & 0.006168 & (0.005831, 0.006544) \\ \hline
+All ANOVA CC & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+1D ANOVA GP  & 1.41560 & (1.41510, 1.41610) & 0.006168 & (0.005831, 0.006544) \\ \hline
+All ANOVA GP & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+Monte Carlo            & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
 Sandwich               &         &                    & 0.006540 &                      \\
 \hline \hline
 \end{tabular}
 \end{table}
 
-% Why don't results match with sandwich formula (analytic sensitivities used, more samples caused convergence)?    
+The five dimensional sparse grid interpolant results are entirely self consistent with the anchored-\ac{ANOVA} results. Further, both of these methods produce identical results to those obtained using Monte Carlo sampling. Although the analytic variance from the Sandwich Equation is within the 99\% confidence bounds of each model's results, there is a notable difference due to the fact that only 1000 samples were used to obtain each model's statistics. Increasing the number of samples decreased the difference. Note that in Table \ref{table:kinf_mean_variance} the anchored-\ac{ANOVA} the reduced order models consisting of only one dimension anchored-\ac{ANOVA} components perfrom just as well as the full decomposition and the sparse grid interpolants over all five random variables. However, the 1D component models require only 29 function evaluations to produce, which is some ten times fewer evaluations than the 5D interpolants, and some hundred times fewer evaluations than the full decomposition. 
+\begin{figure}
+\caption{ \label{fig:kinf_numknots}
+Cummulative number of knots required at each level of an anchored-\ac{ANOVA} decomposition of the multiplication factor of an infinite TMI lattice. Boxes contain the calculated standard deviation at the current level.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_numknots.png}
+ \end{center}
+\end{figure}
+The rapid convergence of the reduced order model containing only one dimensional anchored-\ac{ANOVA} components is shown in \ref{fig:kinf_numknots}. Construction of higher order components is very expensive. Fortunately for this problem, and perhaps others, construction of only one dimensional components is completely sufficient to represent the objective function. 
 
-\begin{table}[!htb] 
+As another performance measure of the reduced order model methodologies, each model is used to obtain normalized sensitivity coefficients for $k_{\infty}$. Central differencing is applied to each model, with perturbations made to each cross section at a time while holding the other cross sections at their mean values. Perturbations are taken to be 1\% of each cross section's value. Using the analytic expression for $k_{\infty}$ in \ref{eq:infinite_lattice_kinf}, the central differencing results can be compared to the true sensitivity coefficients.   The results are summarized in Table \ref{table:kinf_sensitivities}. Table \ref{table:kinf_sensitivities}, sensitivity coefficients are also obtained by applying central differencing to the true function as in Eq. \ref{eq:central_diff_kinf}. 
+\begin{table} 
 \caption{\label{table:kinf_sensitivities} 
 Normalized sensitivity coefficients for the multiplication factor of an infinite TMI lattice.}
 \centering
@@ -148,12 +149,13 @@ Normalized sensitivity coefficients for the multiplication factor of an infinite
 \textbf{Method} & $\Sigma_{a_1}$ & $\Sigma_{a_2}$ & $\nu\Sigma_{f_1}$ & $\nu\Sigma_{f_2}$ & $\Sigma_{1\rightarrow 2}$ \\ \hline
 5D Sparse Grid CC  & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
 5D Sparse Grid GP  & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
-1D HDMR CC         & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
-All HDMR CC        & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
-1D HDMR GP         & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
-All HDMR GP        & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+1D ANOVA CC         & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
+All ANOVA CC        & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+1D ANOVA GP         & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
+All ANOVA GP        & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
 Analytic           & -.367520 & -.775956 & .224044 & .775956 & .143476 \\ \hline
 Central Difference & -.367551 & -.776089 & .224060 & .776011 & .143492 \\
 \hline \hline
 \end{tabular}
 \end{table}
+As expected, all models utilizing the central differencing formula produce self consistent sensitivity coefficients. The models differ from the analytic sensitivity coefficients only in the fourth decimal place, which is expected given the $\mathcal{O}(\Delta\Sigma^2)$ convergence  of the central differencing formula.     

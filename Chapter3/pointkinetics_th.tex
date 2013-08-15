@@ -1,0 +1,48 @@
+\section{Point Kinetics/Lumped Thermal Hydraulics}
+\label{sec:pointkinetics_th}
+
+\subsection{Problem Statement}
+\label{subsec:pointkinetics_th_ps}
+
+A reduced order model based on the anchored-\ac{ANOVA} decomposition will be constructed in this section for a simple system of ordinary differential equations modeling a transient in a BN800 sodium fast cooled reactor. The physical model of the reactor consists of point kinetics to model the neutronics and lumped thermal hydraulics equations to describe temperature feedback. The coupled system is nonlinear and only exhibits time dependence. Previous research groups have utilized point kinetics and lumped thermal hydraulics equations to model basic reactor systems in \cite{Gilli_annals}, \cite{Gilli_mc2011}, and \cite{Housiadas}. In this section a reduced order model will be constructed for the maximum power attained following a reactivity insertion as a function of the random variables exhibited in the description of the point kinetics/lumped thermal hydraulics system.  
+
+The six-group point kinetics equations modeling the neutronics of a reactor consist of a balance for reactor power $P(t)$ and a balance equation for each of the six precursor concentrations $C_k(t)$. Changes in reactor power are dependent on the precursor concentration, decays constants $\lambda_k$, delayed neutron fraction $\beta$ and the mean neutron generation time $\Lambda$ as detailed in,
+\begin{equation}
+\label{eq:pk_power}
+   \frac{dP}{dt} = \frac{\rho(T_f,T_c,t)-\beta}{\Lambda}P +
+    \sum_{k=1}^6 \lambda_k C_k.
+\end{equation}  
+The reactivity $\rho$ depends on feedback from the fluids temperature models for the reactor fuel and coolant, which in turn depend on reactor power. The expression for each of the $k$ precusor concentrations is written as,
+\begin{equation}
+\label{eq:pk_precursors}
+   \frac{dC_k}{dt} = -\lambda_k C_k +
+    \frac{\beta_k}{\Lambda}P.
+\end{equation}
+As for the ordinary differential equations describing the behavior of the reactor coolant system, two coupled equations suffice. For the fuel temperature $T_f$, the following lumped model is used,
+\begin{equation}
+\label{eq:pk_fuel}
+   M_f c_{pf}\frac{dT_f}{dt} = P + Ah(T_c-T_f)
+\end{equation}
+where $M_f$ is the lump fuel mass, $c_{pf}$ is the specific heat capacity of the fuel, $A$ is the heat transfer surface, and $h$ is the heat transfer coefficient between the coolant and reactor fuel. Finally, the coolant temperature is described as,
+\begin{equation}
+\label{eq:pk_coolant}
+   M_c c_{pc}\left(\frac{dT_c}{dt} +v \frac{T_c - T_{in}}{L}\right) = 
+    Ah(T_f-T_c)
+\end{equation}
+where $M_c$ is the lump coolant mass, $c_{pc}$ is the specific heat capacity of the coolant, $L$ is the coolant channel length, $v$ is the coolant flow velocity, and $T_{in}$ is the inlet coolant temperature. The initial conditions for $P$, $C_k$, $T_f$, and $T_c$ depend on the initial power in the reactor $P_0$ before any kind of transient occurs and are listed in \ref{eq:pk_initial_conds}. 
+\begin{eqnarray}
+\label{eq:pk_initial_conds}
+   P(0) &=& P_0 \\ 
+   C_k(0) &=& \frac{\beta_k}{\lambda_k\Lambda}P_0 \nonumber \\
+   T_f(0) &=& T_c(0) + \frac{P_0}{Ah} \nonumber \\
+   T_c(0) &=& T_{in} + \frac{P_0L}{M_c c_{pc}v} \nonumber
+\end{eqnarray}
+Serving as the coupling device between the lumped thermal hydraulics model and point kinetics model is the reactivity, which is proportional to the coolant temperature and the fuel temperature. Of course, any external reactivity $\rho_{ex}$ added to the reactor is also a contributor. The time dependent reactivity is given explicitly as,
+\begin{equation}
+\label{eq:pk_reactivity}
+   \rho(T_f,T_c,t) = \rho_{ex} + \alpha_d(T_f - T_f(0))
+    + \alpha_c(T_c - T_c(0))
+\end{equation}
+where $\alpha_d$ and $\alpha_c$ are the doppler and coolant coefficients of reactivity, respectively.  
+ 
+% equation for rho, figure of transient at mean values, figure of reactivity inserted, table for parameter values, 
