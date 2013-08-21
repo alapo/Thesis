@@ -98,7 +98,7 @@ Several elements of the methodologies described in Chapter \ref{chap:rom} will b
 \caption{ \label{fig:kinf_sg_convergence}
 Convergence study of a five dimensional sparse grid interpolant for the  multiplcation factor of an infinite TMI lattice. The boxed numbers represent the current number of knots in the sparse grid.}
  \begin{center}
-  \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_convergence.png}
+  \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_convergence.pdf}
  \end{center}
 \end{figure}
 
@@ -110,7 +110,7 @@ As a first comparison between all the models developed for quantifying the uncer
     
 \begin{table} 
 \caption{\label{table:kinf_mean_variance} 
-Mean and variance data for the multiplication factor of an infinite TMI lattice. Wherever sampling was utilized the same random numbers were used.}
+Mean and variance data for the multiplication factor of an infinite TMI lattice obtained using Monte Carlo sampling. Wherever sampling was utilized the same random numbers were used.}
 \centering
 \small
 \begin{tabular}{||c|c|c|c|c||} 
@@ -122,7 +122,7 @@ Mean and variance data for the multiplication factor of an infinite TMI lattice.
 All ANOVA CC & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
 1D ANOVA GP  & 1.41560 & (1.41510, 1.41610) & 0.006168 & (0.005831, 0.006544) \\ \hline
 All ANOVA GP & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
-Monte Carlo            & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+True Function & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
 Sandwich               &         &                    & 0.006540 &                      \\
 \hline \hline
 \end{tabular}
@@ -133,7 +133,7 @@ The five dimensional sparse grid interpolant results are entirely self consisten
 \caption{ \label{fig:kinf_numknots}
 Cummulative number of knots required at each level of an anchored-\ac{ANOVA} decomposition of the multiplication factor of an infinite TMI lattice. Boxes contain the calculated standard deviation at the current level.}
  \begin{center}
-  \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_numknots.png}
+  \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_numknots.pdf}
  \end{center}
 \end{figure}
 The rapid convergence of the reduced order model containing only one dimensional anchored-\ac{ANOVA} components is shown in \ref{fig:kinf_numknots}. Construction of higher order components is very expensive. Fortunately for this problem, and perhaps others, construction of only one dimensional components is completely sufficient to represent the objective function. 
@@ -149,10 +149,10 @@ Normalized sensitivity coefficients for the multiplication factor of an infinite
 \textbf{Method} & $\Sigma_{a_1}$ & $\Sigma_{a_2}$ & $\nu\Sigma_{f_1}$ & $\nu\Sigma_{f_2}$ & $\Sigma_{1\rightarrow 2}$ \\ \hline
 5D Sparse Grid CC  & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
 5D Sparse Grid GP  & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
-1D ANOVA CC         & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
-All ANOVA CC        & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
-1D ANOVA GP         & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
-All ANOVA GP        & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+1D ANOVA CC        & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
+All ANOVA CC       & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+1D ANOVA GP        & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
+All ANOVA GP       & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
 Analytic           & -.367520 & -.775956 & .224044 & .775956 & .143476 \\ \hline
 Central Difference & -.367551 & -.776089 & .224060 & .776011 & .143492 \\
 \hline \hline
