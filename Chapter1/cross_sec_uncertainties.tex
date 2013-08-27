@@ -1,0 +1,163 @@
+\section{Uncertainties in Nuclear Data}
+\label{sec:cross_sec_uncertainties}
+
+\subsection{Cross Section Uncertainty Overview}
+\label{subsec:xsec_uq_overview}
+
+While the methods described in this thesis are applicable to a plethora of engineering applications, the target application here concerns the simulation of nuclear reactors. A main component of any reactor analysis is a description of the neutronics, the physical processes behind neutron transport inside a reactor. When studying uncertainty quantification and sensitivity analysis of the neutronics in some reactor system, the primary  player has been shown to be uncertainty in cross section data \cite{Khalik_Turinsky} \cite{Jessee_Khalik_Turinsky}. Cross section uncertainties for various reactions, energies, and nuclides are accumulated during their experimental determination. Many of the cross sections exhibit correlations among themselves that must be taken into account. A problem arises when one becomes interested in performing uncertainty and sensitivity analysis on a core simulator since the simulators use processed cross section data. The experimental cross section uncertainties and covariances must be carefully propogated down through the standard cross section processing regime.   
+
+Until recently, the primary approach for cross section uncertainty propagation involved the application of first-order perturbation theory. The perturbation theory approach is described in detail in \cite{MLWilliams}. Basically, for neutronics uncertainty analysis this approach entails the solution of an adjoint transport equation for each response of interest, allowing for the efficient retrieval of sensitivity coefficients for all input data. The sensitivity coefficients can then be used to obtain response uncertainties by being operated on by the inputs' covariance matrix. However, the linear approximations in perturbation theory and generalized perturbation theory may fail in certain scenerios. In particular, if the ratio of neutron loss due to absorption is high, such as when a control rod is rapidly inserted, second order effects may become substantial \cite{MLWilliams}. In addition, while perturbation theory may be computationally efficient for problems where only a handful of responses are of interest, problems with many respones may be burdensome due to the need to solve the generalized adjoint transport equation for each response. Not to mention, implementation of the perturbation theory approach is intrusive to engineering codes which makes uncertainty quantification of coupled, multiphysics code systems  infeasible.         
+
+With the recent increase in accessibility to parallel computing environments stochastic sampling methods have become popular since they do not apply any kind of approximations to the physics at hand. Consequently, for cross section uncertainty propagation sampling methods have also been adopted to replace perturbation theory. A description of the process for propagating experimental uncertainties in cross section data to few group cross sections is described in this section. The statistical sampling framework for cross section data is extremely flexible since uncertainties can be calculated for any few group parameters. The same cannot be said of perturbation theory, which must formulate responses as ratios of reaction rates. Consequently, uncertanties for few group transport cross sections and assembly discontinuity factors are difficult to obtain using generalized perturbation theory.   
+
+\subsection{Sampling Method}
+\label{subsec:xsec_sampling}
+
+The method for producing stochastically sampled few-group cross sections will be described. Although the method described is quite general, to provide clarity it will be described in the context of the \ac{SCALE} code \cite{SCALE}. Specifically, \ac{SCALE}'s \ac{ENDF} libraries and cross section processing utilities will be detailed. In the \ac{ENDF} libraries the multigroup cross sections are assumed to be Gaussian and conseqently, they can be fully characterized by their means and covariances. The \ac{SCALE} 44-group \ac{ENDF}/B-VII covariance matrix contains generic multigroup covariance data. For a problem where $m$ nuclide-reaction combinations are of interest the pertinent covariance matrix is expanded to a size of $\left[m\cdot 44\right]\times \left[m\cdot 44\right]$. The Gaussian assumption imposed on the cross section values implies the cross sections can take on negative values. Since cross sections physically cannot take on negative values their distributions are truncated \cite{Klein_Gallner}.      
+
+The first step towards obtaining perturbed few-group cross sections is to sample the generic multigroup covariance library. The covariance data schema in \ac{SCALE} is given as relative values of infinitely dilute cross sections \cite{Williams_Ilas}. Denote the 1D energy dependent, pointwise cross section for reaction $x$ as $\sigma_x(E)$. The infinitely dilute cross section in energy group $g$ can then be calculated as,
+\begin{equation}
+\label{eq:infinitely_dilute_xsec}
+   \sigma_{x,g}(\infty) = \frac{\langle\sigma_x(E)\rangle}
+    {\Delta u_g}   
+\end{equation}  
+where the bracket notation indicates a lethargy inner product over the energy interval covered by group $g$. Consequently, when the multigroup covariance matrix in \ac{SCALE} is sampled the resulting perturbation $\sigma_{x,g}'$ to the infinitely dilute cross sections can be expressed in terms of a perturbation factor $Q_{x,g}$,
+\begin{eqnarray}
+\label{eq:infinitely_dilute_xsec_prime}
+   \sigma_{x,g}'(\infty) &=& \left(1 + \frac{\Delta\sigma_{x,g}(\infty)}
+    {\sigma_{x,g}(\infty)}\right)\sigma_{x,g}(\infty) \nonumber \\
+     \nonumber \\
+      &=& Q_{x,g}\sigma_{x,g}(\infty). 
+\end{eqnarray}  
+The perturbations in Eq. \ref{eq:infinitely_dilute_xsec_prime} will provide generic multigroup cross section values to propagate through a transport solver, which can then yield perturbed few-group cross section values. However, to make the perturbed cross sections problem specific they must undergo adjustments due to resonance self shielding. For this purpose, perturbed pointwise cross sections and perturbed Bondarenko self-shielding factors are required. The pointwise, or continuous energy, cross sections are needed to perform 1D transport calculations in the resolved resonance range while the Bondarenko factors are applicable in the unresolved energy range. Since the pointwise cross sections, Bondarenko factors, and generic infinitely dilute multigroup cross section are related algebraically it is necessary to perturb each in terms of the factor $Q_{x,g}$. 
+
+In \cite{Williams_Ilas} the authors show that, given a perturbation factor $Q_{x,g}$, the appropriate pointwise cross sections perturbation can be obtained by,
+\begin{equation}
+\label{eq:pointwise_xsec_prime}
+   \sigma_x'(E) = Q_{x,g}\sigma_x(E) \hspace{1cm} E\in g.
+\end{equation} 
+From Eq. \ref{eq:pointwise_xsec_prime} it is clear that the pointwise cross section data gets perturbed uniformly in a given energy group $g$, which is a valid approximation if the energy width is small. The authors in \cite{Williams_Ilas} note that although this approximation leads to discontinuities at the energy group boundaries, it does not impact the resulting multigroup data significantly. No significant impact is expected because the multigroup data is averaged using fluxes and cross sections from the same energy bin. 
+
+At this point, infinitely dilute multigroup cross sections and pointwise cross sections can be consistently perturbed using the \ac{SCALE} \ac{ENDF} covariance library. To proceed with a transport calculation using perturbed parameters, perturbed Bondarenko self-shielding factors $f_{x,g}'(\sigma_0)$ are also needed. The Bondarenko factors are expressed in terms of the background cross section $\sigma_0$, pointwise cross sections, and infinitely dilute cross sections as,     
+\begin{equation}
+\label{eq:bondarenko}
+   f_{x,g}(\sigma_0) = \frac{1}{\sigma_{x,g}(\infty)}
+    \Big\langle \frac{\sigma_x(E)}{\sigma_t(E) + \sigma_0}\Big\rangle
+     \Big/
+     \Big\langle \frac{1}{\sigma_t(E) + \sigma_0}\Big\rangle.
+\end{equation}
+Substituting Eqs. \ref{eq:infinitely_dilute_xsec_prime} and \ref{eq:pointwise_xsec_prime} into Eq. \ref{eq:bondarenko}, the perturbed Bondarenko factor is obtained,
+\begin{equation}
+\label{eq:bondarenko_prime}
+   f_{x,g}'(\sigma_0) = \frac{1}{Q_{x,g}\sigma_{x,g}(\infty)}
+    \Big\langle \frac{Q_{x,g}\sigma_x(E)}{Q_{t,g}\sigma_t(E)+\sigma_0}\Big\rangle
+     \Big/
+     \Big\langle \frac{1}{Q_{t,g}\sigma_t(E) + \sigma_0}\Big\rangle.
+\end{equation}
+The authors in \cite{Williams_Ilas} show that Eq. \ref{eq:bondarenko_prime} can be evaluated by simply evaluating the unperturbed Bondarenko equation in Eq. 
+\ref{eq:bondarenko} at a perturbed background cross section $\sigma_0' = \sigma_0/ Q_{t,g}$. Note that only those cross sections whose uncertainties are specified in the \ac{SCALE} covariance library can be processed and propagated through transport calculations. Since covariance data for 2D scattering distributions is not available in the \ac{SCALE} \ac{ENDF}/B-VII covariance library, their uncertainty affects cannot be quantified in any analyses \cite{Williams_Ilas}. 
+ 
+\subsection{Cross Section Sampling in SCALE}
+\label{subsec:scale_sampler}  
+
+The method described in section \ref{subsec:xsec_sampling} for producing perturbed cross sections will be further described in the context of the modules in \ac{SCALE}. The first step is to produce perturbation factors using the module XSUSA by sampling the \ac{SCALE} \ac{ENDF}/B-VII covariance library. 
+
+\begin{tikzpicture}[node distance = 3.5cm, auto]
+   % Place nodes
+   \node [block] (xsusa) {\textbf{XSUSA}: Make random perturbations to covariance 
+   library};
+   \node [block, below of=xsusa] (clarol) {\textbf{CLAROL+}: 
+   Perturb MG xsecs and shielding factors};
+   \node [block, below of=clarol] (crawdad) {\textbf{CRAWDAD+}: 
+   Perturb CE xsecs};
+   \node [block, right of=clarol, node distance=8cm] (bonami) {\textbf{BONAMI}: 
+   Perform self-shielding calculations in unresolved energy region};
+   \node [block, right of=crawdad, node distance=8cm] (centrm) 
+   {\textbf{CENTRM/PMC}: 
+   Perform self-shielding calculations in resolved energy region};  
+   \node [block, below of=centrm] (newt) {\textbf{NEWT}: 
+   Perform transport calculations using perturbed xsecs}; 
+   % Invisible node
+   \node [left of= xsusa, node distance=2.5cm, scale=0.01] (xsusa_i) {};
+   \node 
+   
+   % Draw edges
+   \path [line] (xsusa) -- node (xsusa_o) {$Q_{x,g}$} (clarol);
+   \path [line] (clarol) -- (crawdad);   
+   \path [line] (clarol) -- node (clarol_o) {$\sigma_{x,g}'(\infty)$, 
+   $f_{x,g}'(\sigma_0)$} (bonami);
+   \path [line] (crawdad) -- node (crawdad_o) {$\sigma_{x}'(E)$} (centrm);
+   \path [line] (bonami) -- node[left] (bonami_o) {initial self-shielded data}
+   (centrm);
+   \path [line] (centrm) -- node[left] (centrm_o) {final self-shielded data} 
+   (newt);
+   
+   \path[-,draw] (newt) -| node[below]{Repeat $N_1$ times} (xsusa_i.north);
+   \path[line]{} (xsusa_i.north) |- node{} (xsusa);
+   
+
+
+   
+   
+%    \node [cloud, left of=init] (expert) {expert};
+%    \node [cloud, right of=init] (system) {system};
+%    \node [block, below of=init] (identify) {identify candidate models};
+%    \node [block, below of=identify] (evaluate) {evaluate candidate models};
+%    \node [block, left of=evaluate, node distance=3cm] (update) {update model};
+%    \node [decision, below of=evaluate] (decide) {is best candidate better?};
+%    \node [block, below of=decide, node distance=3cm] (stop) {stop};
+%    % Draw edges
+%    \path [line] (init) -- (identify);
+%    \path [line] (identify) -- (evaluate);
+%    \path [line] (evaluate) -- (decide);
+%    \path [line] (decide) -| node [near start] {yes} (update);
+%    \path [line] (update) |- (identify);
+%    \path [line] (decide) -- node {no}(stop);
+%    \path [line,dashed] (expert) -- (init);
+%    \path [line,dashed] (system) -- (init);
+%    \path [line,dashed] (system) |- (evaluate);
+\end{tikzpicture}   
+
+%CENTRM computes neutron flux spectra on a
+%tailored mesh of ~30,000 to 70,000 energy points,
+%as a function of space and direction, using one-
+%dimensional (1D) discrete ordinates or other
+%transport approximations homogeneous medium
+%with buckling; 1D collision probability, or P
+%1
+%(Williams and Asgari, 1995). A linear variation of
+%the flux is assumed between energy points, so that
+%a continuous-energy solution is generated over the
+%entire energy range.
+%The high resolution flux spectra from CENTRM are passed to PMC, where
+%they are used as weigh
+%ting functions to average
+%pointwise (PW) nuclear data into problem-specific
+%MG cross sections. The CENTRM transport
+%solution accounts for temperature-dependent self-
+%shielding effects due to resonance absorption,
+%cross-shielding from overlapping resonances of
+%different materials, space-
+%dependent slowing-down
+%with anisotropic scatte
+%ring, and bound-thermal
+%scattering reactions. 
+%
+%CENTRM (Continuous Energy TRansport Module) calculates
+%1-D discrete ordinates continuous energy flux spectrum for a unit cell.
+%• PMC (Pointwise Multigroup Converter) uses continuous
+%energy flux and cross sections from CENTRM to generate
+%problem-dependent
+%multigroup cross sections.
+%• CENTRM/PMC explicitly handles effects from the following:
+%– fissile material in the fuel and surrounding moderator
+%–
+%overlapping resonances
+%– anisotropic scattering
+%– inelastic level scattering
+
+
+% Mention SAMPLER
+% comparison of xsusa, two-step methods paper...methods are consistent. 
+% SCALE
+% diagrams for propagation

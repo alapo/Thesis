@@ -2,9 +2,21 @@
 \documentclass[thesis]{thesis-umich}
 
 % Load additional packages
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows}
 \usepackage{algpseudocode}
 \usepackage{algorithm}
 \usepackage{array}
+
+% Define block styles for tikz
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=10em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+
 
 % Title of the thesis
 \title{Reduced Order Models for Calibration of Nuclear Reactor Simulation Codes}
@@ -59,6 +71,9 @@ Professor John P. Boyd}
  \acro{UAM}{Uncertainty Analysis in Modeling}
  \acro{GP}{Gauss-Patterson}
  \acro{CC}{Clenshaw-Curtis}
+ \acro{PARCS}{Purdue Advanced Reactor Core Simulator}
+ \acro{SCALE}{Standardized Computer Analyses for Licensing Evaluation}
+ \acro{ENDF}{Evaluated Nuclear Data File}
 }
 
 % Some abstract text

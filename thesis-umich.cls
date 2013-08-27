@@ -1404,6 +1404,7 @@
 %% ---- LINKS ----------------------------------------------------------
 % This loads a package that allows extra colors for links.
 \RequirePackage[usenames,dvipsnames]{color}
+\PassOptionsToPackage{dvipsnames}{xcolor}
 % Custom color for references.
 \definecolor{DarkGreen}{rgb}{0,0.6,0}
 
