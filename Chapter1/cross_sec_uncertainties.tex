@@ -63,8 +63,9 @@ The authors in \cite{Williams_Ilas} show that Eq. \ref{eq:bondarenko_prime} can 
 The method described in section \ref{subsec:xsec_sampling} for producing perturbed cross sections will be further described in the context of the modules in \ac{SCALE}. The first step is to produce perturbation factors using the module XSUSA by sampling the \ac{SCALE} \ac{ENDF}/B-VII covariance library. 
 
 \begin{tikzpicture}[node distance = 3.5cm, auto]
+\tikzstyle{every node}=[font=\small]
    % Place nodes
-   \node [block] (xsusa) {\textbf{XSUSA}: Make random perturbations to covariance 
+   \node [block1] (xsusa) {\textbf{XSUSA}: Make random perturbations to covariance 
    library};
    \node [block, below of=xsusa] (clarol) {\textbf{CLAROL+}: 
    Perturb MG xsecs and shielding factors};
@@ -76,10 +77,19 @@ The method described in section \ref{subsec:xsec_sampling} for producing perturb
    {\textbf{CENTRM/PMC}: 
    Perform self-shielding calculations in resolved energy region};  
    \node [block, below of=centrm] (newt) {\textbf{NEWT}: 
-   Perform transport calculations using perturbed xsecs}; 
-   % Invisible node
+   Perform transport calculations using perturbed xsecs};
+   % Invisible nodes
    \node [left of= xsusa, node distance=2.5cm, scale=0.01] (xsusa_i) {};
-   \node 
+   \node [left of= newt, node distance=4.5cm, scale=0.05] (newt_l) {};
+   \node [block, below of=newt_l, node distance=3.0cm] (cov) {Sample 
+   $C_{\Sigma_{FG}}$ matrix};
+   \node [block, below of=cov] (core) {\textbf{Core Simulator}: Simulate perturbed
+   input data};
+   % Invisible npde
+   \node [left of= cov, node distance=6.0cm, scale=0.05] (cov_i) {};
+   \node [left of= core, node distance=3.5cm, scale=0.05] (core_i) {};
+   \node [block1, below of=core_i, node distance=3.0cm] (stats) {Analyze $N_2$ 
+   Results};
    
    % Draw edges
    \path [line] (xsusa) -- node (xsusa_o) {$Q_{x,g}$} (clarol);
@@ -90,32 +100,16 @@ The method described in section \ref{subsec:xsec_sampling} for producing perturb
    \path [line] (bonami) -- node[left] (bonami_o) {initial self-shielded data}
    (centrm);
    \path [line] (centrm) -- node[left] (centrm_o) {final self-shielded data} 
-   (newt);
-   
-   \path[-,draw] (newt) -| node[below]{Repeat $N_1$ times} (xsusa_i.north);
-   \path[line]{} (xsusa_i.north) |- node{} (xsusa);
-   
-
-
-   
-   
-%    \node [cloud, left of=init] (expert) {expert};
-%    \node [cloud, right of=init] (system) {system};
-%    \node [block, below of=init] (identify) {identify candidate models};
-%    \node [block, below of=identify] (evaluate) {evaluate candidate models};
-%    \node [block, left of=evaluate, node distance=3cm] (update) {update model};
-%    \node [decision, below of=evaluate] (decide) {is best candidate better?};
-%    \node [block, below of=decide, node distance=3cm] (stop) {stop};
-%    % Draw edges
-%    \path [line] (init) -- (identify);
-%    \path [line] (identify) -- (evaluate);
-%    \path [line] (evaluate) -- (decide);
-%    \path [line] (decide) -| node [near start] {yes} (update);
-%    \path [line] (update) |- (identify);
-%    \path [line] (decide) -- node {no}(stop);
-%    \path [line,dashed] (expert) -- (init);
-%    \path [line,dashed] (system) -- (init);
-%    \path [line,dashed] (system) |- (evaluate);
+   (newt); 
+   \path [-,draw] (newt) -| node[below]{Repeat $N_1$ times} (xsusa_i.north);
+   \path [line]{} (xsusa_i.north) |- node{} (xsusa);  
+   \path [line] (newt_l) -- node[left] (newt_lo){$C_{\Sigma_{FG}} =$ Cov 
+   $(\Sigma_{FG_1}...\Sigma_{FG_{N_1}})$} (cov);
+   \path [line] (cov) -- node[left] (cov_o){$\Sigma_{FG_i}'$} (core); 
+   \path [-,draw] (core) -| node[below]{Repeat $N_2$ times} (cov_i.north);
+   \path [line]{} (cov_i.north) |- node{} (cov);
+   \path [line] (core_i) -- (stats); 
+ 
 \end{tikzpicture}   
 
 %CENTRM computes neutron flux spectra on a
@@ -156,6 +150,56 @@ The method described in section \ref{subsec:xsec_sampling} for producing perturb
 %– anisotropic scattering
 %– inelastic level scattering
 
+
+%Ultrafine Group Spectrum Code (0D and 1D, +1000G)
+%-
+%Generate fine group spectrum to generate MG Xsec data
+%-
+%Solve the neutron slowin
+%g
+%down e
+%q
+%uation in ultrafine
+%g
+%rou
+%p
+%s
+%gq gp
+%
+%2D Lattice Transport Code (1D and 2D, ~100G)
+%
+%Resonance Self-Shielding Solver
+%-
+%Incor
+%p
+%orate actual com
+%p
+%osition, tem
+%p
+%erature and environment de
+%p
+%endent effect into
+%ppp p
+%resonance shielded Xsec
+%-
+%Solve fine group slowing down problem with
+%collision probability method
+%or subgroup
+%equation
+%
+%Lattice Transport Solver
+%
+%Lattice
+%Transport
+%Solver
+%-
+%Generate MG flux distribution for a heterogen
+%eous configuration for use in generation of
+%homogenized few-group Xsec and intra assembly heterogeneous flux shape
+%-
+%Solve Sn or
+%method of characteristics
+%(MOC) problem
 
 % Mention SAMPLER
 % comparison of xsusa, two-step methods paper...methods are consistent. 
