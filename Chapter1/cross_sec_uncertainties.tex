@@ -60,8 +60,16 @@ The authors in \cite{Williams_Ilas} show that Eq. \ref{eq:bondarenko_prime} can 
 \subsection{Cross Section Sampling in SCALE}
 \label{subsec:scale_sampler}  
 
-The method described in section \ref{subsec:xsec_sampling} for producing perturbed cross sections will be further described in the context of the modules in \ac{SCALE}. The first step is to produce perturbation factors using the module XSUSA by sampling the \ac{SCALE} \ac{ENDF}/B-VII covariance library. 
+The method described in section \ref{subsec:xsec_sampling} for producing perturbed cross sections will be further described in the context of the modules in \ac{SCALE}. The first step is to produce perturbation factors using the module XSUSA by sampling the \ac{SCALE} \ac{ENDF}/B-VII covariance library. If a total of $N_1$ output files of transport solver are desired then $N_1$ sets of perturbation factors are to be obtained. Using the perturbation factors, the \ac{SCALE} module CLAROL+ yields perturbed, infinitely dilute, multigroup cross sections by essentially applying Eq. \ref{eq:infinitely_dilute_xsec_prime}. The resulting cross sections are then passed to the module CRAWDAD+, which outputs perturbed, continuous energy cross sections. To make the multigroup cross sections problem specific they are passed to the BONAMI module, which adjusts the cross sections to account for self-shielding effects in the unresolved energy region using the Bondarenko shielding factor method. Perturbed Bondarenko factors are used in BONAMI, as output from CLAROL+ upon application of Eq. \ref{eq:bondarenko_prime}.
 
+At this point the cross sections still need to be processed for self-shielding effects in the resolved energy region. The \ac{SCALE} modules CENTRM/PMC are responsible for folding in these effects into the multigroup cross sections. CENTRM solves the neutron slowing down equation on an ultra fine spectra on the order of $\mathcal{O}(10^4)$ energy points. For the flux a linear interpolation scheme is used between energy points to produce a continuous energy solution over the entire energy range \cite{Williams_Gehin}. The CENTRM module incorporates actual composition, temperature, and environment dependent effects into the resonance shielded cross sections. PMC accepts the high resolution flux spectra output by CENTRM and averages pointwise nuclear data into multigroup cross sections, which are now tailored to solve the specific problem of interest.              
+
+Finally, the problem specific multigroup cross sections output by CENTRM/PMC are sent to a lattice transport solver, which in this case is the \ac{SCALE} module NEWT. In general, NEWT can be replaced by any transport solver. However, for the purposes of producing few group cross sections a lattice transport solver will generate the multigroup flux distribution for some heterogeneous configuration, which is then used to generate homogenized few group cross sections and intra-assembly flux shapes. A script to extract desireable output quantities from the transport output, such as few group cross sections and kinetics parameters, is needed. Such a script is executed after each of $N_1$ calls to NEWT. Each call extracts a set of perturbed, few group cross sections that are ultimately propagated through a core simulator. The SAMPLER sequence in \ac{SCALE} automates the process of producing perturbed cross section sets \cite{Williams_Ilas}.      
+
+With the availability of $N_1$ perturbed few group cross section sets, each set containing all the nuclear data required by a core simulator, the sets can be directly propagated through the core simulator. The desired results from each simulation can then be gathered and statistically analyzed in what is referred to as the 'one-step' method. However, in what is referred to as the 'two-step' method, the $N_1$ perturbed few group cross section sets can be used to create a few group covariance matrix \cite{TwoStep_Approach}. The few group covariance matrix is then sampled and each sample is propagated through the core simulator. Both the 'one-step' and 'two-step' methods have been shown to produce consistent results \cite{TwoStep_Approach}. However, the 'two-step' method has the advantage of breaking the limitation on the number of samples that can be propagated through the core simulator. In the 'one-step' method each core simulation requires a corresponding transport solution. Transport solutions are relatively expensive to compute when compared to core simulations. A flow diagram of the 'two-step' method is displayed in Figure \ref{fig:sampler_flow_diagram}. For the 'one-step' method $N_1=N_2$ whereas for the 'two-step' method $N_2 >> N_1$, allowing for the acquisition of better statistics.        
+\begin{figure}
+\caption{\label{fig:sampler_flow_diagram}
+Flow diagram of 'two-step' method for core simulators.}
 \begin{tikzpicture}[node distance = 3.5cm, auto]
 \tikzstyle{every node}=[font=\small]
    % Place nodes
@@ -89,7 +97,7 @@ The method described in section \ref{subsec:xsec_sampling} for producing perturb
    \node [left of= cov, node distance=6.0cm, scale=0.05] (cov_i) {};
    \node [left of= core, node distance=3.5cm, scale=0.05] (core_i) {};
    \node [block1, below of=core_i, node distance=3.0cm] (stats) {Analyze $N_2$ 
-   Results};
+   results};
    
    % Draw edges
    \path [line] (xsusa) -- node (xsusa_o) {$Q_{x,g}$} (clarol);
@@ -109,99 +117,6 @@ The method described in section \ref{subsec:xsec_sampling} for producing perturb
    \path [-,draw] (core) -| node[below]{Repeat $N_2$ times} (cov_i.north);
    \path [line]{} (cov_i.north) |- node{} (cov);
    \path [line] (core_i) -- (stats); 
- 
 \end{tikzpicture}   
+\end{figure}
 
-%CENTRM computes neutron flux spectra on a
-%tailored mesh of ~30,000 to 70,000 energy points,
-%as a function of space and direction, using one-
-%dimensional (1D) discrete ordinates or other
-%transport approximations homogeneous medium
-%with buckling; 1D collision probability, or P
-%1
-%(Williams and Asgari, 1995). A linear variation of
-%the flux is assumed between energy points, so that
-%a continuous-energy solution is generated over the
-%entire energy range.
-%The high resolution flux spectra from CENTRM are passed to PMC, where
-%they are used as weigh
-%ting functions to average
-%pointwise (PW) nuclear data into problem-specific
-%MG cross sections. The CENTRM transport
-%solution accounts for temperature-dependent self-
-%shielding effects due to resonance absorption,
-%cross-shielding from overlapping resonances of
-%different materials, space-
-%dependent slowing-down
-%with anisotropic scatte
-%ring, and bound-thermal
-%scattering reactions. 
-%
-%CENTRM (Continuous Energy TRansport Module) calculates
-%1-D discrete ordinates continuous energy flux spectrum for a unit cell.
-%• PMC (Pointwise Multigroup Converter) uses continuous
-%energy flux and cross sections from CENTRM to generate
-%problem-dependent
-%multigroup cross sections.
-%• CENTRM/PMC explicitly handles effects from the following:
-%– fissile material in the fuel and surrounding moderator
-%–
-%overlapping resonances
-%– anisotropic scattering
-%– inelastic level scattering
-
-
-%Ultrafine Group Spectrum Code (0D and 1D, +1000G)
-%-
-%Generate fine group spectrum to generate MG Xsec data
-%-
-%Solve the neutron slowin
-%g
-%down e
-%q
-%uation in ultrafine
-%g
-%rou
-%p
-%s
-%gq gp
-%
-%2D Lattice Transport Code (1D and 2D, ~100G)
-%
-%Resonance Self-Shielding Solver
-%-
-%Incor
-%p
-%orate actual com
-%p
-%osition, tem
-%p
-%erature and environment de
-%p
-%endent effect into
-%ppp p
-%resonance shielded Xsec
-%-
-%Solve fine group slowing down problem with
-%collision probability method
-%or subgroup
-%equation
-%
-%Lattice Transport Solver
-%
-%Lattice
-%Transport
-%Solver
-%-
-%Generate MG flux distribution for a heterogen
-%eous configuration for use in generation of
-%homogenized few-group Xsec and intra assembly heterogeneous flux shape
-%-
-%Solve Sn or
-%method of characteristics
-%(MOC) problem
-
-% Mention SAMPLER
-% comparison of xsusa, two-step methods paper...methods are consistent. 
-% SCALE
-% diagrams for propagation
