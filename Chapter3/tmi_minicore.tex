@@ -4,8 +4,66 @@
 \subsection{Problem Statement}
 \label{subsec:tmi_minicore_ps}
 
-The previous two problems dealt with relatively simple functions that don't require industrial engineering codes to solve. However, the main intention of this thesis is to construct reduced order models for computer codes that aim to model large engineering systems. Interaction with such computer codes consist of input and output files; the governing equations and their solvers are rarely seen. The primary purpose of this demonstration problem is to show that the same algorithms applied to analyze the previous problems are also functional when applied to engineering computer codes.
+The previous two problems dealt with relatively simple functions that don't require industrial engineering codes to solve. However, the main intention of this thesis is to construct reduced order models for computer codes that aim to model large and complex engineering systems. Interaction with such computer codes consist of input and output files; the governing equations and their solvers are rarely seen. The primary purpose of this demonstration problem is to show that the same algorithms applied to analyze the previous problems are also functional when applied to engineering computer codes.
 
-In this demonstration problem the reactor core simulator code \ac{PARCS} \cite{PARCS} is applied to the \ac{TMI} minicore described in the first phase of the \ac{UAM} Benchmark \cite{UAM_Benchmark}.
+In this demonstration problem the reactor core simulator code \ac{PARCS} \cite{PARCS} is applied to the \ac{TMI} minicore described in the first phase of the \ac{UAM} Benchmark \cite{UAM_Benchmark}. The minicore problem consists of a three-by-three fuel assembly configuration with reflector blocks placed around the assemblies, as seen in Figure \ref{fig:tmi_minicore}. In the minicore the central assembly is rodded while the periphery fuel assemblies are unrodded. Vacuum boundary conditions are applied. The few-group, homogenized cross section description for each fuel assembly consists of transport, absorption, nu-fission, and scatter cross sections along with values for \ac{ADFs}. For a two-group problem the total number of cross sections to describe an assembly is nine. Since the homogenized reflector region does not support fission only seven homogenized cross sections are required to describe it. Consequently, to model the minicore configuration in Fig. \ref{fig:tmi_minicore} in \ac{PARCS} a total of twenty five homogenzied, two-group cross sections are needed.  
+\begin{figure}[!htb]
+\caption{\label{fig:tmi_minicore}
+\ac{TMI} minicore configuration used for analysis, as defined in the \ac{UAM} Benchmark specifications.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter3/tmi_minicore.pdf}
+ \end{center}
+\end{figure}  
 
-% how cross sections generated, diagram of minicore    
+In order to study the effects of the uncertainties inherent in the few-group cross sections on output parameters of interest in \ac{PARCS}, a few-group covariance matrix is necessary. The few-group covariance matrix is obtained using the 'two-step' method depicted in Fig. \ref{fig:sampler_flow_diagram}. A total of 300 transport calculations with perturbed multigroup cross sections were executed to generate the few-group covariance matrix. In the previous example problems only one output parameter was investigated at a time. However, recall in the discussion of the Smolyak algorithm that interpolation is only performed on the random space. The objective function is evaluated at each abscissa in the random space, returning an output that can still be a function of physical space. In this case the hierarchical surplus is no longer one dimensional. Rather, the hierarchical surplus in Eq. \ref{eq:hierarchical_surplus} is rewritten as,
+\begin{equation} 
+\label{eq:hierarchical_surplus_space}
+   f(\mathbf{x}, x_{j_1}^{i_1},...,x_{j_d}^{i_d}) - 
+    A(q-1,d)(\mathbf{x}, x_{j_1}^{i_1},...,x_{j_d}^{i_d})
+\end{equation}
+where $\mathbf{x} \in \mathcal{D}$ is a coordinate in the spatial domain. When the objective function is a function of spatial coordinates the Smolyak algorithm approximates the function as a linear combination of vectors, the linear weights still being tensor products of basis functions for the random space. To determine the mean and variance of a reduced order model approximation of some space-dependent objective function the $L_2$ norm is taken over the spatial domain $\mathcal{D}$. Similarly, to identify important dimensions using the sensitivity coefficient defined in Eq. \ref{eq:anova_sensitivity} the $L_2$ norm is taken of $\eta_i(\mathbf{x})$.  
+
+The problem in this section considers the core box power distribution of the minicore in Fig. \ref{fig:tmi_minicore} and consequently, the objective function is space dependent. For each simulation in \ac{PARCS} a vector of length nine is returned with each entry containing the relative box power in the fuel assemblies. The box powers are calculated such that the average of all nine entries is identically equal to unity. In the \ac{PARCS} output file the box powers are only given to four digits of accuracy and therefore roundoff error in this problem warrants some attention.  
+
+\subsection{Analysis}
+\label{subsec:tmi_analysis}
+
+\begin{table}[!htb] 
+\caption{\label{table:tmi_mean_sd_mc} 
+Mean and standard deviation data for \ac{TMI} minicore box powers where \ac{PARCS} code is used as objective function. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
+\centering
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Assembly} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} & \textbf{99\% CI} \\ \hline
+1 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ \hline 
+2 & 1.1499 & (1.1498, 1.1500) & 0.0011 & (0.0010, 0.0012) \\ \hline
+3 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ \hline
+4 & 1.1499 & (1.1498, 1.1500) & 0.0011 & (0.0010, 0.0012) \\ \hline
+5 & 1.0453 & (1.0450, 1.0456) & 0.0027 & (0.0025, 0.0029) \\ \hline
+6 & 1.1499 & (1.1498, 1.1500) & 0.0011 & (0.0010, 0.0012) \\ \hline
+7 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ \hline
+8 & 1.1499 & (1.1498, 1.1500) & 0.0011 & (0.0010, 0.0012) \\ \hline
+9 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ 
+\hline \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[!htb] 
+\caption{\label{table:tmi_mean_sd_1d} 
+Mean and standard deviation data for \ac{TMI} minicore box powers where the objective function is a reduced order model for \ac{PARCS} containing only 1D components. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
+\centering
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Assembly} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} & \textbf{99\% CI} \\ \hline
+1 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ \hline 
+2 & 1.1500 & (1.1499, 1.1501) & 0.0012 & (0.0011, 0.0013) \\ \hline
+3 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ \hline
+4 & 1.1500 & (1.1499, 1.1501) & 0.0012 & (0.0011, 0.0013) \\ \hline
+5 & 1.0455 & (1.0452, 1.0458) & 0.0027 & (0.0025, 0.0029) \\ \hline
+6 & 1.1500 & (1.1499, 1.1501) & 0.0011 & (0.0010, 0.0012) \\ \hline
+7 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\ \hline
+8 & 1.1500 & (1.1499, 1.1501) & 0.0012 & (0.0011, 0.0013) \\ \hline
+9 & 0.8387 & (0.8386, 0.8388) & 0.0007 & (0.0006, 0.0008) \\
+\hline \hline
+\end{tabular}
+\end{table}

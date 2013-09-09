@@ -149,7 +149,7 @@ True Function & 1.03193 & (1.03175, 1.03211) & 0.002196 & (0.002076, 0.002330) \
 \end{tabular}
 \end{table}
 As evidenced in Table \ref{table:pk_mean_variance} the statistical results for each method are consistent. While the reduced order model with superposition dimension of three is able to replicate the Monte Carlo results to five significant figures, the expected accuracy, the order-one superposition model is slightly short. Of course, this is due to the absence of higher order components. However, the proximity of the order-one superposition model's results to the true results indicate that for this problem the higher order components do not have a significant impact. To further verify the ability of the reduced order models to accurately reproduce basic statistical moments, the probability distributions for the normalized maximum fuel temperature produced by each model are compared in Figure \ref{fig:pk_histograms}. 
-\begin{figure}
+\begin{figure}[!htb]
 \caption{\label{fig:pk_histograms}
 Histograms produced by sampling the true function, order-one superposition reduced order model, and the full adaptive reduced order model.  
 }
@@ -160,7 +160,7 @@ Histograms produced by sampling the true function, order-one superposition reduc
 All of the tested reduced order models are able to reproduce the Gaussian probability distribution for the normalized maximum fuel temperature. 
 
 As done in section \ref{subsec:kinf_analysis}, a sensitivity analysis will be completed for the reduced order model and compared to the normalized sensitivity coefficients obtained using central differencing. From Table \ref{table:pk_sensitivities} notice that the largest sensitivity coefficients are those of the random variables deemed "important" using the adaptive reduced order model algorithm. Only the sensitivity coefficients for the Clenshaw-Curtis sparse grid are shown in Table \ref{table:pk_sensitivities} since the Gauss-Patterson sparse grid returns identical results. The normalized sensitivity coefficients calculated using the reduced order models are the same as those calculated using central differencing to the expected number of significant digits.   
-\begin{table} 
+\begin{table}[!htb] 
 \caption{\label{table:pk_sensitivities} 
 Normamlized sensitivity coefficients of the maximum fuel temperature to random variables.}
 \centering
