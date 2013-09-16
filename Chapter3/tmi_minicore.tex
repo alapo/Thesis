@@ -28,6 +28,10 @@ The problem in this section considers the core box power distribution of the min
 \subsection{Analysis}
 \label{subsec:tmi_analysis}
 
+In this analysis a pure 'two-step' approach is used to compare the results obtained using a reduced order model for the box powers output in \ac{PARCS}. For the 'two-step' approach a few group covariance matrix is constructed and sampled 500 times, with each sample containing perturbed few group cross sections. Each cross section set is propagated through the \ac{PARCS} code and the box powers for the fuel assemblies are extracted from the output file. Ultimately, 500 box power outputs are analyzed statistically to obtain correlations, means, and variances. The same few group covariance matrix is used to sample the reduced order model for the box powers.    
+
+To build a reduced order model, Algorithm \ref{code:rom_algorithm} is applied with a hierarchical surplus threshold of $10^{-4}$ since the \ac{PARCS} box powers are only output to four decimal places. Consequently, roundoff error may accumulate in the fourth decimal point of the reduced order model. A total of 123 executions of \ac{PARCS} were required to construct all single order components of the reduced order model using Clenshaw-Curtis abscissas. Due to the geometry of the \ac{TMI} minicore, 1/8 symmetry is expected in the box power results. Consequently, only fuel assemblies one, four and five are investigated, as defined in Fig. \ref{fig:tmi_minicore}. Sampling results for the mean and standard deviation for the true box power \ac{PARCS} model and the reduced order model are summarized in Tables \ref{table:tmi_mean_sd_mc} and \ref{table:tmi_mean_sd_1d}, respectively. 
+%
 \begin{table}[!htb] 
 \caption{\label{table:tmi_mean_sd_mc} 
 Mean and standard deviation data for \ac{TMI} minicore box powers where \ac{PARCS} code is used as objective function. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
@@ -47,7 +51,7 @@ Mean and standard deviation data for \ac{TMI} minicore box powers where \ac{PARC
 \hline \hline
 \end{tabular}
 \end{table}
-
+%
 \begin{table}[!htb] 
 \caption{\label{table:tmi_mean_sd_1d} 
 Mean and standard deviation data for \ac{TMI} minicore box powers where the objective function is a reduced order model for \ac{PARCS} containing only 1D components. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
@@ -67,3 +71,16 @@ Mean and standard deviation data for \ac{TMI} minicore box powers where the obje
 \hline \hline
 \end{tabular}
 \end{table}
+%
+As always, the same random numbers are used to produce each sample when comparing two different methods. The results are identical in all cases to four significant digits and in most cases, to five significant digits. In the reduced order model results notice that the standard deviation for assembly six is slightly off in the fourth decimal place when compared to assemblies two, four, and eight. The standard deviation should be equal in these four assemblies due to symmetry, indicating the presence of roundoff error.        
+
+Adding higher order components in accordance with Algorithm \ref{code:rom_algorithm} did not improve the statistics of the reduced order model. For the purposes of uncertainty quantification the reduced order model consisting entirely of 1D components is sufficient for this problem. The bivariate distributions for the box powers for all combinations of assemblies one, four, and five are given in Fig. \ref{fig:tmi_correlations}.    
+\begin{figure}[!htb]
+\caption{\label{fig:tmi_correlations}
+Multivariate distributions for the box powers of two assemblies. Dashed distributions were obtained by sampling the reduced order model consisting of only 1D components.}
+ \begin{center}
+  \includegraphics[scale=.70]{./Chapter3/tmi_correlations.pdf}
+ \end{center}
+\end{figure} 
+For each case in Fig. \ref{fig:tmi_correlations} the bivariate distributions are obtained by sampling the reduced order model and \ac{PARCS}. Variations between the overlayed distributions can be attributed to roundoff error. A decrease in the box power of assembly five is equivalent to an increase in the absorption of the assembly's control rods, which effectively shifts the neutron flux away from the central assembly. Consequently, a negative correlation is expected between assemblies one and five and between assemblies one and four. Indeed, statistical sampling has the Pearson correlation coefficient for the box powers of assemblies one and four to be $-0.83$ and $-0.84$ between assemblies one and five. However, negative correlation coefficients between assembly one and assemblies four and five implies a positive correlation coefficient between assemblies four and five. The positive correlation coefficient of $+0.40$ between assemblies four and five is evident in Fig. \ref{fig:tmi_correlations}.  
+
