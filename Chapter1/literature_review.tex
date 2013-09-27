@@ -15,13 +15,25 @@ The polynomial chaos expansions based on stochastic galerkin methods applied in 
 
 To this end the stochastic collocation method, a variant of polynomial chaos expansion, is considered since it circumvents the need to modify engineering code in order to implement spectrally converging uncertainty quantification methods. Stochastic collocation methods are essentially interpolatory, projecting a set of deterministic simulations onto a polynomial basis. With stochastic collocation codes can be treated as "black boxes". Such an attribute is highly desireable for the uncertainty analysis of nuclear engineering computer codes since often these consist of coupled, multi-physics, and multi-scale legacy code. The success of perturbatory methods, which are linear, in the uncertainty analysis of nuclear engineering codes is indicative of the potential for stochastic collocation. Being a spectral method, stochastic collocation performs best on smooth functions \cite{BoydSpec}.    
 
-However, even when utilizing a stochastic collocation method based on sparse grid constructs, the method suffers from the so-called "curse of dimensionality" \cite{LeMaitreKnio}. The "curse of dimensionality" arises when the convergence of a method is proportional to the exponent of the the function's dimensionality, as in a full tensor product interpolation scheme. While sparse grids help to mitigate the "curse of dimensionality" researchers have shown that when applied to realistic engineering computer simulations the practicality of stochastic collocation diminishes for dimensions greater than $\mathcal{O}(10)$ \cite{AHSGC_HighDimensions}. Consequently, further mitigation is needed in order to apply stochastic collocation to real-world engineering problems. To this end, reduced order models, also known as surrogates and response surfaces, are utilized. Reduced order models work to find a relatively small subspace of some function that is still representative of the original function space. 
+However, even when utilizing a stochastic collocation method based on sparse grid constructs, the method suffers from the so-called "curse of dimensionality" \cite{LeMaitreKnio}. The "curse of dimensionality" arises when the convergence of a method is proportional to the exponent of the the function's dimensionality, as in a full tensor product interpolation scheme. While sparse grids help to mitigate the "curse of dimensionality" researchers have shown that when applied to realistic engineering computer simulations the practicality of stochastic collocation diminishes for dimensions greater than $\mathcal{O}(10)$ \cite{AHSGC_HighDimensions}. Consequently, further mitigation is needed in order to apply stochastic collocation to real-world engineering problems. To this end, reduced order models, also known as surrogate models, are utilized. Reduced order models work to find a relatively small subspace of some function that is still representative of the original function space. 
 
-Performing uncertainty quantification on high-dimensional, coupled, multiphysics engineering codes can be prohibitive if the codes take many hours to run. To make uncertainty quantification feasible for such problems reduced order models are constructed. While a reduced order model may be computationally expensive to build, the ideal end product is a function that can be evaluated in seconds that captures the behavior of the objective function on which the reduced order model is based.    
+Performing uncertainty quantification on high-dimensional, coupled, multiphysics engineering codes can be prohibitive if the codes take many hours to run. To make uncertainty quantification feasible for such problems reduced order models are constructed. While a reduced order model may be computationally expensive to build, the ideal end product is a function that can be evaluated in seconds that captures the behavior of the objective function on which the reduced order model is based. Due to the rapid evaluation of the reduced order model, uncertainty quantification and optimization studies can be carried out. 
 
+%Model reduction is a systematic approach for deriving cost-
+%efficient representations of large-scale systems that result, for example, from dis-
+%cretization of partial differential equations (PDEs). Reduced models are essential
+%in applications such as optimal design, optimal control, probabilistic analysis, and
+%inverse problems, for which the physical system must be simulated repeatedly and
+%thus computations with the large-scale model become prohibitive. To be useful for
+%these applications, the reduced model must provide an accurate representation of the
+%large-scale model over a wide range of parameters.
+
+%Talk about if you can only afford a limited number of data points. Statistics from trend. Or, if more flexibility available, mathematically advantageous points, interpolate those and get spectrall converging statistics. 
+%\cite{Giunta}
+ 
 %Time to build rom at first, but then pays off for UQ, optimization, inference.
 %consequently, reduced order model/surrogate is needed. mathematical surrogate
 % discuss paper
-% Uncertainty quantification using reduced order models. Stochastic collocation curse of dimensionality, not practical for high dimensions. Must use dimension reduction to make parctical.
+
 
 
