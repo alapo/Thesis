@@ -6,7 +6,7 @@
 
 In an infinite lattice a reactor of infinite size is considered and therefore neutrons are not capable of leaking out of the system. An infinite lattice effectively removes the effects of geometry in neutron transport and characterizes the system entirely in terms of its material properties. Since the physics of an infinite lattice are greatly simplified an analytic analysis of the system is possible. Consequently, the infinite lattice problem is ideal for an initial analysis of any new computational method. 
 
-To begin, the mathemtical formulation of an infinite lattice will be described. In matrix form the two-group neutron balance equations for an infinite lattice can be written as,
+To begin, the mathematical formulation of an infinite lattice will be described. In matrix form the two-group neutron balance equations for an infinite lattice can be written as,
 \begin{equation}
 \label{eq:infinite_lattice_neutron_balance}
    \left(
@@ -88,7 +88,7 @@ Since there exists an analytic expression for $k_{\infty}$ the sensitivity vecto
     k_{\infty}(\Sigma_i - \Delta\Sigma_i)}
     {2\Delta\Sigma_i}
 \end{equation} 
-where all cross sections $\Sigma_j$, $j\neq i$, are held at their mean values. Generally a one percent perturbation $\Delta\Sigma$ is sufficient to obtain accurate sensitivities although this rule of thumb is dependent on the smoothness of the objective function. With a variety of methods available to obtain sensitivities and statistical momements of $k_{\infty}$ it is possible to thoroughly assess the potential of a reduced order model.       
+where all cross sections $\Sigma_j$, $j\neq i$, are held at their mean values. Generally a one percent perturbation $\Delta\Sigma$ is sufficient to obtain accurate sensitivities although this rule of thumb is dependent on the smoothness of the objective function. With a variety of methods available to obtain sensitivities and statistical moments of $k_{\infty}$ it is possible to thoroughly assess the potential of a reduced order model.       
      
 \subsection{Analysis}
 \label{subsec:kinf_analysis}
@@ -96,7 +96,7 @@ where all cross sections $\Sigma_j$, $j\neq i$, are held at their mean values. G
 Several elements of the methodologies described in Chapter \ref{chap:rom} will be tested in this section and compared to results obtained using analytic and Monte Carlo approaches. For all Smolyak sparse grids constructed the hypercube domain extends to six standard deviations in each random variable. Since $k_{\infty}$ is a function of only five random variables a sparse grid interpolant will be constructed without applying any function decomposition in order to demonstrate the accuracy and convergence of the method. The convergence criteria for the sparse grid interpolant is set such that the maximum hierarchical surplus at a given level is not to exceed $10^{-10}$. Both Clenshaw-Curtis and Gauss-Patterson abscissas are tested. 
 \begin{figure}
 \caption{ \label{fig:kinf_sg_convergence}
-Convergence study of a five dimensional sparse grid interpolant for the  multiplcation factor of an infinite TMI lattice. The boxed numbers represent the current number of knots in the sparse grid.}
+Convergence study of a five dimensional sparse grid interpolant for the  multiplication factor of an infinite TMI lattice. The boxed numbers represent the current number of knots in the sparse grid.}
  \begin{center}
   \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_convergence.pdf}
  \end{center}
@@ -128,10 +128,10 @@ Sandwich               &         &                    & 0.006540 &              
 \end{tabular}
 \end{table}
 
-The five dimensional sparse grid interpolant results are entirely self consistent with the anchored-\ac{ANOVA} results. Further, both of these methods produce identical results to those obtained using Monte Carlo sampling. Although the analytic variance from the Sandwich Equation is within the 99\% confidence bounds of each model's results, there is a notable difference due to the fact that only 1000 samples were used to obtain each model's statistics. Increasing the number of samples decreased the difference. Note that in Table \ref{table:kinf_mean_variance} the anchored-\ac{ANOVA} the reduced order models consisting of only one dimension anchored-\ac{ANOVA} components perfrom just as well as the full decomposition and the sparse grid interpolants over all five random variables. However, the 1D component models require only 29 function evaluations to produce, which is some ten times fewer evaluations than the 5D interpolants, and some hundred times fewer evaluations than the full decomposition. 
+The five dimensional sparse grid interpolant results are entirely self consistent with the anchored-\ac{ANOVA} results. Further, both of these methods produce identical results to those obtained using Monte Carlo sampling. Although the analytic variance from the Sandwich Equation is within the 99\% confidence bounds of each model's results, there is a notable difference due to the fact that only 1000 samples were used to obtain each model's statistics. Increasing the number of samples decreased the difference. Note that in Table \ref{table:kinf_mean_variance} the anchored-\ac{ANOVA} the reduced order models consisting of only one dimension anchored-\ac{ANOVA} components perform just as well as the full decomposition and the sparse grid interpolants over all five random variables. However, the 1D component models require only 29 function evaluations to produce, which is some ten times fewer evaluations than the 5D interpolants, and some hundred times fewer evaluations than the full decomposition. 
 \begin{figure}
 \caption{ \label{fig:kinf_numknots}
-Cummulative number of knots required at each level of an anchored-\ac{ANOVA} decomposition of the multiplication factor of an infinite TMI lattice. Boxes contain the calculated standard deviation at the current level.}
+Cumulative number of knots required at each level of an anchored-\ac{ANOVA} decomposition of the multiplication factor of an infinite TMI lattice. Boxes contain the calculated standard deviation at the current level.}
  \begin{center}
   \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_numknots.pdf}
  \end{center}
