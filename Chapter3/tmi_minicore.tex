@@ -33,7 +33,7 @@ In this analysis a pure 'two-step' approach is used to compare the results obtai
 To build a reduced order model, Algorithm \ref{code:rom_algorithm} is applied with a hierarchical surplus threshold of $10^{-4}$ since the \ac{PARCS} box powers are only output to four decimal places. Consequently, roundoff error may accumulate in the fourth decimal point of the reduced order model. A total of 123 executions of \ac{PARCS} were required to construct all single order components of the reduced order model using Clenshaw-Curtis abscissas. Due to the geometry of the \ac{TMI} minicore, 1/8 symmetry is expected in the box power results. Consequently, only fuel assemblies one, four and five are investigated, as defined in Fig. \ref{fig:tmi_minicore}. Sampling results for the mean and standard deviation for the true box power \ac{PARCS} model and the reduced order model are summarized in Tables \ref{table:tmi_mean_sd_mc} and \ref{table:tmi_mean_sd_1d}, respectively. 
 %
 \begin{table}[!htb] 
-\caption{\label{table:tmi_mean_sd_mc} 
+\caption[Mean and standard deviation data for \ac{TMI} minicore box powers where the \ac{PARCS} code is the objective function.]{\label{table:tmi_mean_sd_mc} 
 Mean and standard deviation data for \ac{TMI} minicore box powers where \ac{PARCS} code is used as objective function. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
 \centering
 \begin{tabular}{||c|c|c|c|c||} 
@@ -53,7 +53,7 @@ Mean and standard deviation data for \ac{TMI} minicore box powers where \ac{PARC
 \end{table}
 %
 \begin{table}[!htb] 
-\caption{\label{table:tmi_mean_sd_1d} 
+\caption[Mean and standard deviation data for \ac{TMI} minicore box powers where the objective function is a reduced order model for \ac{PARCS} containing only 1D components.]{\label{table:tmi_mean_sd_1d} 
 Mean and standard deviation data for \ac{TMI} minicore box powers where the objective function is a reduced order model for \ac{PARCS} containing only 1D components. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
 \centering
 \begin{tabular}{||c|c|c|c|c||} 
@@ -76,7 +76,7 @@ As always, the same random numbers are used to produce each sample when comparin
 
 Adding higher order components in accordance with Algorithm \ref{code:rom_algorithm} did not improve the statistics of the reduced order model. For the purposes of uncertainty quantification the reduced order model consisting entirely of 1D components is sufficient for this problem. The bivariate distributions for the box powers for all combinations of assemblies one, four, and five are given in Fig. \ref{fig:tmi_correlations}.    
 \begin{figure}[!htb]
-\caption{\label{fig:tmi_correlations}
+\caption[Multivariate distributions for the box powers of \ac{TMI} assemblies.]{\label{fig:tmi_correlations}
 Multivariate distributions for the box powers of two assemblies. Dashed distributions were obtained by sampling the reduced order model consisting of only 1D components.}
  \begin{center}
   \includegraphics[scale=.70]{./Chapter3/tmi_correlations.pdf}

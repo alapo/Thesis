@@ -45,7 +45,7 @@ Solving the system in \ref{eq:infinite_lattice_neutron_balance} for the infinite
 \end{equation}
 The infinite multiplication factor is a function of five material parameters. Since this thesis is concerned with the affect of uncertainties in input parameters on computer code outputs, variations in $k_{\infty}$ as a function its stochastic input variables are of interest. Assume all variation in $k_{\infty}$ can be attributed to its input cross sections, whose distributions follow a multivariate Gaussian. To obtain physical homogenized, two-group cross section values a real system must first be modeled in a transport code. The \ac{UAM} Benchmark is sought for this purpose \cite{UAM_Benchmark}. Specifically, the \ac{TMI} assembly is modeled using the two-step method described in \cite{TwoStep_Approach}. A total of 300 perturbed cross section sets were produced to obtain the few-group mean and covariance data used in the proceeding analysis. The cross section data is summarized in Table \ref{table:infintie_lattice_tmi_data}.      
 \begin{table}[!htb]
-\caption{\label{table:infintie_lattice_tmi_data} 
+\caption[TMI infinite lattice two-group cross sections.]{\label{table:infintie_lattice_tmi_data} 
 Two-group cross section data for an infinite TMI lattice.}
 \centering
 \begin{tabular}{||c||c|c|c|c|c|c|c||} 
@@ -95,7 +95,7 @@ where all cross sections $\Sigma_j$, $j\neq i$, are held at their mean values. G
 
 Several elements of the methodologies described in Chapter \ref{chap:rom} will be tested in this section and compared to results obtained using analytic and Monte Carlo approaches. For all Smolyak sparse grids constructed the hypercube domain extends to six standard deviations in each random variable. Since $k_{\infty}$ is a function of only five random variables a sparse grid interpolant will be constructed without applying any function decomposition in order to demonstrate the accuracy and convergence of the method. The convergence criteria for the sparse grid interpolant is set such that the maximum hierarchical surplus at a given level is not to exceed $10^{-10}$. Both Clenshaw-Curtis and Gauss-Patterson abscissas are tested. 
 \begin{figure}
-\caption{ \label{fig:kinf_sg_convergence}
+\caption[Hierarchical surplus convergence for infinite TMI lattice.]{ \label{fig:kinf_sg_convergence}
 Convergence study of a five dimensional sparse grid interpolant for the  multiplication factor of an infinite TMI lattice. The boxed numbers represent the current number of knots in the sparse grid.}
  \begin{center}
   \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_convergence.pdf}
@@ -109,7 +109,7 @@ With the Smolyak interpolation routines working as expected it's safe to apply t
 As a first comparison between all the models developed for quantifying the uncertainty in $k_{\infty}$ the mean and variance values of each model will be compared. With the exception of the variance obtained using the Sandwich Equation, each model's variance was obtained by propagating 1000 samples of Eq. $\ref{eq:sample_covariance}$ through the model. All samples produced for each model were seeded identically and so the same random numbers were drawn. The mean and variance results, along with 99\% confidence intervals, are summarized in Table \ref{table:kinf_mean_variance}. 
     
 \begin{table} 
-\caption{\label{table:kinf_mean_variance} 
+\caption[Mean and variance for TMI infinite multiplication factor.]{\label{table:kinf_mean_variance} 
 Mean and variance data for the multiplication factor of an infinite TMI lattice obtained using Monte Carlo sampling. Wherever sampling was utilized the same random numbers were used.}
 \centering
 \small
@@ -130,7 +130,7 @@ Sandwich               &         &                    & 0.006540 &              
 
 The five dimensional sparse grid interpolant results are entirely self consistent with the anchored-\ac{ANOVA} results. Further, both of these methods produce identical results to those obtained using Monte Carlo sampling. Although the analytic variance from the Sandwich Equation is within the 99\% confidence bounds of each model's results, there is a notable difference due to the fact that only 1000 samples were used to obtain each model's statistics. Increasing the number of samples decreased the difference. Note that in Table \ref{table:kinf_mean_variance} the anchored-\ac{ANOVA} the reduced order models consisting of only one dimension anchored-\ac{ANOVA} components perform just as well as the full decomposition and the sparse grid interpolants over all five random variables. However, the 1D component models require only 29 function evaluations to produce, which is some ten times fewer evaluations than the 5D interpolants, and some hundred times fewer evaluations than the full decomposition. 
 \begin{figure}
-\caption{ \label{fig:kinf_numknots}
+\caption[Cumulative knot count for constructing an anchored-\ac{ANOVA} decomposition.]{ \label{fig:kinf_numknots}
 Cumulative number of knots required at each level of an anchored-\ac{ANOVA} decomposition of the multiplication factor of an infinite TMI lattice. Boxes contain the calculated standard deviation at the current level.}
  \begin{center}
   \includegraphics[scale=.75]{./Chapter3/kinf_sparse_grid_numknots.pdf}

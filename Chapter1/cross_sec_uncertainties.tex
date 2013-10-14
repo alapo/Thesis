@@ -68,7 +68,7 @@ Finally, the problem specific multigroup cross sections output by CENTRM/PMC are
 
 With the availability of $N_1$ perturbed few group cross section sets, each set containing all the nuclear data required by a core simulator, the sets can be directly propagated through the core simulator. The desired results from each simulation can then be gathered and statistically analyzed in what is referred to as the 'one-step' method. However, in what is referred to as the 'two-step' method, the $N_1$ perturbed few group cross section sets can be used to create a few group covariance matrix \cite{TwoStep_Approach}. The few group covariance matrix is then sampled and each sample is propagated through the core simulator. Both the 'one-step' and 'two-step' methods have been shown to produce consistent results \cite{TwoStep_Approach}. However, the 'two-step' method has the advantage of breaking the limitation on the number of samples that can be propagated through the core simulator. In the 'one-step' method each core simulation requires a corresponding transport solution. Transport solutions are relatively expensive to compute when compared to core simulations. A flow diagram of the 'two-step' method is displayed in Figure \ref{fig:sampler_flow_diagram}. For the 'one-step' method $N_1=N_2$ whereas for the 'two-step' method $N_2 >> N_1$, allowing for the acquisition of better statistics.        
 \begin{figure}
-\caption{\label{fig:sampler_flow_diagram}
+\caption['Two-Step' method flow diagram.]{\label{fig:sampler_flow_diagram}
 Flow diagram of 'two-step' method for core simulators.}
 \begin{tikzpicture}[node distance = 3.5cm, auto]
 \tikzstyle{every node}=[font=\small]

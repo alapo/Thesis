@@ -57,7 +57,7 @@ The equations in \ref{eq:pk_power}, \ref{eq:pk_precursors}, \ref{eq:pk_coolant},
 \end{equation}
 By treating the coefficients in the point kinetics/lumped thermal hydraulics model as random variables, the objective function investigates the response surface for the maximum fuel temperature attained during transient. The reduced order methodologies will be tested against the stated problem. A depiction of the transient at the random variables' mean values, along with the external reactivity is shown in Figure \ref{fig:pk_transient}.  
 \begin{figure}
-\caption{ \label{fig:pk_transient}
+\caption[Half sawtooth external reactivity insertion transient behavior.]{ \label{fig:pk_transient}
 Transient resulting from a half sawtooth external reactivity insertion, as modeled using the mean parameter values of the point kinetics/lumped thermal hydraulics system.}
  \begin{center}
   \includegraphics[scale=.75]{./Chapter3/pk_power.pdf}
@@ -65,7 +65,7 @@ Transient resulting from a half sawtooth external reactivity insertion, as model
 \end{figure}
 A total of twenty two random variables will be investigated for their affect on the maximum fuel temperature attained during transient. The random variables' mean values, along with their standard deviations are listed in \ref{table:pkinetics_parameters}. Note that all standard deviations are taken to be 5\% of the mean value. All random variables are assumed to be independent of one another, as was assumed in \cite{Gilli_mc2011}. 
 \begin{table} 
-\caption{\label{table:pkinetics_parameters} 
+\caption[Parameter values used in a point kinetics/lumped thermal hydraulics model of a BN800 fast sodium cooled reactor.]{\label{table:pkinetics_parameters} 
 Mean parameter values used in the point kinetics/lumped thermal hydraulics model for the analysis of a BN800 fast sodium cooled reactor.}
 \centering
 \begin{tabular}{||c|c|c|c||} 
@@ -98,7 +98,7 @@ $\rho_{max}$ &                &  4.19E-04  &  2.09e-05  \\
 \end{table}
 A plot of the fuel temperature as a function of time due to the external reactivity profile shown in the same figure is depicted in Figure \ref{fig:pk_fuel_temp}. 
 \begin{figure}[!htb]
-\caption{ \label{fig:pk_fuel_temp}
+\caption[Fuel temperature transient resulting from a half sawtooth reactivity insertion.]{ \label{fig:pk_fuel_temp}
 Fuel temperature transient resulting from a half sawtooth reactivity insertion. All parameters in the coupled point kinetics/lumped thermal hydraulics equations are held at their mean values. 
 }
  \begin{center}
@@ -113,7 +113,7 @@ An adaptive reduced order model, whose formulation is summarized in Algorithm \r
 
 From Figure \ref{fig:pk_importance_pie} the "important" variables are identified to be $Ah$, $\alpha_d$, and $\rho_{max}$. Collectively these three "important" random variables comprise 82\% of the total sensitivity. 
 \begin{figure}[!htb]
-\caption{ \label{fig:pk_importance_pie}
+\caption[Normalized sensitivity indices for random variables comprising the coupled point kinetics/lumped thermal hydraulics equations.]{ \label{fig:pk_importance_pie}
 Normalized sensitivity indices for all random variables comprising the coupled point kinetics/lumped thermal hydraulics equations. The effects of all $\beta_k$ and $\lambda_k$ have been lumped into single $\beta$ a $\lambda$ effects, respectively. 
 }
  \begin{center}
@@ -124,7 +124,7 @@ The indication that the maximum fuel temperature is sensitive to the heat transf
 
 With only three random variables deemed as "important" only three second order anchored-\ac{ANOVA} components must be built for the reduced order model. Neglecting any convergence criteria, third order component describing the interaction effects among the three important random variables is also built. A summary of the total number of function evaluations needed to construct the adaptive reduced order model for the maximum fuel temperature is shown in Figure \ref{fig:pk_sparse_grid_numknots}.          
 \begin{figure}[!htb]
-\caption{\label{fig:pk_sparse_grid_numknots}
+\caption[Cumulative number of knots for constructing a reduced order model of the maximum fuel temperature in the point kinetics/lumped thermal hydraulics model.]{\label{fig:pk_sparse_grid_numknots}
 Number of knots needed to adaptively construct a reduced order model for the maximum fuel temperature in both the Clenshaw-Curtis and Gauss-Patterson schemes. Boxed values state the standard deviation calculated at each level.  
 }
  \begin{center}
@@ -133,7 +133,7 @@ Number of knots needed to adaptively construct a reduced order model for the max
 \end{figure}
 The Gauss-Patterson scheme required almost twice as many knots as Clenshaw-Curtis to adaptively build the reduced order model. From Figure \ref{fig:pk_sparse_grid_numknots} it's clear that the reduced order model consisting of only one dimensional components is effectively just as accurate as the full model, but requiring only 126 function evaluations to build using Clenshaw-Curtis. To see how well the reduced order models are able to reproduce the mean and variance of the true function Monte Carlo simulation is utilized. The models produced using anchored-\ac{ANOVA} decomposition with superposition dimensions of one and three are sampled along with the true function. Mean, variance, and pertinent 99\% confidence intervals for the sampling are summarized in Table \ref{table:pk_mean_variance}. A total of 1000 samples were used for each method, each using the same random numbers.      
 \begin{table}[!htb] 
-\caption{\label{table:pk_mean_variance} 
+\caption[Mean and variance data for maximum fuel temperature achieved during transient.]{\label{table:pk_mean_variance} 
 Mean and variance data for the maximum fuel temperature achieved during transient obtained using Monte Carlo sampling. The same random numbers were used for all 1000 samples for each method.}
 \centering
 \small
