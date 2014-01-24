@@ -44,3 +44,28 @@ Uses Morris' Algorithm to determine which of a function's design variables induc
 \State Return mean and standard deviation of $d_{stats}$ 
 \end{algorithmic}
 \end{algorithm}
+
+\subsection{Latin Hypercube Sampling}
+\label{subsec:lhs}
+
+One of the major problems with random sampling occurs when a relatively limited sample size is utilized. In this case, subsets of the sample space with high consequence but low probability are likely to be missed \cite{Helton}. In addition, the proximity of sampled values caused by random sampling is inefficient, which often causes slow convergence. In order to resolve such issues \ac{LHS} was conjured. The basis of \ac{LHS} rests upon dividing the normalized space of each design variable into $n$ equally sized bins if $n$ samples are required. As a result, when the $n$ samples are taken it is guaranteed that the entire spectrum of each design variable's space has been visited. Algorithmically an $n$ sample Latin hypercube in $k$ dimensions can be easily calculated, as described in algorithm \ref{code:lhs}.
+
+\begin{algorithm}
+\caption{\label{code:lhs} 
+Creates a random Latin hypercube consisting of $n$ samples in $k$ dimensions.} 
+\begin{algorithmic}[1]
+\State Initialize zeros matrix $X$ of size $[n]\times[k]$
+\For {$i=1:k$}
+   \State $p\rightarrow$ Create random permutation of the set $\lbrace 1,2,...,n\rbrace$ 
+   \State $X[:,i] := p[:]$
+\EndFor
+\State Map each entry of $X$ into hypercube
+\State Return $X$ 
+\end{algorithmic}
+\end{algorithm}
+
+Each row of the output from algorithm \ref{code:lhs} is a sample point normalized to a hypercube. As mentioned previously, when sampling a design space it is important to take sample points uniformly. While \ac{LHS} increases the likelihood of obtaining such a uniform sampling space at random it is actually possible to obtain an optimized sampling space based on the maximin metric \cite{Forrester}.    
+
+
+ 
+
