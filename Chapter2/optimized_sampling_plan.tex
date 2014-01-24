@@ -1,0 +1,46 @@
+\section{Optimized Sampling Plans} \label{sec:sampling_plans}
+
+The following section is concerned with the problem of identifying an optimal set of points at which to build a surrogate model for an expensive computer code when only $N$ evaluations can be afforded. All surrogate models are built around a set of points at which the objective computer code is actually evaluated. Intuitively, the surrogate accuracy is expected to decrease as one moves further away from such points. Consequently, it is important to spread $N$ points as uniformly as possible across the design space. 
+
+\subsection{Morris Algorithm}
+\label{subsec:morris_algorithm}
+
+Expensive computer codes generally have many input parameters because they attempt to model some phenomena on a very fine scale as accurately as possible. Of course, when writing such computer codes engineers are not aware which input parameters have the greatest impact on the outputs of interest or else only these parameters would be modeled. Contrarily, engineers typically only know that certain parameters are involved in the pertinent physics in some way but not to what extent. Due to the curse of dimensionality, the less design variables considered in the construction of a surrogate the cheaper the computational cost will be \cite{Forrester}. Consequently, before attempting to construct a surrogate for an expensive computer code it is worth identifying which design variables are most active. After all, if a design variable has a trivial effect on some output of interest then its presence in the surrogate should be minimized, for this is the very purpose of a surrogate model. One method for weeding out unimportant design variables is described by Morris \cite{Morris}, which is summarized in algorithm \ref{code:morris_algorithm}.   
+
+The premise of Morris' algorithm is that if the derivative of some output parameter with respect to a design variable changes significantly throughout the design space then the variable is important. If the output parameter does not change with respect to the design variable then the variable can safely be ignored. To this end, the metric in Eq. \ref{eq:elementary_effect_x} is introduced by Morris to estimate the so-called elementary effect $d_i\left(\textbf{x}\right)$ of design variable $x_i$.
+\begin{equation}
+\label{eq:elementary_effect_x}
+   d_i\left(\textbf{x}\right) = \frac{f\left(x_1,x_2,...,x_{i-1},x_i+\Delta,x_{i+1},....,x_k 										\right) - f\left(\textbf{x}\right)}
+   								{\Delta}      
+\end{equation}  
+In Eq. \ref{eq:elementary_effect_x}, $\Delta$ is a step-length size for the perturbation. For convenience all variables $x_i$ are normalized to unit length and divided into $p$ segments such that $x_i\in\lbrace 0,1/(p-1),2/(p-1),...,1\rbrace$. Choosing a set of $\textbf{x}$ carefully, it is possible to calculate an elementary effect for each of $k$ design variables using only $k+1$ function evaluations. Indeed, as described in \cite{Morris}, a $[k+1]\times [k]$ random orientation matrix $B^*$ can be constructed using the equation,
+\begin{equation}
+\label{eq:random_orientation}
+   \textbf{B}^* = \left(\textbf{1}_{k+1,1}\textbf{x}^* + \frac{\Delta}{2}\left[
+                   \left(2\textbf{B} - \textbf{1}_{k+1,k}\right)\textbf{D}^* + 
+                    \textbf{1}_{k+1,k}\right]\right)\textbf{P}^*.
+\end{equation}            
+In Eq. \ref{eq:random_orientation}, $\textbf{1}$ is a matrix of ones with size specified by its subscript and $\textbf{B}$ is a $[k+1]\times [k]$ matrix of zeros and ones with the characteristic that for each column there exists a pair of rows differing in only their $i^{th}$ entry for $i\in\lbrace 1,2,...,k\rbrace$. Also, $\textbf{D}^*$ is a $[k]\times [k]$ diagonal matrix with ones of differing parity uniformly spread, $\textbf{P}^*$ is a $[k]\times [k]$ random permutation matrix, and $\textbf{x}^*$ is a random point chosen in the $p$-level design space. When the rows of $\textbf{B}^*$ are evaluated by the objective function and substituted into Eq. \ref{eq:elementary_effect_x} an elementary effect is calculated for each design variable. 
+
+The more elementary effects that can be calculated for each design variable, the better the estimate as to the effect of each design variable on the objective function. Consequently, $r$ random orientation matrices are typically created to obtain a total of $r$ elementary effects for each design variable. Taking the mean and standard deviation of each variable's $r$ effects can yield insight into the most important variables. Plotting the mean and standard deviation of each variable's effects on a scatter plot, variables that have a negligible effect on the objective function will cluster around the origin. Large fluctuations in standard deviation are indicative of nonlinear and interactive effects \cite{Morris}. 
+
+\begin{algorithm}
+\caption{\label{code:morris_algorithm} 
+Uses Morris' Algorithm to determine which of a function's design variables induce the most significant effects and interactions.} 
+\begin{algorithmic}[1]
+\State Initialize zeros matrix $d_{stats}$ of size $[r]\times[k]$
+\For {$i=1:r$}
+   \State $X\rightarrow$ Create random orientation matrix 
+   \Comment{Eq. \ref{eq:random_orientation}} 
+   \State $f_{base} = f(X[0,:])$
+   \For {$j=1:k$}
+      \State $f_{new} = f(X[k,:])$
+      \State $l\rightarrow$ Find index of effect being perturbed
+      \State $d_{effect}\rightarrow$ Calculate elementary effect \Comment{Eq. \ref{eq:elementary_effect_x}} 
+      \State $d_{stats}[i,l] = d_{effect}$
+      \State $f_{base} := f_{new}$
+   \EndFor
+\EndFor
+\State Return mean and standard deviation of $d_{stats}$ 
+\end{algorithmic}
+\end{algorithm}
