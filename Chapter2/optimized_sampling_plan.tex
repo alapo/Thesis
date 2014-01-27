@@ -64,7 +64,32 @@ Creates a random Latin hypercube consisting of $n$ samples in $k$ dimensions.}
 \end{algorithmic}
 \end{algorithm}
 
-Each row of the output from algorithm \ref{code:lhs} is a sample point normalized to a hypercube. As mentioned previously, when sampling a design space it is important to take sample points uniformly. While \ac{LHS} increases the likelihood of obtaining such a uniform sampling space at random it is actually possible to obtain an optimized sampling space based on the maximin metric \cite{Forrester}.    
+Each row of the output from algorithm \ref{code:lhs} is a sample point normalized to a hypercube. As mentioned previously, when sampling a design space it is important to take sample points uniformly. While \ac{LHS} increases the likelihood of obtaining such a uniform sampling space at random it is actually possible to obtain an optimized sampling space based on the maximin metric \cite{Forrester}.
+
+The maximin metric describe by Morris and Mitchell \cite{Morris_Mitchell} makes use of two notions in an attempt to quantify the uniformity, or 'space-fillingness', of a set of sampling points. In order to describe the notions for each sampling plan it is useful to gather $\lbrace d_1, d_2, ..., d_m\rbrace$ and $\lbrace J_1, J_2, ..., J_m\rbrace$, the unique distances between all points in the plan sorted in ascending order and the number of occurrences of each distance, respectively. In words, the Morris and Mitchell criteria states that an optimized sampling plan will minimize all $J_i$ while maximizing the corresponding $d_i$. More formally, Morris and Mitchell define the maximin sampling plan as one which maximizes $d_1$, and among plans for which this is true, minimizes $J_1$, among plans for which this is true, maximizes $d_2$, and so on \cite{Forrester}. The previous definition can be restated into pseudo-equivalent minimization problem by introducing the parameter $\Phi_q(\textbf{X})$,
+\begin{equation}
+\label{eq:Phi_q}
+   \Phi_q(\textbf{X}) = \left(\sum_{j=1}^m J_j d_j^{-q} \right)^{1/q}
+\end{equation}
+where $\textbf{X}$ is a sampling plan and $q$ is a control parameter inherent in the minimization problem. 
+
+The minimization of Eq. \ref{eq:Phi_q} and the Morris and Mitchell definition of the maximin sampling plan are generally used in unison to obtain a locally optimal sampling plan since finding the globally optimal plan is computationally infeasible. In this approach a random sampling plan $\textbf{X}_0$ is initially generated using algorithm \ref{code:lhs}. Using a range of $q$ values, usually from one to one-hundred, an optimal latin hypercube plan is found for each value based on the initial sampling plan $\textbf{X}_0$. To obtain an optimized plan for each $q$ algorithms such as simulated annealing \cite{Kirkpatrick} and evolutionary operation \cite{Box} can be used. These algorithms work to minimize Eq. \ref{eq:Phi_q} by comparing an initial sampling plan to perturbed versions, which are obtained by switching pairs of column entries in the output of algorithm \ref{code:lhs}. Once an optimized \ac{LHS} plan is found for each $q$ value, the resulting set of plans are contested directly against each other by explicit application of Morris and Mitchell's maximin definition. The sampling plan satisfying the maximin criteria is the locally optimal sampling plan to be used for proceeding surrogate model construction. Algorithm \ref{code:best_lhs} summarizes the search for a locally optimal \ac{LHS} plan.  
+
+\begin{algorithm}
+\caption{\label{code:best_lhs} 
+Obtains a locally optimal \ac{LHS} plan using the Morris-Mitchell minimax criteria.} 
+\begin{algorithmic}[1]
+\State Initialize sampling plan $\textbf{X}_0$ \Comment{Apply algorithm \ref{code:lhs}}
+\State $q = \left[1, 2, 5, 10, 20, 50, 100\right]$
+\State $\textbf{X}^{cands.} \rightarrow$ Initialize empty array for optimal $\textbf{X}$ candidates
+\For {$q_i$ in $q$}
+   \State $\textbf{X}_{opt}(q_i)\rightarrow$ Find optimal $\textbf{X}$ for $q_i$ using simulated annealing \Comment{Minimize Eq. \ref{eq:Phi_q}}
+   \State Add $\textbf{X}_{opt}(q_i)$ to $\textbf{X}^{cands.}$ 
+\EndFor
+\State Apply Morris-Mitchell criterion between all $(\textbf{X}^{cands.}_i, \textbf{X}^{cands.}_j)$ to find optimal plan
+\end{algorithmic}
+\end{algorithm}
+  
 
 
  
