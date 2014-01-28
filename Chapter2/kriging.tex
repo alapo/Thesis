@@ -1,3 +1,74 @@
 \section{Kriging} \label{sec:kriging}
 
-Write about Kriging!
+The formulation of kriging is such that a deterministic computer code's output is assumed to be a stochastic process, enabling a statistical approach to a surrogate construction \cite{Sacks}. To this end, consider the sampling data $\textbf{X}=\lbrace \textbf{x}^{(1)}, \textbf{x}^{(2)}, ..., \textbf{x}^{(n)}\rbrace$, which may have come from the result of an optimized sampling plan as described in section \ref{subsec:lhs}. At each datum $\textbf{x}^{(k)}$ a random process $Y(\textbf{x}^{(k)})$ induces an observation $y^{(k)}$. In kriging the random field can be described with a mean value of $\textbf{1}\mu$, where $\textbf{1}$ is a vector of length $n$, and a correlation matrix of the random field instances,
+\begin{equation}
+\label{eq:Psi}
+ \boldsymbol{\Psi} =
+ \begin{pmatrix} 
+	cor[Y(\textbf{x}^{(1)}), Y(\textbf{x}^{(1)})] & \cdots & 
+		cor[Y(\textbf{x}^{(1)}), Y(\textbf{x}^{(n)})] \\
+	\vdots & \ddots & \vdots \\ 
+	cor[Y(\textbf{x}^{(n)}), Y(\textbf{x}^{(1)})] & \cdots & 
+		cor[Y(\textbf{x}^{(n)}), Y(\textbf{x}^{(n)})]
+ \end{pmatrix}.
+\end{equation}   
+The correlation between two stochastic processes $Y(\textbf{x}^{(i)})$ and $Y(\textbf{x}^{(l)})$ is expressed as,
+\begin{equation}
+\label{eq:gauss_correlation}
+   cor[Y(\textbf{x}^{(i)}), Y(\textbf{x}^{(l)})] = 
+    \exp\left(-\sum_{j=1}^k \theta_j |x_j^{(i)} - x_j^{(l)} |^{p_j} \right) 
+\end{equation}
+where $\theta_j$ and $p_j$ are optimization parameters controlling the magnitude of correlation at each basis. Specifically the parameter $p_j$ controls a correlation's smoothness while $\theta_j$ defines the spread. 
+
+Given the formulation of the observations occurring at $\textbf{x}^{(k)}$ as instances of a stochastic process it is appropriate to discuss the likelihood of seeing the observed data. Of course, the likelihood is conditional on the parameters described in Eq. \ref{eq:gauss_correlation} as well as the mean and standard deviation of the random field. The likelihood of seeing the observed data can be written as,
+\begin{eqnarray}
+\label{eq:kriging_likelihood1}
+   L\left(\textbf{Y}^{(1)}, ..., \textbf{Y}^{(n)} | 
+    \mu, \sigma, \lbrace \theta_1,..., \theta_k\rbrace, 
+    \lbrace p_1,..., p_k\rbrace\right) = 
+     \frac{1}{\left(2\pi\sigma^2\right)^{n/2}|\boldsymbol{\Psi}|^{1/2}}\times\cdots  \\
+   \times\exp\left[\frac{  \left(\textbf{y}-\textbf{1}\mu\right)^T
+    \boldsymbol{\Psi}^{-1} \left(\textbf{y}-\textbf{1}\mu\right)}
+    {2\sigma^2} \right] . \nonumber
+\end{eqnarray}  
+In order to maximize the likelihood $L$, that is, picking values for the mean and standard deviation that maximize the probability of seeing the observed data, the standard procedures taught in calculus can be applied to obtain the maximum likelihood estimators,
+\begin{equation}
+\label{eq:maxlikelihood_estimator_mu}
+   \hat{\mu} = \frac{ \textbf{1}^T\boldsymbol{\Psi}^{-1}\textbf{y} }
+    				   {  \textbf{1}^T\boldsymbol{\Psi}^{-1}\textbf{1} }
+\end{equation}    
+\begin{equation}
+\label{eq:maxlikelihood_estimator_sigma}
+   \hat{\sigma}^2 = \frac{  \left(\textbf{y}-\textbf{1}\mu\right)^T
+    	\boldsymbol{\Psi}^{-1} \left(\textbf{y}-\textbf{1}\mu\right)}{n}.
+\end{equation}
+The estimators in Eq. \ref{eq:maxlikelihood_estimator_mu}- \ref{eq:maxlikelihood_estimator_sigma} are actually estimators of the natural logarithm of the likelihood since this form is easier to work with. Substitution of Eq. \ref{eq:maxlikelihood_estimator_mu}- \ref{eq:maxlikelihood_estimator_sigma} into the natural logarithm likelihood leads to the so called concentrated ln-likelihood function \cite{Forrester}, given as,
+\begin{equation}
+\label{eq:concentrated_likelihood}
+   \log(L) \approx -\frac{n}{2}\log\left(\hat{\sigma}^2\right) -
+     \frac{1}{2} \log|\boldsymbol{\Psi}|.	
+\end{equation}
+While it is relatively easy to optimize the natural logarithm likelihood with respect to $\mu$ and $\sigma$ it is much more difficult to optimize Eq. \ref{eq:concentrated_likelihood} with respect to the $\theta$ and $p$ parameters discussed earlier. Indeed, global search algorithms such as simulated annealing \cite{Kirkpatrick} are generally used to find optimizing $\theta$ and $p$ parameters. Since such search algorithms require repetitive calls to the objective function, in this specific optimization problem it is important to be able to evaluate Eq. \ref{eq:concentrated_likelihood} efficiently. Quick inspection of Eqs. \ref{eq:maxlikelihood_estimator_mu} - \ref{eq:concentrated_likelihood} leads to the observation that $\boldsymbol{\Psi}$ must be inverted, a common computational bottleneck for large matrices. Fortunately, being symmetric positive-definite, the matrix inversion action of $\boldsymbol{\Psi}$ can be completed efficiently by performing Cholesky decomposition followed by calls to forward and backwards substitution routines.      
+
+Once all optimizing parameters are available the goal is to utilize the parameters to build a model that makes function predictions on new points $\textbf{x}$. Of course, the prediction should be consistent with all correlation parameters. To this end, for some new data point $\textbf{x}$ a vector of correlations with existing points must be constructed using Eq. \ref{eq:gauss_correlation},
+\begin{equation}
+\label{eq:psi_predict}
+ \boldsymbol{\psi} =
+ \begin{pmatrix} 
+	cor[Y(\textbf{x}^{(1)}), Y(\textbf{x})] \\
+	\vdots \\ 
+	cor[Y(\textbf{x}^{(n)}), Y(\textbf{x})] 
+ \end{pmatrix}.
+\end{equation} 
+Using Eq. \ref{eq:psi_predict} new predictions can be made at $\textbf{x}$ using the maximum likelihood estimator,
+\begin{equation}
+\label{eq:kriging_predict}
+   \hat{y}(\textbf{x}) = \hat{\mu} + 
+   		\boldsymbol{\psi}^T\boldsymbol{\Psi}^{-1}
+   		 \left(\textbf{y} - \textbf{1}\hat{\mu}\right).
+\end{equation}
+To get some intuition for Eq. \ref{eq:kriging_predict}, it is worth while to consider the second term on the right-hand side as a perturbation to the mean of the stochastic process. The term $\boldsymbol{\Psi}^{-1}\left(\textbf{y} - \textbf{1}\hat{\mu}\right)$ is a vector of coefficients of the unique linear expansion of $\left(\textbf{y} - \textbf{1}\hat{\mu}\right)$ in the basis columns of $\boldsymbol{\Psi}$. From this point of view, prediction using kriging works to estimate a function value at a certain point by computing a weighted average of known function values in the vicinity of the objective points \cite{Isaaks}. 
+
+
+ 
+
