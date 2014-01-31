@@ -158,4 +158,18 @@ Central Difference & -.367551 & -.776089 & .224060 & .776011 & .143492 \\
 \hline \hline
 \end{tabular}
 \end{table}
-As expected, all models utilizing the central differencing formula produce self consistent sensitivity coefficients. The models differ from the analytic sensitivity coefficients only in the fourth decimal place, which is expected given the $\mathcal{O}(\Delta\Sigma^2)$ convergence  of the central differencing formula.     
+As expected, all models utilizing the central differencing formula produce self consistent sensitivity coefficients. The models differ from the analytic sensitivity coefficients only in the fourth decimal place, which is expected given the $\mathcal{O}(\Delta\Sigma^2)$ convergence  of the central differencing formula.
+
+Finally, the performance of a Kriging surrogate, as described in section \ref{sec:kriging}, in modeling the infinite multiplication factor will be assessed. Before a Kriging surrogate is constructed the designer must agree on the number of points that will be used to construct the surrogate. As the number of points increases the accuracy of the Kriging surrogate is expected to increase. Recall that each point requires an evaluation of the true objective function, in this case Eq. \ref{eq:infinite_lattice_kinf}. Since Eq. \ref{eq:infinite_lattice_kinf} is linear relatively few sampling points are expected to exactly reproduce the objective function. Indeed, these expectations are demonstrated in
+Fig. \ref{fig:kinf_kriging}.  
+\begin{figure}
+\caption[Reduction in Kriging surrogate error for infinite multiplication factor with increase in points.]{ \label{fig:kinf_kriging}
+Reduction in Kriging surrogate error for the infinite multiplication factor as the number of points used to build the surrogate increases.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter3/error_vs_npoints.png}
+ \end{center}
+\end{figure}
+
+In Fig. \ref{fig:kinf_kriging} the number of points used to construct the Kriging surrogate is gradually increased. For each surrogate the root mean square error is calculated by having both Eq. \ref{eq:infinite_lattice_kinf} and the surrogate evaluate the same 100 randomly chosen points in the design space. Observe that for ten evaluation points, which is twice the number of design variables in the objective function, the error essentially goes to zero. This result can be explained by Eq. \ref{eq:infinite_lattice_kinf}'s linearity and the fact that Kriging is an interpolation method, thus requiring a pair of points in each dimension for exact interpolation.     
+
+   

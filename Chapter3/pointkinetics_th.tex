@@ -114,7 +114,7 @@ An adaptive reduced order model, whose formulation is summarized in Algorithm \r
 From Figure \ref{fig:pk_importance_pie} the "important" variables are identified to be $Ah$, $\alpha_d$, and $\rho_{max}$. Collectively these three "important" random variables comprise 82\% of the total sensitivity. 
 \begin{figure}[!htb]
 \caption[Normalized sensitivity indices for random variables comprising the coupled point kinetics/lumped thermal hydraulics equations.]{ \label{fig:pk_importance_pie}
-Normalized sensitivity indices for all random variables comprising the coupled point kinetics/lumped thermal hydraulics equations. The effects of all $\beta_k$ and $\lambda_k$ have been lumped into single $\beta$ a $\lambda$ effects, respectively. 
+Normalized sensitivity indices for all random variables comprising the coupled point kinetics/lumped thermal hydraulics equations. The effects of all $\beta_k$ and $\lambda_k$ have been lumped into single $\beta$ and $\lambda$ effects, respectively. 
 }
  \begin{center}
   \includegraphics[scale=.5]{./Chapter3/pk_importance_pie.pdf}
@@ -193,3 +193,15 @@ $\rho_{max}$ &  3.1164E-02 &  3.1164E-02 &  3.1272E-02 \\
 \end{tabular}
 \end{table}
 
+To further analyze the coupled point kinetics/lumped thermal hydraulics problem in hand, Morris' algorithm is applied, as described in section \ref{subsec:morris_algorithm}. As previously described, algorithm \ref{code:morris_algorithm} aims to identify the design variables that have the greatest influence on an objective function's behavior, which in this case is the fuel temperature. To effectively determine such design variables it is convenient to plot the mean against the standard deviation of each design variable's elementary effects. From the problem at hand, the elementary effect statistics are plotted in Fig. \ref{fig:kth_important_vars}.     
+\begin{figure}[!htb]
+\caption{\label{fig:kth_important_vars}
+Statistics of each design variable's elementary effects, as applied to the coupled point kinetics/lumped thermal hydraulics problem.   
+}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter3/importantvariables.png}
+ \end{center}
+\end{figure}
+Figure \ref{fig:kth_important_vars} was obtained using five divisions and ten elementary effects per design variable. Observe how eighteen of the twenty two points are clustered around the origin, implying that each of these clustered variables have minimal influence on the fuel temperature. In contrast, the variables $\rho_{ex}$, $\alpha_f$, and $Ah$ are likely to be primary contributors. The results of Fig. \ref{fig:kth_important_vars} are entirely consistent with Fig. \ref{fig:pk_importance_pie}, which also identifies the variables $\rho_{ex}$, $\alpha_f$, and $Ah$ as being principally important.      
+
+Now, with the three key variables identified a Kriging surrogate is constructed for the normalized fuel temperature. Sampling the three-dimensional surrogate 1000 times, as done to obtain the results in Table \ref{table:pk_mean_variance}, a mean normalized temperature of $1.03198 \pm 0.002299$ was obtained which is well within the $99\%$ confidence interval of the sampled true result. Note that some of the statistical discrepancies being observed can be attributed to the fact that the same random number were not used in the evaluation of the surrogate and true function. 

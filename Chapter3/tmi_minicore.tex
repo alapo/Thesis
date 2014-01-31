@@ -75,7 +75,7 @@ Mean and standard deviation data for \ac{TMI} minicore box powers where the obje
 As always, the same random numbers are used to produce each sample when comparing two different methods. The results are identical in all cases to four significant digits and in most cases, to five significant digits. In the reduced order model results notice that the standard deviation for assembly six is slightly off in the fourth decimal place when compared to assemblies two, four, and eight. The standard deviation should be equal in these four assemblies due to symmetry, indicating the presence of roundoff error.        
 
 Adding higher order components in accordance with Algorithm \ref{code:rom_algorithm} did not improve the statistics of the reduced order model. For the purposes of uncertainty quantification the reduced order model consisting entirely of 1D components is sufficient for this problem. The bivariate distributions for the box powers for all combinations of assemblies one, four, and five are given in Fig. \ref{fig:tmi_correlations}.    
-\begin{figure}[!htb]
+\begin{figure}[htb]
 \caption[Multivariate distributions for the box powers of \ac{TMI} assemblies.]{\label{fig:tmi_correlations}
 Multivariate distributions for the box powers of two assemblies. Dashed distributions were obtained by sampling the reduced order model consisting of only 1D components.}
  \begin{center}
@@ -84,3 +84,34 @@ Multivariate distributions for the box powers of two assemblies. Dashed distribu
 \end{figure} 
 For each case in Fig. \ref{fig:tmi_correlations} the bivariate distributions are obtained by sampling the reduced order model and \ac{PARCS}. Variations between the overlaid distributions can be attributed to roundoff error. A decrease in the box power of assembly five is equivalent to an increase in the absorption of the assembly's control rods, which effectively shifts the neutron flux away from the central assembly. Consequently, a negative correlation is expected between assemblies one and five and between assemblies one and four. Indeed, statistical sampling has the Pearson correlation coefficient for the box powers of assemblies one and four to be $-0.83$ and $-0.84$ between assemblies one and five. However, negative correlation coefficients between assembly one and assemblies four and five implies a positive correlation coefficient between assemblies four and five. The positive correlation coefficient of $+0.40$ between assemblies four and five is evident in Fig. \ref{fig:tmi_correlations}.  
 
+Further investigation into the decisive parameters effecting the core power distribution can be obtained with a design variable screening study. Applying algorithm \ref{code:morris_algorithm} to the normalized power distribution of assemblies one, two, four, and five, the plot in Fig. \ref{fig:tmi_screening_study} is obtained. 
+\begin{figure}[htb]
+\caption[Design variable screening study for the \ac{TMI} Minicore.]{\label{fig:tmi_screening_study}
+Design variable screening study for the \ac{TMI} Minicore.}
+ \begin{center}
+  \includegraphics[scale=.3]{./Chapter3/tmi_important_vars.png}
+ \end{center}
+\end{figure}
+As seen in Fig. \ref{fig:tmi_screening_study}, a cluster of design variables are centered around the origin indicating a lack of activity relating to the core power. For example, the \ac{ADFs} in each of the four assemblies have a negligible effect on the core power. On the contrary, the cross sections $\Sigma_{12}^i$, $\Sigma_{12}^o$ and $\Sigma_{tr}^o$ stand out from the cluster, which is no surprise considering the \ac{TMI} minicore is a scattering dominant problem. The key design variables effecting assembly five's core power, which essentially controls the remaining power in the core, are $\Sigma_{a1}^i$, $\nu\Sigma_{f2}^i$, $\nu\Sigma_{f2}^o$, and the scattering cross sections. Note that the elementary effects of the important design variables in assembly five are an order of magnitude greater than in the other assemblies.
+
+From the observation of the important design variables in Fig. \ref{fig:tmi_screening_study}, a Kriging surrogate is constructed for the core power as a function of $\Sigma_{a1}^i$, $\nu\Sigma_{f2}^i$, $\Sigma_{12}^i$, $\Sigma_{tr1}^o$, $\nu\Sigma_{f2}^o$ and $\Sigma_{12}^o$. Using these variables a sampling plan consisting of twenty true \ac{PARCS} evaluations was obtained using algorithm \ref{code:best_lhs}. Based on the optimized sampling plan a Kriging surrogate was constructed and sampled 500 times in accordance with the six design variables' covariance matrix. The results are summarized in Table \ref{table:tmi_mean_sd_kriging} and should be compared to Tables \ref{table:tmi_mean_sd_mc} and \ref{table:tmi_mean_sd_1d}. 
+\begin{table}[!htb] 
+\caption[Mean and standard deviation for \ac{TMI} minicore box powers using a six dimensional Kriging surrogate.]{\label{table:tmi_mean_sd_kriging} 
+Mean and standard deviation for \ac{TMI} minicore box powers using a six dimensional Kriging surrogate. A total of 500 samples were used. Assembly numbers correspond to Fig. \ref{fig:tmi_minicore}.}
+\centering
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Assembly} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} & \textbf{99\% CI} \\ \hline
+1 & 0.8385 & (0.8384, 0.8386) & 0.0010 & (0.0009, 0.0011) \\ \hline 
+2 & 1.1499 & (1.1497, 1.1500) & 0.0013 & (0.0012, 0.0014) \\ \hline
+3 & 0.8384 & (0.8383, 0.8386) & 0.0010 & (0.0009, 0.0011) \\ \hline
+4 & 1.1499 & (1.1497, 1.1500) & 0.0013 & (0.0012, 0.0014) \\ \hline
+5 & 1.0465 & (1.0462, 1.0467) & 0.0022 & (0.0020, 0.0024) \\ \hline
+6 & 1.1499 & (1.1497, 1.1500) & 0.0013 & (0.0012, 0.0014) \\ \hline
+7 & 0.8384 & (0.8383, 0.8386) & 0.0010 & (0.0009, 0.0011) \\ \hline
+8 & 1.1499 & (1.1497, 1.1500) & 0.0013 & (0.0012, 0.0014) \\ \hline
+9 & 0.8384 & (0.8383, 0.8386) & 0.0010 & (0.0009, 0.0011) \\
+\hline \hline
+\end{tabular}
+\end{table}
+The random numbers used for sampling the the Kriging surrogate were not the same as those used to sample the true function and the collocation-based surrogate. Consequently, some of the discrepancies between Table \ref{table:tmi_mean_sd_kriging} and Tables \ref{table:tmi_mean_sd_mc} and \ref{table:tmi_mean_sd_1d} are purely statistical. Despite this fact each assembly's core power mean and standard deviation confidence intervals overlap between the different modeling approaches. The Kriging surrogate consisting of six of the original twenty five design variables can adequately represent the physical phenomenon occurring in the \ac{TMI} minicore. Of course, this conclusion can be made for this problem because the uncertainties in the cross sections are relatively small. Larger uncertainties in the design variables are likely to effect the ability of a surrogate's ability to represent its objective function.            
