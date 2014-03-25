@@ -20,7 +20,7 @@
 
 
 % Title of the thesis
-\title{Uncertainty Quantification of Reactor Simulation Codes Using Surrogate Modeling Techniques}
+\title{A Surrogate Approach Towards Validation and Uncertainty Quantification of Multiphysics Reactor Simulation Codes}
 
 % Author name
 \author{Artem Yankov}
@@ -29,7 +29,7 @@
 \department{Nuclear Engineering}
 
 % Year of completion
-\year=2013
+\year=2014
 
 % Frontispiece
 %\frontispiece{\includegraphics[width=4in]{./pics/frontispiece.pdf}}
@@ -53,7 +53,8 @@ I would like to thank...}
 Professor Thomas J. Downar, Chair \\
 Professor John C. Lee \\
 Professor Krzysztof J. Fidkowski \\
-Professor Karthik Duraisamy}
+Professor Karthik Duraisamy \\ 
+Dr. Benjamin Collins}
 
 % Chair must be entered separately for formatting reasons.
 \chair{Thomas J. Downar}
@@ -82,6 +83,8 @@ Professor Karthik Duraisamy}
  \acro{ENDF}{Evaluated Nuclear Data File}
  \acro{ADFs}{assembly discontinuity factors}
  \acro{LHS}{Latin Hypercube Sampling}
+ \acro{MPACT}{Michigan Parallel Characteristics Transport Code}
+ \acro{SIFGRS}{Simple Integrated Fission Gas Release and Swelling}
 }
 
 % Some abstract text
@@ -97,12 +100,16 @@ Professor Karthik Duraisamy}
 \input{./Chapter1/chapter1_main}
 
 % Reduced Order Models
-\chapter{Reduced Order Models for Computer Codes} \label{chap:rom}
+\chapter{Surrogate Models for Computer Codes} \label{chap:rom}
 \input{./Chapter2/chapter2_main}
 
 % Application to Reactor Systems
 \chapter{Application to Simplified Reactor Systems} \label{chap:applications}
 \input{./Chapter3/chapter3_main}
+
+% Ongoing Work
+\chapter{Ongoing Work} \label{chap:ongoing_work}
+\input{./Ongoing_Work/ongoing_work}
 
 % Bibliography
 \bibliographystyle{plain}
