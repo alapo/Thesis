@@ -5,6 +5,7 @@
 \usetheme{Rochester} 
 }
 
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usetikzlibrary{shapes, arrows, positioning}
@@ -199,12 +200,325 @@ neutronics data in the fuel elements.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % SURROGATE CONSTRUCTION
-\section{Building Surrogate Models}
+\section{Surrogate Models}
+
+% OVERVIEW
+\subsection{Overview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Classic Overview}
+
+\begin{figure}
+\begin{tikzpicture}[node distance=0.5cm, auto]  
+\tikzset{
+    mynode/.style={rectangle,rounded corners,draw=black, top color=white, bottom color=blue!50, very thick, inner sep=.5em, minimum size=2em, text centered, font=\small},
+    myarrow/.style={->, >=latex', shorten >=1pt, thick}
+}  
+\node[mynode, text width=2cm, label=right:(Define computer experiments)](samp_plan) {Sampling Plan};
+\node[mynode, below= of samp_plan, text width=2cm, label=right:(Quantiative evaluation of designs)](obs) {Observations};
+\node[mynode, below= of obs, text width=2cm, label=right:(Strategic processing of design variables)](dim_red) {Dimension Reduction};
+\node[mynode, below= of dim_red, text width=2.5cm, label=right:(Create fast mapping)](surr) {Surrogate Construction};
+\node[mynode, below= of surr, text width=2cm, label=right:(Evaluate surrogate many times)](opt) {Optimization};
+\draw[myarrow] (samp_plan) edge node {} (obs);
+\draw[myarrow] (obs) edge node {} (dim_red);
+\draw[myarrow] (dim_red) edge node {} (surr);
+\draw[myarrow] (surr) edge node {} (opt);
+\end{tikzpicture}  
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Kriging vs. anchored-ANOVA Collocation}
+
+\begin{columns}
+ \begin{column}{0.5\textwidth}
+  Kriging
+  \begin{itemize}
+    \item Dimension reduction processed separately
+    \item Sampling points random
+    \item User determines how many points to use for sampling plan
+    \item Interpolation by covariance basis functions
+    \item More statistical approach
+  \end{itemize}
+ \end{column}
+ \begin{column}{0.5\textwidth}
+ anchored-ANOVA Collocation
+  \begin{itemize}
+    \item Dimension reduction inherent
+    \item Sampling done on structured grid
+    \item Sampling plan size dependent on number of design variables
+    \item Polynomial interpolation
+    \item More deterministic approach
+  \end{itemize}
+ \end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kriging}
+
+\begin{frame}
+\frametitle{Designing a Kriging Sampling Plan}
+
+\begin{itemize}
+  \item All surrogate models are built around a set of points at which the objective computer code is actually evaluated. 
+  \item Intuitively, the surrogate accuracy is expected to decrease as one moves further away from such points. 
+  \item Important to spread $N$ points as uniformly as possible across the design space.
+  \item For Kriging, Latin Hypercube Sampling (LHS) is used to create a sampling plan.
+  \item There is a notion of an optimized LHS sampling plan based on the maximin metric.   
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Latin Hypercube Sampling}
+
+\begin{itemize}
+  \item Basis of LHS rests upon dividing the normalized space of each design variable into $n$ equally sized bins if $n$ samples are required. 
+  \item As a result, when the $n$ samples are taken it is guaranteed that the entire
+spectrum of each design variable's space has been visited.  
+\end{itemize}
+\centering
+\includegraphics[width=0.58\textwidth]{./lhs.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Optimizing a LHS Plan}
+
+\begin{itemize}
+  \item The maximin metric describe by Morris and Mitchell makes use of two notions in an attempt to quantify the 'space-fillingness' of a sampling plan. 
+  \item Unique distances between all points in the plan sorted in ascending order $\lbrace d_1, d_2, ..., d_m\rbrace$.
+  \item Corresponding number of occurrences of each distance $\lbrace J_1, J_2, ..., J_m\rbrace$.  
+  \item In words, the Morris and Mitchell criteria states that an optimized sampling plan will minimize all $J_i$ while maximizing the corresponding $d_i$. 
+  \item The maximin sampling plan maximizes $d_1$, and among plans for which this is true, minimizes $J_1$, among plans for which this is true, maximizes $d_2$,....
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Optimizing a LHS Plan}
+
+\begin{itemize}
+  \item The previous definition can be restated into a pseudo equivalent minimization problem.
+\begin{equation}
+\label{eq:Phi_q}
+   \Phi_q(\textbf{X}) = \left(\sum_{j=1}^m J_j d_j^{-q} \right)^{1/q} \nonumber
+\end{equation}
+  \item The minimization of this equation and the Morris and Mitchell definition of the maximin sampling plan are used in unison to obtain a locally optimal sampling plan.
+  \item Generate initial sampling plan, optimize for set of $q$ values using simulated annealing.  
+  \item Resulting set of plans are contested directly against each other by explicit application of Morris and Mitchell's maximin definition. 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Kriging on a Sampling Plan}
+
+\begin{itemize}
+  \item Optimized sampling plan $\textbf{X}=\lbrace \textbf{x}^{(1)}, \textbf{x}^{(2)}, ... \textbf{x}^{(n)}\rbrace$. 
+  \item At each datum $\textbf{x}^{(k)}$ a random process $Y(\textbf{x}^{(k)})$ induces an observation $y^{(k)}$.
+  \item Resulting random field can be described with a mean value of $\textbf{1}\mu$ and a correlation matrix,
+\begin{equation}
+ \boldsymbol{\Psi} =
+ \begin{pmatrix} 
+	cor[Y(\textbf{x}^{(1)}), Y(\textbf{x}^{(1)})] & \cdots & 
+		cor[Y(\textbf{x}^{(1)}), Y(\textbf{x}^{(n)})] \\
+	\vdots & \ddots & \vdots \\ 
+	cor[Y(\textbf{x}^{(n)}), Y(\textbf{x}^{(1)})] & \cdots & 
+		cor[Y(\textbf{x}^{(n)}), Y(\textbf{x}^{(n)})]
+ \end{pmatrix} \nonumber
+\end{equation}  
+\begin{equation}
+   cor[Y(\textbf{x}^{(i)}), Y(\textbf{x}^{(l)})] = 
+    \exp\left(-\sum_{j=1}^k \theta_j |x_j^{(i)} - x_j^{(l)} |^{p_j} \right) \nonumber
+\end{equation}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Kriging on a Sampling Plan}
+
+\begin{itemize}
+  \item Given the formulation of the observations occurring at $\textbf{x}^{(k)}$ as instances of a stochastic process, the likelihood of seeing the observed data is,
+\begin{eqnarray}
+   L\left(\textbf{Y}^{(1)}, ..., \textbf{Y}^{(n)} | 
+    \mu, \sigma, \lbrace \theta_1,..., \theta_k\rbrace, 
+    \lbrace p_1,..., p_k\rbrace\right) = \nonumber \\
+     \frac{1}{\left(2\pi\sigma^2\right)^{n/2}|\boldsymbol{\Psi}|^{1/2}}\times
+     \exp\left[\frac{  \left(\textbf{y}-\textbf{1}\mu\right)^T
+    \boldsymbol{\Psi}^{-1} \left(\textbf{y}-\textbf{1}\mu\right)}
+    {2\sigma^2} \right] . \nonumber
+\end{eqnarray} 
+  \item Maximizing the log likelihood, 
+   \begin{equation}
+   	\hat{\mu} = \frac{ \textbf{1}^T\boldsymbol{\Psi}^{-1}\textbf{y} }
+    		 	    {  \textbf{1}^T\boldsymbol{\Psi}^{-1}\textbf{1} } \nonumber
+   \end{equation}
+   \begin{equation}
+   	\hat{\sigma}^2 = \frac{  \left(\textbf{y}-\textbf{1}\mu\right)^T
+    			\boldsymbol{\Psi}^{-1} \left(\textbf{y}-\textbf{1}\mu\right)}{n}. \nonumber
+   \end{equation}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Kriging on a Sampling Plan}
+
+\begin{itemize}
+  \item Substitute $\hat{\sigma}$ and $\hat{\mu}$ into log likelihood to get, concentrated ln-likelihood function.
+   \begin{equation}
+    \log(L) \approx -\frac{n}{2}\log\left(\hat{\sigma}^2\right) -
+     \frac{1}{2} \log|\boldsymbol{\Psi}| \nonumber	
+   \end{equation}
+  \item Optimize with respect to the $\theta$ and $p$ parameters using global search algorithm.
+  \item Once all optimizing parameters are available the goal is to utilize the parameters to build a model that makes function predictions on new points $\textbf{x}$.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Making Predictions with Kriging Surrogate}
+
+\begin{itemize}
+  \item Construct a vector of correlations with existing points and $\textbf{x}$,
+   \begin{equation}
+ 	\boldsymbol{\psi} =
+ 	\begin{pmatrix} 
+	 cor[Y(\textbf{x}^{(1)}), Y(\textbf{x})] \\
+	 \vdots \\ 
+	 cor[Y(\textbf{x}^{(n)}), Y(\textbf{x})] 
+    \end{pmatrix}. \nonumber
+   \end{equation} 
+  \item  New predictions can be made at $\textbf{x}$ using the maximum likelihood estimator,
+   \begin{equation}
+    \hat{y}(\textbf{x}) = \hat{\mu} + 
+   	 \boldsymbol{\psi}^T\boldsymbol{\Psi}^{-1}
+   	  \left(\textbf{y} - \textbf{1}\hat{\mu}\right). \nonumber
+   \end{equation}
+  \item Prediction using kriging works to estimate a function value at a certain point by computing a weighted average of known function values in the vicinity of the objective points.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Collocation and anchored-ANOVA}
+
+\begin{frame}
+\frametitle{Collocation and anchored-ANOVA Algorithmic Overview}
+
+\begin{itemize}
+  \item anchored-ANOVA: Decompose objective function into functions of one variable $f(x_i)$, two variables $f(x_i, x_j)$, three variables $f(x_i, x_j, x_k)$ as needed.
+  \item Collocation: For each component in the decomposition construct a polynomial interpolant by sampling objective function at pre-defined points.
+  \item The pre-defined points are determined by Smolyak Sparse Grids, and a selection of quadrature abscissas (e.g. Newton-Cotes). 
+  \item Combine interpolants in decomposition to get an effective surrogate. 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Numerical Interpolation in 1D}
+
+\begin{itemize}
+  \item First, pick a set of $m_i$ collocation points.   
+  \item Evaluate objective function at all collocation points.
+  \item Interpolated function is a linear expansion of some basis $a_j^i$ (e.g. Lagrange polynomials) with weights $f\left(x_j^i\right)$.  
+\end{itemize}
+
+\begin{equation} 
+    U^i = \sum_{j=1}^{m_i} 
+     f\left(x_j^i\right) a_j^i \nonumber
+\end{equation}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Clenshaw-Curtis Collocation Points}
+
+\begin{itemize}  
+  \item Clenshaw-Curtis points consist of the extrema of Chebyshev polynomials. 
+  \item $n + 1 $ abscissas can exactly integrate polynomials of degree $n$.
+  \item Points have the advantage of being nested.
+\end{itemize}
+\begin{equation}
+    x_{j}^{i} = \left\{
+     \begin{array}{cr}
+       \cos\frac{\pi(j-1)}{m_i-1}   & j=1,...,m_i \text{ if } i>1 \\
+       0   &  j=1 \text{ if } i=1
+     \end{array}
+   \right. \nonumber
+\end{equation} 
+\begin{equation} 
+    m_i = \left\{
+     \begin{array}{cr}
+      2^{i-1}+1   & i>1 \\
+      1   & i=1
+     \end{array}
+    \right. \nonumber
+\end{equation}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Basis Functions}
+
+\begin{itemize}  
+  \item Lagrange characteristic polynomials are plagued by the fact that each evaluation requires $\mathcal{O}(m_i^2)$ operations and often the computation is numerically unstable.
+  \item Instead the barycentric form of Lagrange characteristic polynomials is used to form a basis. 
+\begin{equation} 
+    a_j^i = \left\{
+     \begin{array}{cc}
+      1   & \text{ if } i=1 \\
+      \displaystyle \frac{\frac{w_j^i}{x-x_j^i} }
+       {\sum_{j=0}^{m_i} 
+        \frac{w_j^i}{x-x_j^i}}   & j=1,...,m_i \text{ for } i>1
+     \end{array}
+    \right. \nonumber
+\end{equation}
+  \item For Clenshaw-Curtis collocation points the barycentric weights are given by,
+\begin{equation} 
+    w_j^i = (-1)^{j+1}\delta_j^i \hspace{1 cm}
+     \delta_j^i = \left\{
+                   \begin{array}{cc}
+                    .5   & j=1 \text{ or } j=m_i \\
+                    1   & \text{ else }  
+				   \end{array}
+				  \right. . \nonumber                   
+\end{equation}        
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 
 % APPLICATION OF SURROGATE METHODS
 \section{Application of Surrogate Models}
 
+% EXTRAS
+\section{Extras}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sparse Grid Mechanics Example}
+
+\begin{itemize}
+  \item Consider a function of two dimensions $f(x_1, x_2)$ ($d=2$). 
+  \item Let's calculate the Level 1 (q=3) Smolyak sparse grid interpolant for $f$, A(q=3, d=2).
+\end{itemize}
+
+\begin{equation}
+\begin{array}{c}
+ A(3,2) = A(2,2) + \Delta A(3,2) \\
+ = \Delta A(2,2) + \Delta A(3,2)
+\end{array} \nonumber
+\end{equation}
+
+\end{frame}
 
 
 \end{document}
