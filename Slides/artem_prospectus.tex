@@ -5,6 +5,7 @@
 \usetheme{Rochester} 
 }
 
+\usepackage{cancel}
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{tikz}
@@ -491,7 +492,157 @@ spectrum of each design variable's space has been visited.
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Expanding to Multivariate Interpolation}
 
+\begin{itemize}  
+  \item Combine 1D interpolation formulas using tensor products
+  \item Suffers from "Curse of Dimensionality".
+  \item Mitigate the curse using Smolyak Sparse Grids.        
+\end{itemize}
+
+\begin{equation} 
+    \left(U^{i_1} \otimes\cdots\otimes U^{i_d}\right)\left(f\right) = 
+     \sum_{j_1=1}^{m_{i_1}} \cdots
+      \sum_{j_d=1}^{m_{i_d}} f\left(
+       x_{j_1}^{i_1},\cdots,x_{j_d}^{i_d}\right)
+        \left(a_{j_1}^{i_1}\otimes\cdots\otimes a_{j_d}^{i_d}\right) \nonumber
+\end{equation} 
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Smolyak Sparse Grids}
+
+\begin{itemize}  
+  \item Based on full tensor product formula the only difference being not all tensor products are used. 
+  \item In explicit form, the Smolyak formula is,
+\begin{equation} 
+    A_{q,d}(f) = 
+     \sum_{q-d+1\leq \vert \textbf{i}\vert\leq q}
+      \left(-1\right)^{q-\vert\textbf{i}\vert}
+       \binom{d-1}{q-\vert\textbf{i}\vert}
+        \left(U^{i_1} \otimes\cdots\otimes U^{i_d}\right). \nonumber
+\end{equation}  
+  \item $i_k$ is the index corresponding to the level of interpolation in dimension $k$. 
+  \item The magnitude of $\textbf{i}$ is $\vert\textbf{i}\vert = \vert i_1 +\cdots+ i_d\vert$. 
+  \item $q$ keeps track of the level of interpolation of the Smolyak algorithm. More tensor product combinations are allowed as $q$ increases. 
+  \item Smolyak algorithm reduces the total number of tensor product components by limiting the entries of $\textbf{i}$.     
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Smolyak Sparse Grid Visualization}
+
+\begin{columns}
+ \begin{column}{0.5\textwidth}
+  \centering
+  Level 4 Clenshaw-Curtis Full Tensor Product Grid
+  \includegraphics[width=1.\textwidth]{./tensor_prod_grid_L4.png}
+ \end{column}
+ \begin{column}{0.5\textwidth}
+  \centering
+  Level 4 Clenshaw-Curtis Smolyak Sparse Grid
+  \includegraphics[width=1.\textwidth]{./sparse_grid_L4.png}
+ \end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 0 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L0.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 1 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L1.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 2 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L2.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 3 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L3.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 4 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L4.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 5 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L5.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 6 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L6.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+\frametitle{Smolyak Sparse Grid Visualization}
+\centering
+Level 7 Sparse Grid
+\includegraphics[width=.75\textwidth]{./sparse_grid_L7.png}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Recursive Definition of Smolyak's Algorithm}
+
+\begin{itemize}
+  \item The explicit definition of Smolyak's algorithm can be rewritten in a recursive fashion.
+  \item Able to increase interpolation level without having to start over each time.
+  \item Hierarchical surplus serves as an error indicator. Lets you know how well the interpolation is going as the grid is refined.
+  \item Use hierarchical surplus to determine convergence.
+\end{itemize}
+
+\begin{equation}
+ A_{q,d}(f) = A_{q-1,d}(f) + \Delta A_{q,d} \nonumber
+\end{equation}
+\begin{equation} 
+ \Delta A_{q,d} = \sum_{\vert\textbf{i}\vert=q}
+  \left( \underbrace{f(x_{j_1}^{i_1},...,x_{j_d}^{i_d}) - 
+   A_{q-1,d}(x_{j_1}^{i_1},...,x_{j_d}^{i_d}}_{\text{Hierarchical Surplus}})\right)\cdot
+    \left(a_{j_1}^{i_1}\otimes\cdots\otimes a_{j_d}^{i_d}\right) \nonumber
+\end{equation}
+
+\end{frame}
 
 
 
@@ -507,18 +658,111 @@ spectrum of each design variable's space has been visited.
 \frametitle{Sparse Grid Mechanics Example}
 
 \begin{itemize}
-  \item Consider a function of two dimensions $f(x_1, x_2)$ ($d=2$). 
-  \item Let's calculate the Level 1 (q=3) Smolyak sparse grid interpolant for $f$, A(q=3, d=2).
+  \item Consider a function of two dimensions $f(x_1, x_2)$, $d=2$. 
+  \item Let's calculate the Level 1 (q=3) Smolyak sparse grid interpolant for $f$, $A_{3,2}(f)$.
 \end{itemize}
 
-\begin{equation}
-\begin{array}{c}
- A(3,2) = A(2,2) + \Delta A(3,2) \\
- = \Delta A(2,2) + \Delta A(3,2)
-\end{array} \nonumber
-\end{equation}
+\begin{align*}
+A_{3,2}(f) &= A_{2,2}(f) + \Delta A_{3,2} \\
+&= \Delta A_{2,2} + \cancel{A_{1,2}(f)} + \Delta A_{3,2} 
+\end{align*}
+
+\begin{itemize}
+  \item First let's calculate $\Delta A_{2,2}$. 
+\end{itemize}
+
+\begin{align*}
+    \Delta A_{2,2} = \sum_{\vert\textbf{i}\vert=2}
+     \left(f(x_{j_1}^{i_1},x_{j_2}^{i_2}) - 
+      \cancel{A_{1,2}(f)(x_{j_1}^{i_1}, x_{j_2}^{i_2})}\right)\cdot
+       \left(a_{j_1}^{i_1}\otimes a_{j_2}^{i_2}\right)
+\end{align*}
 
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sparse Grid Mechanics Example}
+
+\begin{itemize}
+  \item $\vert\textbf{i}\vert=2 \rightarrow i_1 + i_2 = 2 \rightarrow$ sum over the set of $i$ indices $\lbrace (1, 1)\rbrace$.
+  \item Using Clenshaw-Curtis for $i=1$ we have $m_i=1$, namely the origin. 
+\begin{align*}
+ \Delta A_{2,2} = f\left( x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}
+\end{align*}
+  \item In this case, $a_1^1 = 1$ and $x_1^1=0$ so $\Delta A_{2,2}$ amounts to evaluating the objective function at the hypercube origin. 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sparse Grid Mechanics Example}
+
+\begin{itemize}
+  \item Now let's calculate $\Delta A_{3,2}$. 
+  \item $\vert\textbf{i}\vert=3 \rightarrow i_1 + i_2 = 3 \rightarrow$ sum over the set of $i$ indices $\lbrace (1, 2), (2, 1) \rbrace$.
+  \item Using Clenshaw-Curtis for $i=2$ we have $m_i=3$ so $j\in \lbrace 1,2,3\rbrace$
+\end{itemize}
+
+\begin{align*}
+ \Delta A_{3,2} &= \sum_{\vert\textbf{i}\vert=3}
+  \left(f(x_{j_1}^{i_1},x_{j_2}^{i_2}) - 
+  A_{2,2}(f)(x_{j_1}^{i_1}, x_{j_2}^{i_2})\right)\cdot
+  \left(a_{j_1}^{i_1}\otimes a_{j_2}^{i_2}\right) \\ 
+ &= \sum_{\vert\textbf{i}\vert=3}
+  \left(f(x_{j_1}^{i_1},x_{j_2}^{i_2}) - 
+  f\left( x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right)\cdot
+  \left(a_{j_1}^{i_1}\otimes a_{j_2}^{i_2}\right)
+\end{align*}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sparse Grid Mechanics Example}
+
+\begin{align*}
+ \Delta A_{3,2} &= \left[f(x_{1}^{2},x_{1}^{1}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{2}a_{1}^{1} \\
+  &+ \left[f(x_{2}^{2},x_{1}^{1}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{2}^{2}a_{1}^{1} \\ 
+  &+ \left[f(x_{3}^{2},x_{1}^{1}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{3}^{2}a_{1}^{1} \\  
+  &+ \left[f(x_{1}^{1},x_{1}^{2}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{1}a_{1}^{2} \\
+  &+ \left[f(x_{1}^{1},x_{2}^{2}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{1}a_{2}^{2} \\
+  &+ \left[f(x_{1}^{1},x_{3}^{2}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{1}a_{3}^{2} \\  
+\end{align*}
+
+\begin{itemize}
+  \item Due to the nestedness of Clenshaw-Curtis, points can be reused.
+  \item For example, $f(x_1^1, x_1^1) = f(x_1^1, x_2^2) = f(x_2^2, x_1^1)$.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sparse Grid Mechanics Example}
+
+\begin{itemize}
+  \item Putting everything together, the level 1 Sparse grid interpolant is:
+\end{itemize}
+
+\begin{align*}
+ A_{3,2}(f) &= \Delta A_{2,2} + \Delta A_{3,2} \\
+  &= f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1} \\
+  &+ \left[f(x_{1}^{2},x_{1}^{1}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{2}a_{1}^{1} \\
+  &+ \left[f(x_{3}^{2},x_{1}^{1}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{3}^{2}a_{1}^{1} \\  
+  &+ \left[f(x_{1}^{1},x_{1}^{2}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{1}a_{1}^{2} \\
+  &+ \left[f(x_{1}^{1},x_{3}^{2}) -
+  f\left(x_{1}^{1},x_{1}^{1}\right)a_{1}^{1}a_{1}^{1}\right]a_{1}^{1}a_{3}^{2} \\  
+\end{align*}
+
+\end{frame}
+
 
 
 \end{document}
