@@ -643,12 +643,397 @@ Level 7 Sparse Grid
 \end{equation}
 
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{anchored-ANOVA Decomposition}
 
+\begin{itemize}
+  \item Consider a $d$-dimensional function $f(\textbf{x}) = f(x_1, x_2, ..., x_d)$.
+  \item The operator $P_{\textbf{u}}$ projects from a $d$-dimensional space to a $\vert\textbf{u}\vert$-dimensional space for some set $\textbf{u}\subseteq \mathcal{D} = \lbrace 1,...,d\rbrace$.  
+\begin{equation}
+ f_{\textbf{u}}(\textbf{x}_{\textbf{u}}) = P_{\textbf{u}}f\left(\textbf{x}\right) =
+  \int_{\Omega^{d-\vert\textbf{u}\vert}} 
+   f\left(\textbf{x}\right)d\mu_{\mathcal{D}\setminus\textbf{u}}
+    \left(\textbf{x}\right) \nonumber
+\end{equation}
+  \item Use the Dirac measure $\delta(\textbf{x}-\textbf{a})d\textbf{x}$ to evaluate the projection operator at an "anchor" point $\textbf{a}$,
+\begin{equation} 
+ P_{\textbf{u}}f\left(\textbf{x}\right) = 
+  f\left(\textbf{x}\right)\vert_{\textbf{x}=
+   \textbf{a}\setminus\textbf{x}_{\textbf{u}}}. \nonumber
+\end{equation}
+  \item For $\textbf{u}\neq\textbf{v}$ the following orthogonality relation holds:
+\begin{equation} 
+ \left(f_{\textbf{u}},f_{\textbf{v}}\right) = 0 \nonumber
+\end{equation}
+\end{itemize}
 
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{anchored-ANOVA Decomposition}
 
+\begin{itemize}
+  \item A function can be written in terms of its $2^d$ orthogonal components,
+\begin{equation} 
+ f\left(\textbf{x}\right) = 
+  \sum_{\textbf{u}\subseteq\mathcal{D}}
+   f_{\textbf{u}}\left(\textbf{x}_{\textbf{u}}\right). \nonumber
+\end{equation}
+  \item The component functions $f_{\textbf{u}}$ are defined recursively,
+\begin{equation} 
+ f_{\textbf{u}}\left(\textbf{x}_{\textbf{u}}\right) = 
+  P_{\textbf{u}}f\left(\textbf{x}\right) -
+   \sum_{\textbf{v}\subset\textbf{u}}
+    f_{\textbf{v}}\left(\textbf{x}_{\textbf{v}}\right). \nonumber 
+\end{equation}
+  \item Zeroth order component: 
+\begin{align*}
+ f_{\lbrace \emptyset \rbrace} = f(\overline{\textbf{x}}) 
+\end{align*}
+  \item First and second order components:
+\begin{align*}
+ f_{\lbrace x_i \rbrace} &= f\left(\textbf{x}\right)\vert_{\textbf{x} =
+   \textbf{a}\setminus x_i} - f_{\lbrace \emptyset \rbrace} \\
+ f_{\lbrace x_i, x_j \rbrace} &= f\left(\textbf{x}\right)\vert_{\textbf{x}=
+   \textbf{a}\setminus \lbrace x_i, x_j \rbrace} - f_{\lbrace \emptyset \rbrace} -
+    f_{\lbrace x_i \rbrace} - f_{\lbrace x_j \rbrace} 
+\end{align*}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Note on anchored-ANOVA and Taylor Series}
+
+\begin{itemize}
+  \item The multivariate Taylor series of $f(\textbf{x})$ about $\textbf{\=x}$,
+\begin{align*} 
+ f\left(\textbf{x}\right) = 
+  f\left(\bar{\textbf{x}}\right) &+
+   \sum_{i=1}^{d} 
+    \frac{\partial f(\textbf{x})}{\partial x_i}\left(x_i - \bar{x}_i\right) \\
+     &+ \frac{1}{2!}\sum_{i,j=1}^{d}
+      \frac{\partial^2 f(\textbf{x})}{\partial x_i\partial x_j}
+       \left(x_i - \bar{x}_i\right) \left(x_j - \bar{x}_j\right) + ...
+\end{align*}  
+  \item Evaluate at $\textbf{x} = \textbf{a}\setminus x_i$,
+\begin{align*} 
+    f\left(\textbf{x}\right)\vert_{\textbf{x} = \textbf{a}\setminus x_i} = 
+     f\left(\bar{\textbf{x}}\right) +
+      \frac{\partial f(\textbf{x})}{\partial x_i}\left(x_i - \bar{x}_i\right)
+       + \frac{1}{2!} \frac{\partial^2 f(\textbf{x})}{\partial x_i^2}
+        \left(x_i - \bar{x}_i\right)^2 + ...
+\end{align*}
+  \item Component functions are entire Taylor series expansions.
+  \item Truncated anchored-ANOVA expansion will always be a better approximation than a truncated Taylor expansion. 
+      
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Combining anchored-ANOVA and Smolyak Sparse Grids}
+
+\begin{itemize}
+  \item anchored-ANOVA decomposition forms foundation for surrogate model.
+  \item Build each component function on a Smolyak sparse grid.
+  \item Build all first-order components first. 
+  \item Compute sensitivity coefficient for each component. 
+\begin{equation} 
+ \eta_i = \frac{
+  \int_{\Omega_i}
+   \left[f(\textbf{x})\vert_{
+    \textbf{x}=\overline{\textbf{x}}\setminus x_i}
+     -f(\overline{\textbf{x}}) \right]\rho(x_i)dx_i}
+      {
+       f_{\left\{\emptyset\right\}}} \nonumber
+\end{equation}
+  \item Build higher order components for only those variables whose sensitivity coefficients  exceed a certain threshold.
+  \item Continue to add higher order terms until convergence criteria met.     
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % APPLICATION OF SURROGATE METHODS
 \section{Application of Surrogate Models}
+
+\subsection{Infinite Lattice}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Infinite Lattice Problem Statement}
+
+\begin{itemize}
+  \item Reactor of infinite size is considered, effectively removing the effects of geometry in neutron transport
+  \item System entirely characterized in terms of its material properties.
+  \item Analytic solution available!       
+\end{itemize}
+
+\begin{equation}
+   \left(
+    \begin{array}{cc}
+     \Sigma_{a_1} + \Sigma_{1\rightarrow 2} & 0 \\
+     -\Sigma_{12} & \Sigma_{a_2} 
+    \end{array}
+   \right)
+   \left(
+    \begin{array}{c}
+     \phi_1 \\
+     \phi_2
+    \end{array}
+   \right) 
+   = \frac{1}{k_{\infty}}
+   \left(
+    \begin{array}{cc}
+     \nu\Sigma_{f_1} & \nu\Sigma_{f_2} \\
+     0 & 0 
+    \end{array}
+   \right)
+   \left(
+    \begin{array}{c}
+     \phi_1 \\
+     \phi_2
+    \end{array}
+   \right) \nonumber
+\end{equation}
+\begin{equation}
+   k_{\infty} = \frac{\Sigma_{a_2}\nu\Sigma_{f_1} + 
+             \Sigma_{1\rightarrow 2}\nu\Sigma_{f_2}}{
+              \Sigma_{a_2}\left(
+               \Sigma_{a_1} + \Sigma_{1\rightarrow 2}\right)} \nonumber
+\end{equation}  
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Infinite Lattice Problem Statement}
+
+\begin{itemize}
+  \item Assume all variation in $k_{\infty}$ can be attributed to its input cross sections, whose distributions follow a multivariate Gaussian.       
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{||c||c|c|c|c|c|c|c||} 
+\hline \hline
+  &  &  & \multicolumn{5}{|c||}{\textbf{Correlation Coefficient Matrix}}  \\ \hline
+  & \textbf{Mean} & \textbf{Standard Dev.} & $\Sigma_{a_1}$ & $\Sigma_{a_2}$ & 
+  $\nu\Sigma_{f_1}$ & $\nu\Sigma_{f_2}$ & $\Sigma_{1\rightarrow 2}$ \\ \hline \hline
+$\Sigma_{a_1}$ & 1.04E-02 & 9.06E-05 & 1 & 0.07 & -0.13 & 0.02 & 0.75 \\ \hline
+$\Sigma_{a_2}$ & 1.10E-01 & 2.31E-04 & 0.07  &  1     & 0.06  & 0.31 & -0.07 \\ \hline
+$\nu\Sigma_{f_1}$ & 9.00E-03 & 4.85E-05 & -0.13 &  0.06  & 1     & 0.33 & -0.10 \\ \hline
+$\nu\Sigma_{f_2}$ & 1.91E-01 & 8.87E-04 & 0.02  &  0.31  & 0.33  & 1    & 0.01 \\ \hline
+$\Sigma_{1\rightarrow 2}$ & 1.80E-02 & 2.18E-04 & 0.75  &  -0.07 & -0.10 & 0.01 & 1 \\ \hline \hline
+\end{tabular}}
+\end{table}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Infinite Lattice Problem Objective}
+
+\begin{itemize}
+  \item Propagate cross section uncertainties to find the mean and standard deviation of $k_{\infty}$ using Monte Carlo sampling of true and surrogate functions, and the "Sandwich Equation".
+\begin{align*}
+ \sigma^2(k_{\infty}) = S^TCS
+\end{align*} 
+\begin{equation}
+ S^T = \left(
+  \begin{array}{ccccc}
+   \frac{\partial k_{\infty}}{\partial\Sigma_{a_1}} &
+    \frac{\partial k_{\infty}}{\partial\Sigma_{a_2}} &
+     \frac{\partial k_{\infty}}{\partial\nu\Sigma_{f_1}} &
+      \frac{\partial k_{\infty}}{\partial\nu\Sigma_{f_2}} &
+       \frac{\partial k_{\infty}}{\partial\Sigma_{1\rightarrow 2}}
+ \end{array}\right) \nonumber
+\end{equation} 
+  \item Also, find sensitivity coefficients analytically and numerically.
+\begin{equation}
+ \frac{\partial k_{\infty}}{\partial \Sigma_i}\biggr\rvert_
+  {\Sigma_{j\neq i} = \bar{\Sigma}_j}
+   \approx \frac{k_{\infty}(\Sigma_i + \Delta\Sigma_i) - 
+    k_{\infty}(\Sigma_i - \Delta\Sigma_i)}
+     {2\Delta\Sigma_i} \nonumber
+\end{equation}        
+           
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Convergence of 5-D Sparse Grid Interpolant}
+
+\begin{columns}
+ \begin{column}{0.5\textwidth}
+  \centering
+  Hierarchical Surplus  
+  \includegraphics[width=1.\textwidth]{./kinf_sparse_grid_convergence.pdf}
+ \end{column}
+ \begin{column}{0.5\textwidth}
+  \centering
+  Number of Abscissas 
+  \includegraphics[width=1.\textwidth]{./kinf_sparse_grid_numknots.pdf}
+ \end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Mean and Variance of $k_{\infty}$}
+
+\begin{itemize}
+  \item 1000 Monte Carlo samples, using the same random numbers, were gathered for each method.
+  \item In "1D ANOVA" only the 5 first-order components are used.
+  \item In "All ANOVA" all 32 components are used.
+  \item Clenshaw-Curtis collocation points represented by "CC" while "GP" is Gauss-Patterson.
+\end{itemize}
+\begin{table} 
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Method} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} & \textbf{99\% CI} \\ \hline
+5D Sparse Grid CC      & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005909, 0.006544) \\ \hline
+5D Sparse Grid GP      & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+1D ANOVA CC  & 1.41560 & (1.41510, 1.41610) & 0.006168 & (0.005831, 0.006544) \\ \hline
+All ANOVA CC & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+1D ANOVA GP  & 1.41560 & (1.41510, 1.41610) & 0.006168 & (0.005831, 0.006544) \\ \hline
+All ANOVA GP & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+True Function & 1.41562 & (1.41512, 1.41612) & 0.006168 & (0.005831, 0.006544) \\ \hline
+Sandwich               &         &                    & 0.006540 &                      \\
+\hline \hline
+\end{tabular}}
+\end{table}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sensitivity Coefficients for $k_{\infty}$}
+
+\begin{itemize}
+  \item Central differencing... perturbations (1\%) made to each cross section while holding the others at mean value. 
+  \item Models differ from analytic coefficients in fourth decimal place
+  \item Expected due to $\mathcal{O}(\Delta\Sigma^2)$ convergence of central differencing.
+\end{itemize}
+
+\begin{table}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{||c|c|c|c|c|c||} 
+\hline \hline
+  & \multicolumn{5}{|c||}{\textbf{Normalized Sensitivity Coefficient of $k_{\infty}$}}  \\ \hline
+\textbf{Method} & $\Sigma_{a_1}$ & $\Sigma_{a_2}$ & $\nu\Sigma_{f_1}$ & $\nu\Sigma_{f_2}$ & $\Sigma_{1\rightarrow 2}$ \\ \hline
+5D Sparse Grid CC  & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+5D Sparse Grid GP  & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+1D ANOVA CC        & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
+All ANOVA CC       & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+1D ANOVA GP        & -.367556 & -.776098 & .224063 & .776020 & .143493 \\ \hline
+All ANOVA GP       & -.367551 & -.776087 & .224060 & .776010 & .143491 \\ \hline
+Analytic           & -.367520 & -.775956 & .224044 & .775956 & .143476 \\ \hline
+Central Difference & -.367551 & -.776089 & .224060 & .776011 & .143492 \\
+\hline \hline
+\end{tabular}}
+\end{table}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Kriging Surrogate for $k_{\infty}$}
+
+\begin{itemize}
+  \item Observe that for ten evaluation points, twice the number of design variables in the objective function, error goes to zero. 
+\end{itemize}
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[width=.75\textwidth]{./error_vs_npoints.png}
+ \end{center}
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Point Kinetics/Lumped TH}
+
+\begin{frame}
+\frametitle{Point Kinetics/Lumped Thermal Hydraulics Problem Statement}
+
+\begin{itemize}
+  \item Modeling a transient resulting from a half sawtooth external reactivity insertion in a BN800 sodium fast cooled reactor.
+\begin{equation}
+ \rho_{ex}(t) = \left\{
+  \begin{array}{cr}
+   t\rho_{max}/20 & t \leq 20 \\
+    0                      & t > 20 
+    \end{array}
+    \right. \nonumber
+\end{equation}     
+  \item The physical model of the reactor consists of point kinetics to model the neutronics and lumped thermal hydraulics equations to describe temperature feedback. 
+  \item The coupled system is nonlinear and only has a time dependence.
+  \item Kinetics coupled to thermal hydraulics through reactivity. 
+\end{itemize}
+
+\begin{equation}
+ \rho(T_f,T_c,t) = \rho_{ex} + \alpha_d(T_f - T_f(0))
+    + \alpha_c(T_c - T_c(0)) \nonumber
+\end{equation}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Point Kinetics/Lumped Thermal Hydraulics Problem Statement}
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[width=.9\textwidth]{./pk_power.pdf}
+ \end{center}
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Point Kinetics/Lumped Thermal Hydraulics Problem Statement}
+
+\begin{itemize}
+  \item Reactor Power
+\begin{align*}
+ \frac{dP}{dt} = \frac{\rho(T_f,T_c,t)-\beta}{\Lambda}P +
+  \sum_{k=1}^6 \lambda_k C_k 
+\end{align*}
+  \item Precursor Concentration
+\begin{align*}
+ \frac{dC_k}{dt} = -\lambda_k C_k +
+  \frac{\beta_k}{\Lambda}P
+\end{align*}
+  \item Fuel Temperature
+\begin{align*}
+  M_f c_{pf}\frac{dT_f}{dt} = P + Ah(T_c-T_f)
+\end{align*} 
+  \item Coolant Temperature
+\begin{align*}
+ M_c c_{pc}\left(\frac{dT_c}{dt} +v \frac{T_c - T_{in}}{L}\right) = 
+  Ah(T_f-T_c)
+\end{align*} 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Point Kinetics/Lumped Thermal Hydraulics Objective}
+
+\begin{itemize}
+  \item A total of twenty two random variables will be investigated for their affect on the maximum fuel temperature attained during transient.
+\begin{align*}
+ \lambda_1, \lambda_2, \lambda_3, \lambda_4, \lambda_5, \lambda_6, \beta_1, \beta_2, \beta_3, \beta_4, \beta_5, \beta_6 \\
+ \Lambda, Ah, M_c, M_f, c_{pc}, c_{pf}, v, \alpha_d, \alpha_c, \rho_{max}
+\end{align*}
+  \item All random variables are assumed to be independent of one another. 
+  \item Objective is to identify "important variables", perform sensitivity analysis, and calculate basic statistics using anchored-ANOVA collocation and Kriging. 
+\end{itemize}
+
+\end{frame}
+
 
 % EXTRAS
 \section{Extras}
