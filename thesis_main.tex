@@ -66,7 +66,7 @@ Dr. Benjamin Collins}
 \hidecopyright
 \hidededication
 \hideacknowledgments
-\hideabstract
+%\hideabstract
 
 % Definition of any abbreviations used.
 \abbreviations{
@@ -87,10 +87,13 @@ Dr. Benjamin Collins}
  \acro{SIFGRS}{Simple Integrated Fission Gas Release and Swelling}
 }
 
-% Some abstract text
-%\abstract{
-%Write abstract here!}
-%\hideabstractpagenumber
+% Abstract
+\abstract{
+The relatively recent abundance of computing resources has driven computational scientists to build more complex and approximation-free computer models of physical phenomenon. Often times, multiple high fidelity computer codes are coupled together in hope of improving the predictive powers of simulations with respect to experimental data. To improve the predictive capacity of computer codes experimental data should be folded back into the parameters processed by the codes through optimization and calibration algorithms. However, application of such algorithms may be prohibitive since they generally require thousands of evaluations of computationally expensive, coupled, multiphysics codes. Surrogates models for expensive computer codes have shown promise towards making optimization and calibration feasible.
+
+In this thesis, non-intrusive surrogate building techniques are investigated for their applicability in nuclear engineering applications. Specifically, Kriging and the coupling of  the anchored-ANOVA decomposition with collocation are utilized as surrogate-building approaches. Initially, these approaches are applied and naively tested on simple reactor applications with analytic solutions. Ultimately, the same methods are applied to model fission gas release during the Ris\o~AN3 power ramp experiment using the fuel modeling code BISON. In particular, a surrogate model is built for fission gas release and the true values of relevant parameters are inferred by folding experimental data with the surrogate. The calibration study is repeated using the coupled, multiphysics code system BISON/MPACT to investigate the effect of code coupling on surrogate efficacy.
+}
+\hideabstractpagenumber
 
 %% DOCUMENT AREA
 \begin{document}
