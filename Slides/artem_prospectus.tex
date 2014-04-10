@@ -1033,6 +1033,209 @@ Central Difference & -.367551 & -.776089 & .224060 & .776011 & .143492 \\
 \end{itemize}
 
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{anchored-ANOVA Sensitivity Analysis}
+
+\begin{itemize}
+  \item For each first-order component in anchored-ANOVA decomposition, calculate a sensitivity coefficient.
+  \item Variables $Ah$, $\alpha_d$, and $\rho_{max}$ comprise 82\% of the total sensitivity. 
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=0.6\textwidth]{./pk_importance_pie.pdf}
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Morris' Algorithm Sensitivity Analysis}
+
+\begin{itemize}
+  \item Algorithm visually identifies $Ah$, $\alpha_d$, and $\rho_{max}$ to be "important variables".
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=0.75\textwidth]{./importantvariables.png}
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Statistics from anchored-ANOVA Collocation Surrogate}
+
+\begin{itemize}
+  \item Basic statistics for the maximum fuel temperature attained during transient.
+  \item A total of 1000 Monte Carlo samples were used to get the statistics for each method (using the same random numbers). 
+  \item A Kriging surrogate based on 3 "important variables" was constructed and also sampled 1000 times for a mean normalized temperature of $1.03198 \pm 0.002299$. 
+\end{itemize}
+
+\begin{table}[h] 
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Method} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} & \textbf{99\% CI} \\ \hline
+1D ANOVA CC  & 1.03193 & (1.03175, 1.03211) & 0.002187 & (0.002068, 0.002320) \\ \hline
+All ANOVA CC & 1.03193 & (1.03175, 1.03211) & 0.002196 & (0.002076, 0.002330) \\ \hline
+1D ANOVA GP  & 1.03193 & (1.03175, 1.03211) & 0.002187 & (0.002068, 0.002320) \\ \hline
+All ANOVA GP & 1.03193 & (1.03175, 1.03211) & 0.002196 & (0.002076, 0.002330) \\ \hline
+True Function & 1.03193 & (1.03175, 1.03211) & 0.002196 & (0.002076, 0.002330) \\ 
+\hline \hline
+\end{tabular}}
+\end{table}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Statistics from anchored-ANOVA Collocation Surrogate}
+
+\begin{figure}
+  \includegraphics[width=.63\textwidth]{./pk_histograms.pdf}
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Statistics from anchored-ANOVA Collocation Surrogate}
+
+\begin{itemize}
+  \item Higher-order ANOVA components built only to model interaction effects between $Ah$, $\alpha_d$, and $\rho_{max}$. 
+  \item Surrogate consisting entirely of first-order components required 126 function evaluations. 
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=.63\textwidth]{./pk_sparse_grid_numknots.pdf}
+\end{figure}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Calculating Sensitivity Coefficients on anchored-ANOVA Collocation Surrogates}
+
+\begin{table}[h] 
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{||c|c|c|c||} 
+\hline \hline
+\textbf{Random Variable} & \textbf{1D ANOVA CC} & \textbf{All ANOVA CC} & \textbf{Central Diff.} \\ \hline
+$\lambda_4$  &  9.7308E-04 &  9.7309E-04 &  9.7379E-04 \\ \hline
+$\beta_2$    & -2.6582E-03 & -2.6582E-03 & -2.6616E-03 \\ \hline
+$\Lambda$    & -8.9294E-08 & -8.9295E-08 & -8.9364E-08 \\ \hline
+\colorbox{yellow}{$Ah$}         &  1.2553E-02 &  1.2553E-02 &  1.2584E-02 \\ \hline
+$M_c$        &  1.8753E-03 &  1.8753E-03 &  1.8716E-03 \\ \hline
+$M_f$        & -3.6695E-04 & -3.6695E-04 & -3.6360E-04 \\ \hline
+$c_{pc}$     &  1.8753E-03 &  1.8753E-03 &  1.8903E-03 \\ \hline
+$c_{pf}$     & -3.6695E-04 & -3.6695E-04 & -3.5976E-04 \\ \hline
+$v$          &  1.8838E-03 &  1.8839E-03 &  1.9177E-03 \\ \hline
+\colorbox{yellow}{$\alpha_d$}  & -2.6655E-02 & -2.6656E-02 & -2.6625E-02 \\ \hline
+$\alpha_c$   &  8.4387E-04 &  8.4387E-04 &  8.7194E-04 \\ \hline
+\colorbox{yellow}{$\rho_{max}$} &  3.1164E-02 &  3.1164E-02 &  3.1272E-02 \\ 
+\hline \hline
+\end{tabular}}
+\end{table}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{TMI Minicore}
+
+\begin{frame}
+\frametitle{Three Mile Island (TMI) Minicore Problem Statement}
+
+\begin{itemize}
+  \item Build surrogate for TMI Minicore power distribution using core simulator code PARCS.
+  \item Total of 25 homogenized, two-group cross sections are used as design variables.  
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=.6\textwidth]{./tmi_minicore.pdf}
+\end{figure} 
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{TMI Minicore Problem Data}
+
+\begin{itemize}
+  \item The few group, homogenized cross section description for each fuel assembly consists of transport, absorption, nu-fission, and scatter cross sections along with values for ADFs. 
+  \item For a two-group problem the total number of cross sections to describe an assembly is nine. 
+  \item Since the homogenized reflector region does not support fission only seven homogenized cross sections are required to describe it.
+  \item Few-group covariance matrix is obtained using the 'Two-Step' method based on a total of 300 transport calculations with perturbed multigroup cross sections. 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Morris' Algorithm Sensitivity Study}
+
+\begin{figure}
+  \includegraphics[width=0.85\textwidth]{./tmi_important_vars.png}
+\end{figure} 
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Kriging Surrogate}
+
+\begin{itemize}
+  \item Kriging surrogate is constructed for the core power as a function of $\Sigma_{a1}^i$, $\nu\Sigma_{f2}^i$, $\Sigma_{12}^i$, $\Sigma_{tr1}^o$, $\nu\Sigma_{f2}^o$ and $\Sigma_{12}^o$. 
+  \item Using these variables a sampling plan consisting of 20 true PARCS evaluations were.
+  \item Based on the optimized sampling plan a Kriging surrogate was constructed and sampled 500 times in accordance with the six design variables' covariance matrix.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sampling the Kriging Surrogate}
+
+\begin{columns}
+ \begin{column}{0.5\textwidth}
+  \centering
+  Kriging Surrogate Statistics
+  \begin{table}
+  \resizebox{\textwidth}{!}{%
+   \begin{tabular}{||c|c|c|c||} 
+    \hline \hline
+    \textbf{Assembly} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} \\ \hline
+     1 & 0.8385 & (0.8384, 0.8386) & 0.0010\\ \hline 
+    2 & 1.1499 & (1.1497, 1.1500) & 0.0013  \\ \hline
+    3 & 0.8384 & (0.8383, 0.8386) & 0.0010  \\ \hline
+    4 & 1.1499 & (1.1497, 1.1500) & 0.0013  \\ \hline
+    5 & 1.0465 & (1.0462, 1.0467) & 0.0022  \\ \hline
+    6 & 1.1499 & (1.1497, 1.1500) & 0.0013  \\ \hline
+    7 & 0.8384 & (0.8383, 0.8386) & 0.0010  \\ \hline
+    8 & 1.1499 & (1.1497, 1.1500) & 0.0013  \\ \hline
+    9 & 0.8384 & (0.8383, 0.8386) & 0.0010  \\
+    \hline \hline
+   \end{tabular}}
+  \end{table}
+ \end{column}
+ \begin{column}{0.5\textwidth}
+  \centering
+  PARCS Two-Step Statistics
+  \begin{table}
+   \resizebox{\textwidth}{!}{%
+    \begin{tabular}{||c|c|c|c||} 
+     \hline \hline
+     \textbf{Assembly} & \textbf{Mean} & \textbf{99\% CI} & \textbf{Standard Dev.} \\ \hline
+     1 & 0.8387 & (0.8386, 0.8388) & 0.0007 \\ \hline 
+     2 & 1.1499 & (1.1498, 1.1500) & 0.0011  \\ \hline
+     3 & 0.8387 & (0.8386, 0.8388) & 0.0007  \\ \hline
+     4 & 1.1499 & (1.1498, 1.1500) & 0.0011  \\ \hline
+     5 & 1.0453 & (1.0450, 1.0456) & 0.0027 \\ \hline
+     6 & 1.1499 & (1.1498, 1.1500) & 0.0011  \\ \hline
+     7 & 0.8387 & (0.8386, 0.8388) & 0.0007  \\ \hline
+     8 & 1.1499 & (1.1498, 1.1500) & 0.0011  \\ \hline
+     9 & 0.8387 & (0.8386, 0.8388) & 0.0007  \\ 
+    \hline \hline
+   \end{tabular}}
+  \end{table} 
+ \end{column}
+\end{columns}
+
+\end{frame}
+
+
 
 
 % EXTRAS
