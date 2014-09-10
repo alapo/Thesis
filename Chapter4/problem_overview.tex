@@ -1,0 +1,51 @@
+In the previous chapters collocation-based and Kriging surrogates were applied to several play problems in hopes of demonstrating the surrogates' efficacy. Ultimately, the same surrogate methods will be applied to a difficult problem in nuclear fuel performance modeling. Specifically, modeling the depletion behavior of high burnup fuel is of interest. The field of fuel performance modeling is an ideal application for surrogates because most modern fuel performance codes such as Bison \cite{Williamson} are computationally expensive and there is a relative abundance of experimental data to complement the computer codes. Recall that the true promise of surrogates arises when thousands of simulations of an expensive computer code are required, as is the case for optimization and calibration studies. The idea is to fold together computer simulations and experimental data to improve the computer code's predictive accuracy.    
+
+Calibration studies involving the fuel performance code Bison have already been conducted by Swiler et. al. in \cite{Swiler2}. In \cite{Swiler2}, an optimal fuel relocation activation parameter is identified by an aggregated calibration to experimental observations of several Halden fuel rods. Surrogates were not required for the calibration study due to the relative simplicity of the fuel rod model used. The Dakota \cite{dakota} framework was used to complete the calibration study.       
+
+For the proposed thesis research the application of interest arises from the extensive validation base for fuel performance modeling found in the Fumex-II database \cite{fumex2}. 
+Specifically, the application involves calibrating fission gas parameters involved in modeling the Ris\o~ AN3 experiment since these parameters are notoriously uncertain. The Ris\o~ AN3 experiment consists of a base irradiation of four reactor cycles, as shown in Fig. \ref{fig:riso_base_irradiation} followed by a power ramp. The base irradiation takes place in the Biblis A pressurized water reactor \cite{fumex2}. 
+\begin{figure}
+\caption{\label{fig:riso_base_irradiation}
+Base irradiation history for the Ris\o~ AN3 experiment.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/base_irrad.png}
+ \end{center}
+\end{figure}     
+After the base irradiation period, a fuel rod is extracted and refabricated to a shorter length before undergoing the power ramp in Fig. \ref{fig:riso_power_ramp}. The refabricated fuel rod is outfitted with various instrumentation such that fuel centerline temperature, fission gas release and rod internal pressure measurements can be obtained.  
+\begin{figure}
+\caption{\label{fig:riso_power_ramp}
+Power ramp experiment for the the Ris\o~ AN3 experiment.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/power_ramp.png}
+ \end{center}
+\end{figure} 
+
+The Ris\o~ AN3 experiment was modeled using solely Bison in \cite{Perez}. To model fission gas release the \ac{SIFGRS} model is utilized. Bison's prediction of fission gas release during the power ramp is displayed alongside the corresponding experimental results in Fig. \ref{fig:riso_fgr}.  
+\begin{figure}
+\caption{\label{fig:riso_fgr}
+Comparison of Bison fission gas release prediction to experimental results during the Ris\o~ AN3 power ramp.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/fgr_comparison.png}
+ \end{center}
+\end{figure} 
+As seen in Fig. \ref{fig:riso_fgr}, Bison over predicts fission gas release by a factor of two some forty hours into the power ramp. Similarly, Bison's prediction of fuel centerline temperature is plotted against experimental data in Fig. \ref{fig:riso_tc_temp}. Since fission gas release and fuel temperature are strongly coupled \cite{Perez}, it is anticipated that better fission gas release predictions will result in a more accurate fuel centerline temperature comparison. 
+
+Calibrated parameters in \ac{SIFGRS} are expected to decrease the error between Bison's predicted output and the experimental data. Input parameters to \ac{SIFGRS} such as the fuel grain radius, hydrostatic stress, fuel porosity, bubble surface tension, and the gas diffusion coefficient are quite generic and uncertain. Consequently, adjusting such parameters to better match experimental data is justified. However, Bison's fission gas release predictions are computationally expensive. Considering the calibration of parameters in \ac{SIFGRS} will requires thousands of Bison instances, a surrogate model for fission gas release behavior becomes necessary. 
+\begin{figure}
+\caption{\label{fig:riso_tc_temp}
+Comparison of Bison fuel centerline temperature prediction to experimental results during the Ris\o~ AN3 power ramp.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/tc_temp_comparison.png}
+ \end{center}
+\end{figure} 
+As in \cite{Swiler}, the Dakota framework will be utilized to construct surrogate models for fission gas release behavior and to perform calibration routines. 
+
+The primary culprits in the \ac{SIFGRS} model have been identified in \cite{Swiler3} and \cite{Pastore} to be the initial fuel grain radius, fuel porosity, surface tension, temperature, fuel grain radius, diffusion coefficient, resolution parameter and grain boundary coefficient. The importance and role of of these variables will be described in section \ref{sec:fgrTheory}. For now, suffice it to say that the true values of these variables are unknown and only uniform probability distributions can be attached to each variable. As a starting point for analysis, the \ac{LHS} module in Dakota was utilized to sample the variable space and simulate the resulting fission gas release time series resulting from the Ris\o~ AN3 power ramp. The 100 resulting time series are shown in Fig. \ref{fig:fgrSimulations}.
+\begin{figure}
+\caption{\label{fig:fgrSimulations}
+Fission gas release time series for 100 \ac{LHS} Bison simulated Ris\o~ AN3 power ramp experiments.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/fgr_simulations.png}
+ \end{center}
+\end{figure}
+From Fig. \ref{fig:fgrSimulations}, it is clear that Bison tends to over predict fission gas release. However, it is also apparent that the range of variables is sufficient to contend with the experimental data.

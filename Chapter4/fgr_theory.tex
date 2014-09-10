@@ -1,0 +1,46 @@
+Initial attempts to create models describing fission gas release were based on empirical correlations. Analyses performed with such models are limited in scope since they depend on a limited set of experimental observations. Simulations with conditions set outside the realm of the experimental data are extrapolating and therefore unreliable, especially when it is acknowledged that the input parameters to the fission gas release models have high uncertainty. To this end, a physics-based fission gas release model was developed by Pastore et. al \cite{Pastore3}. Physics based models are based on the solution of partial differential equations describing the various processes in fission gas release such as fuel swelling and diffusion of gas bubbles to the rod free volume. 
+
+There are two primary physical processes that lead to fission gas release into the rod free volume. Both processes involve the formation of Xenon and Krypton gas bubbles along UO$_2$ grain boundaries. In athermal gas release, which occurs at relatively low operating reactor temperatures, the diffusion of gas bubbles from within the fuel grains is negligible. However, in athermal gas release bubbles along fuel grain surfaces are able to escape into the rod free volume through the release mechanisms of recoil and knockout \cite{Pastore1}. At high temperatures fission gas release is dominated by thermal release, which involves the coupling of several physical processes. In thermal release Xenon and Krypton gas atoms formed within fuel grains diffuse towards the grain boundaries through trapping-in and irradiation-induced resolution \cite{Pastore3}. Additional gas bubbles appear onto grain boundaries through sweeping due to grain growth. As more and more gas bubbles diffusion towards grain boundaries the bubbles experience growth and ultimately coalesce. Eventually, tunnel networks form that provide a means for fission gases to escape into the rod free volume. The internal pressure causing bubble growth can be subdued by hydrostatic stress from the rod internal pressure and pellet/cladding contact pressure. A primary motivation for developing a physics-based fission gas release model is to accurately describe the interplay between these opposing forces \cite{Pastore3}.    
+
+The physics-based models for athermal and thermal fission gas release are given mathematical treatments in the proceeding sections. The implementation of the physics-based fission gas release model by Pastore et. al., namely \ac{SIFGRS}, is implemented in the Bison code and utilized in this research. The implementation is validated in \cite{Pastore1}, \cite{Pastore2}, \cite{Perez}, and \cite{Pastore}. Note that the models on which the \ac{SIFGRS} implementation is based on is kept relatively simple in order to provide timely estimates of fission gas release in the computationally expensive, finite-element based Bison code. The relative simplicity of the models is justified considering the large uncertainties in both fuel performance modeling codes and model parameters in the fission gas release model \cite{Pastore2} \cite{Lassmann}. 
+
+\subsection{Thermal Release}
+\label{subsec:thermal_release}
+
+The primary challenges of modeling thermal fission gas release are in describing the diffusional process of fission gases to grain boundaries and the resulting bubble growth and coalescence. As mentioned previously, the thermal release model is intended to be relatively simple, and as such, makes several assumptions that are in contrast to the current understanding of materials science. Upon reaching a fuel grain boundary fission gas atoms can be thrust back into the grain by irradiation. Such behavior is neglected in the proceeding model. Further, the complexity of grain edges, most notably triple grain junctions, are completely neglected. In addition, the initial concentration of grain face bubbles is static, which is not entirely correct because new bubbles will form during any irradiation process. Bubbles are also assumed to absorb any gas atoms arriving at grain faces. Finally, all grain face bubbles are assumed to have the same size and shape \cite{Pastore1}.  
+
+Fission gas bubble growth is known to result from two channels. First, growth occurs due to absorption of vacancies caused by a pressure differential between the bubble's expansion and external forces acting on the bubble. Second, bubble growth is accelerated due to the diffusional process bringing gas atoms from the inner fuel grain to the grain faces. To this end, bubble growth rate can be described as,
+\begin{equation}
+\label{eq:bubble_growth}
+ \frac{dV_{gf}}{dt} = \omega\frac{dn_g}{dt} + \Omega_{gf}\frac{dn_v}{dt}  
+\end{equation}  
+where $V_{gf}$ is the bubble volume, $n_v$ is the number of vacancies per bubble, and $n_g$ is the number of fission gas atoms per bubble. The first term in Eq. \ref{eq:bubble_growth} describes the contribution from diffusional gas atoms while the second term describes absorption of vacancies. The factors $\omega$ and $\Omega_{gf}$ are respective proportionality constants commonly described in the literature as Van Der Waal's' volume  of a fission gas atom and the vacancy volume in grain boundary bubbles. The term due to diffusional gas atoms is obtained by solving the diffusion equation in spherical geometry for the concentration of intra-granular gas atoms $C_{ig}$,
+\begin{equation}
+\label{eq:bubble_diffusion}
+ \frac{dC_{ig}}{dt} = \frac{b}{b+g}D_s \frac{1}{r^2} \frac{\partial}{\partial r} \left(r^2 \frac{\partial C_{ig}}{\partial r} \right) +\beta.
+\end{equation}
+The effective diffusion coefficient in Eq. \ref{eq:bubble_diffusion}, which regulates the rate at which gas atoms in a UO$_2$ lattice diffuse from fuel grain to face, consists of several components. The factor $g$ represents the trapping parameter while $b$ is the resolution parameter. Together, the ratio $b/(b+g)$ is the fraction of all intra-granular gas atoms that can potentially diffuse towards the grain boundary \cite{Pastore3}. The final component in the effective diffusion coefficient is the intra-granular gas atom diffusion coefficient $D_s$, which carries the classic interpretation of a diffusion coefficient. The source term in Eq. \ref{eq:bubble_diffusion} is the rate at which gas is generated. 
+
+Changes in vacancy absorption and emission, the second term in Eq. \ref{eq:bubble_growth}, is proportional to the pressure differential of the gas bubble. If $n_v$ is the vacancy number in a bubble then the time rate of change of $n_v$ is given by,
+\begin{equation}
+\label{eq:vacancy_change}
+ \frac{dn_v}{dt} = \frac{2\pi D_v \delta_g}{kTs}\left(p - p_{eq}\right).
+\end{equation}    
+The internal pressure of the gas bubble can be expressed using Van Der Waal's equation,
+\begin{equation}
+\label{eq:interal_gas_pressure}
+ p = \frac{kT}{\Omega_{gf}} \frac{n_g}{n_v}
+\end{equation}
+where $k$ is Boltzman's constant and $T$ is temperature. The pressure $p_{eq}$ acting on the bubble is given as the difference between the bubble surface tension and the hydrostatic stress $\sigma_h$ of the surrounding medium. More formally,
+\begin{equation}
+\label{eq:external_gas_pressure}
+ p_{eq} = \frac{2\gamma}{R_{gf}} - \sigma_h
+\end{equation} 
+where $R_{gf}$ is the bubble radius of curvature. The factor $\gamma$ is the surface tension, which is also commonly referred to as the UO$_2$/gas specific surface energy. The surface tension parameter strongly affects the kinetics of bubble growth \cite{Swiler3}. To solve for the vacancy number in Eq. \ref{eq:vacancy_change} the grain boundary diffusion layer thickness $\delta_g$ is needed in addition to the vacancy diffusion coefficient $D_v$. The factor $s$ in Eq. \ref{eq:vacancy_change} is closely related to the grain face fractional coverage \cite{Pastore1}. At this point all the elements are in place to model bubble growth using Eq. \ref{eq:bubble_growth}.  
+
+  
+% How experimental data was taken
+%Those measurements are pressure transducer data then converted to FGR. I think the FGR decreases because, under some conditions, the transducer doesn't detect the gas that is actually released but is trapped in the closed gap/cracks - and then does not contribute to plenum pressure. This may also explain (partly, in addition to burst FGR due to micro-cracking) the FGR jumps at the power reductions (gap opening and detection of gas released previously).
+
+% The uncertain parameters are chosen as a conglomeration of two publications that specifiically investigated fgr sensitivity analysis. 
+
