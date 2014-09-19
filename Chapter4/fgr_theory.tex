@@ -4,9 +4,6 @@ There are two primary physical processes that lead to fission gas release into t
 
 The physics-based models for athermal and thermal fission gas release are given mathematical treatments in the proceeding sections. The implementation of the physics-based fission gas release model by Pastore et. al., namely \ac{SIFGRS}, is implemented in the Bison code and utilized in this research. The implementation is validated in \cite{Pastore1}, \cite{Pastore2}, \cite{Perez}, and \cite{Pastore}. Note that the models on which the \ac{SIFGRS} implementation is based on is kept relatively simple in order to provide timely estimates of fission gas release in the computationally expensive, finite-element based Bison code. The relative simplicity of the models is justified considering the large uncertainties in both fuel performance modeling codes and model parameters in the fission gas release model \cite{Pastore2} \cite{Lassmann}. 
 
-\subsection{Thermal Release}
-\label{subsec:thermal_release}
-
 The primary challenges of modeling thermal fission gas release are in describing the diffusional process of fission gases to grain boundaries and the resulting bubble growth and coalescence. As mentioned previously, the thermal release model is intended to be relatively simple, and as such, makes several assumptions that are in contrast to the current understanding of materials science. Upon reaching a fuel grain boundary fission gas atoms can be thrust back into the grain by irradiation. Such behavior is neglected in the proceeding model. Further, the complexity of grain edges, most notably triple grain junctions, are completely neglected. In addition, the initial concentration of grain face bubbles is static, which is not entirely correct because new bubbles will form during any irradiation process. Bubbles are also assumed to absorb any gas atoms arriving at grain faces. Finally, all grain face bubbles are assumed to have the same size and shape \cite{Pastore1}.  
 
 Fission gas bubble growth is known to result from two channels. First, growth occurs due to absorption of vacancies caused by a pressure differential between the bubble's expansion and external forces acting on the bubble. Second, bubble growth is accelerated due to the diffusional process bringing gas atoms from the inner fuel grain to the grain faces. To this end, bubble growth rate can be described as,
@@ -76,9 +73,5 @@ As a final note, due to the relatively high temperatures involved in the Ris\o~A
 \end{equation}
 The parameters $y$ and $F$ are the yield of fission gases and fission rate density, respectively. Also, $S_g$, $S_t$ and $\mu_{U,ko}$ are the geometric surface area of the fuel, total fuel surface area, and range of higher-order knock-on in uranium oxide \cite{Pastore2}. 
 
-  
-% How experimental data was taken
-%Those measurements are pressure transducer data then converted to FGR. I think the FGR decreases because, under some conditions, the transducer doesn't detect the gas that is actually released but is trapped in the closed gap/cracks - and then does not contribute to plenum pressure. This may also explain (partly, in addition to burst FGR due to micro-cracking) the FGR jumps at the power reductions (gap opening and detection of gas released previously).
 
-% The uncertain parameters are chosen as a conglomeration of two publications that specifiically investigated fgr sensitivity analysis. 
 
