@@ -1,0 +1,8 @@
+In Section \ref{subsec:fgrPCA} \ac{PCA} was used used to show that three eigenvectors are sufficient to capture over 99\% of the variance in Bison's simulated Ris\o~ AN3 power ramp fission gas release time series. The variation is caused by perturbations in the fission gas release parameters although they are not explicit in the \ac{PCA} framework. The Dakota code is used to create the 100 time series in the previous section. In accordance with each parameter's uniform distribution described in Table \ref{table:fgr_params}, Dakota made 100 sets of perturbations to the parameters using the \ac{LHS} method. Each of the 100 samples was then propagated through Bison and a time series of fission gas release was output. \ac{PCA} was then performed on the covariance matrix of the 100 samples. Consequently, there is a clear mapping from a set of eight fission gas release parameters to a time series. More specifically, there is a mapping from the i$^{th}$ set of eight parameters to the three expansion coefficients $\lbrace p_{i1}, p_{i2}, p_{i3} \rbrace$ that are capable of reproducing the time series, as described in Eq. \ref{eq:pcaExpCoeffs}. In order to predict new time series for a set of fission gas release parameters not in the set used to derive the three principal components this mapping must be generated. Kriging is used achieve the mapping.  
+
+
+%How to make prediction of new time series
+%Error in prediction
+%Plot
+%
+%\subsection{Cross Validation}
