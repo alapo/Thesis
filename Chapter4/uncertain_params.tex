@@ -1,0 +1,22 @@
+In order to calibrate certain parameters it's necessary to first assign a valid range of values each parameter can potentially take on. In light of previous fission gas release parameter sensitivity research in \cite{Pastore2}, \cite{Swiler3}, and \cite{Johns} a total of eight parameters have been chosen for calibration in this research due to their propensity for influencing fission gas release behavior. The eight parameters are the initial fuel grain radius, fuel porosity, bubble surface tension, temperature, fuel grain radius, intra-granular gas atom diffusion coefficient, vacancy diffusion coefficient and resolution parameter. Each of the parameters is assumed to carry a uniform uncertainty distribution with lower and upper bounds estimated by Pastore et. al. \cite{Swiler3} \cite{Pastore2} using experimental values cited in published literature. The distributions are summarized in Table \ref{table:fgr_params}.
+\begin{table} 
+\caption{Fission gas release parameters used for calibration along with their uniform probability distributions.}
+\label{table:fgr_params} 
+\centering
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Description} & \textbf{Symbol} & \textbf{Lower Bound} & \textbf{Upper Bound} & \textbf{Scaled} \\ \hline
+Initial Fuel Grain Radius & $r_{gr,0}$  & 2.0E-6 & 15.0E-6 & no \\ \hline
+Fuel Porosity               & $P_f$      & 0.0      & 0.1      & no \\ \hline
+Surface Tension           & $\gamma$  & 0.5     & 1.0      & no \\ \hline
+Temperature               & $T$          & 0.95   & 1.05     & yes \\ \hline
+Fuel Grain Radius         & $r_g$       & 0.4     & 1.6      & yes \\ \hline
+Vacancy Diffusion Coef.  & $D_v$      & 0.1      & 10.0     & no \\ \hline
+Resolution Parameter    & $b$         & 0.1      & 10.0     & no \\ \hline
+Intra-granular Diffusion Coef. & $D_s$ & 0.316 & 3.162   & no \\ 
+\hline \hline
+\end{tabular}
+\end{table}
+
+The scaled column in Table \ref{table:fgr_params} denotes whether or not the parameter is scaled at each time-step in a Bison simulation, as described in Section \ref{sec:fgrTheory}. Temperature $T$ is a ubiquitous field parameter in Bison that gets passed into the \ac{SIFGRS} model, appearing most notably in Eq. \ref{eq:interal_gas_pressure} and \ref{eq:vacancy_change} along with the vacancy diffusion coefficient $D_v$. The bubble surface tension parameterizes how internal bubble gas pressure behaves and appears in Eq. \ref{eq:interal_gas_pressure}. The fuel grain radius appears in the grain boundary sweeping model \ref{eq:grain_boundary_sweeping} along with the equation describing the rate at which fission gases are released into the rod free volume in Eq. \ref{eq:fgr_rate_final}. In addition, the fuel grain radius $r_g$ is a boundary condition in the gas diffusion process in Eq. \ref{eq:bubble_diffusion}. The parameters $b$ and $D_s$ also appear in Eq. \ref{eq:bubble_diffusion}.   
+
