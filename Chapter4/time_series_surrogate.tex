@@ -40,4 +40,22 @@ Cross validation of Kriging predictions for \ac{PCA} expansion coefficients usin
 \end{figure}
 Surprisingly, regardless of the training set size, predictions for the first principal component expansion coefficient are of the highest quality followed by the predictions for the expansion coefficients of the third principal component. It is most important to accurately predict expansion coefficients for the top principal components since they explain the most variance. Accurate prediction of lower principal components offers diminishing returns. Both inverse and logarithmic transforms were applied to the data as suggested in \cite{Jones_Schonlau} although no noticeable improvement was observed in prediction accuracy.   
 
+\subsection{Calibration}
+\label{\subsec:calibration}
+
+Now that the predictive accuracy of the individual Kriging surrogates for each expansion coefficient have been cross validated it is time to investigate how well the surrogates can perform collectively in predicting Ris\o~AN3 power ramp fission gas release time series. To determine the error between predicted time series the \ac{RMSE} is used as a cost function. Recall that before any two time series are compared each is segmented into 150 identical locations. The objective of calibration is to find a set of fission gas release parameters $R^i$ such that when they are input into Eq. \ref{eq:predicted_mean_fgr_ts} the \ac{RMSE} is minimized. 
+
+Ideally, the landscape of possible \ac{RMSE} values is such that a clear global minimum exists. In this case, an algorithm such as \ac{EGO} can be used to find the minimal value and its corresponding parameter set \cite{Jones_Schonlau}. \ac{EGO} couples a computer model's surrogate prediction and uncertainty with the computer model itself in an iterative optimization process.  At each iteration \ac{EGO} estimates the parameter space location that is most likely to contain a \ac{RMSE} value smaller than the current minimum. The true computer model is then evaluated at this point and therefore, the minimization procedure can be potentially expensive. However, if it is known a priori that the \ac{RMSE} landscape is for example, convex then \ac{EGO} should be strongly considered. Unfortunately, there is usually no way to tell a priori the shape of a landscape for most expensive engineering codes such as Bison. Due to the non-linearities inherent in such codes the landscape is often fairly "flat". A flat landscape can result when some parameters are insignificant and thus, many values of these parameters will result in similar cost function values. Also, a flat landscape can result if the minimization problem is non-unique, meaning many combinations of parameters can yield the same, or nearly the same, optimal values for the \ac{RMSE}. Often times, these two issues may be interrelated and both will tremendously complicate the global optimizer search. Indeed, if \ac{EGO} is used many expensive computer code evaluations will be wasted. A local optimization algorithm should be utilized if a flat landscape is suspected.  
+
+In order to decide which time of minimization algorithm to apply to the problem in-hand Sobol indices are calculated using the surrogate model. 
+% Morris plot 
+
+       
+
+
+
+
+
+
+   
 
