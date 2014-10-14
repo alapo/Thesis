@@ -38,7 +38,7 @@ Cross validation of Kriging predictions for \ac{PCA} expansion coefficients usin
   \includegraphics[scale=.4]{./Chapter4/xval_45degree.pdf}
  \end{center}
 \end{figure}
-Surprisingly, regardless of the training set size, predictions for the first principal component expansion coefficient are of the highest quality followed by the predictions for the expansion coefficients of the third principal component. It is most important to accurately predict expansion coefficients for the top principal components since they explain the most variance. Accurate prediction of lower principal components offers diminishing returns. Both inverse and logarithmic transforms were applied to the data as suggested in \cite{Jones_Schonlau} although no noticeable improvement was observed in prediction accuracy.   
+Surprisingly, regardless of the training set size, predictions for the first principal component expansion coefficient are of the highest quality followed by the predictions for the expansion coefficients of the third principal component. It is most important to accurately predict expansion coefficients for the top principal components since they explain the most variance. Accurate prediction of lower principal components offers diminishing returns. Both inverse and logarithmic transforms were applied to the data as suggested in \cite{Jones_Schonlau} although no noticeable improvement was observed in prediction accuracy. Due to the relatively noisy values for the second expansion coefficient in Fig. \ref{fig:xval_45degree} it is anticipated the largest prediction errors will occur from the release jump and onwards since the second principal components attempts to account for a majority of the variance in this area per Fig. \ref{fig:fgrEvecs}.
 
 \subsection{Calibration}
 \label{\subsec:calibration}
@@ -47,10 +47,47 @@ Now that the predictive accuracy of the individual Kriging surrogates for each e
 
 Ideally, the landscape of possible \ac{RMSE} values is such that a clear global minimum exists. In this case, an algorithm such as \ac{EGO} can be used to find the minimal value and its corresponding parameter set \cite{Jones_Schonlau}. \ac{EGO} couples a computer model's surrogate prediction and uncertainty with the computer model itself in an iterative optimization process.  At each iteration \ac{EGO} estimates the parameter space location that is most likely to contain a \ac{RMSE} value smaller than the current minimum. The true computer model is then evaluated at this point and therefore, the minimization procedure can be potentially expensive. However, if it is known a priori that the \ac{RMSE} landscape is for example, convex then \ac{EGO} should be strongly considered. Unfortunately, there is usually no way to tell a priori the shape of a landscape for most expensive engineering codes such as Bison. Due to the non-linearities inherent in such codes the landscape is often fairly "flat". A flat landscape can result when some parameters are insignificant and thus, many values of these parameters will result in similar cost function values. Also, a flat landscape can result if the minimization problem is non-unique, meaning many combinations of parameters can yield the same, or nearly the same, optimal values for the \ac{RMSE}. Often times, these two issues may be interrelated and both will tremendously complicate the global optimizer search. Indeed, if \ac{EGO} is used many expensive computer code evaluations will be wasted. A local optimization algorithm should be utilized if a flat landscape is suspected.  
 
-In order to decide which time of minimization algorithm to apply to the problem in-hand Sobol indices are calculated using the surrogate model. 
-% Morris plot 
+To decide which class of minimization algorithm to apply to solve the problem in-hand Sobol indices are calculated using the surrogate model. However, Morris' algorithm is first applied to get a sense of which of the eight fission gas release parameters in Table \ref{table:fgr_params} most influence the \ac{RMSE}. In reference to Section \cite{subsec:morris_algorithm}, 500 elementary effects are calculated for each fission gas release parameter. A total of 4500 evaluations of the surrogate in Eq. \ref{eq:predicted_mean_fgr_ts} were required to produce the plot in Fig. \ref{fig:fgr_morris_plot}.
+\begin{figure}[!h]
+\caption{\label{fig:fgr_morris_plot}
+Morris' algorithm applied to the \ac{RMSE} of the fission gas release time series.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/fgr_morris.png}
+ \end{center}
+\end{figure}
+The value $\mu^*$ in Fig. \ref{fig:fgr_morris_plot} is simply the average of the absolute values of each parameter's elementary effects, as defined in Eq. \ref{eq:elementary_effect_x}. Taking the absolute value helps to ensure cancellation effects in non-monotonic models do not obscure a parameter's true influence \cite{Morris}. The initial fuel grain radius is clearly the most influential parameter followed by the fuel grain and temperature scaling parameters. Such results are consistent with the variable importances discovered through the \ac{PCA} study that resulted in Fig. \ref{fig:principalCompTS}. The importance of fuel grain radius parameters is of no surprise given how omnipresent they are in the \ac{SIFGRS} model, and specifically in determining diffusion distances and grain boundary sweeping. The positive distances away from the origin along the $\sigma$-axis are indicative of non-linear interaction effects between the fission gas release parameters and a first sign that a global minimum solution may be too computationally expensive for the calibration problem.  
 
-       
+Further investigation of the sensitivity of the \ac{RMSE} with respect to its input parameters is achieved by calculating Sobol indices. As described in \cite{Sobol}, Sobol indices attribute a system's total variance to individual variables and their interactions with other variables by applying the anchored-\ac{ANOVA} decomposition described in Section \ref{subsec:anchored_anova}. In reference to Eq. \ref{eq:hdmr_decomp}, the "main effect index" is defined to be the variance of $f_\textbf{u}\left(\textbf{x}_\textbf{u}\right)$ normalized by the system's total variance. The main effect determines the fraction of variance that is due to either one variable or any number of interacting variables. The anchored-\ac{ANOVA} frameworks allows for the subtraction of variance contributions from other variables. If the main effect indices are added for all combinations of a systems $d$ variables then the $2^d-1$ components are expected to sum to unity. 
+
+However, the integrals involved in calculating the variance of $f_\textbf{u}\left(\textbf{x}_\textbf{u}\right)$ are expensive and therefore, typically main effect indices are only calculated for the individual variables and not their interactions \cite{Saltelli}. The "total effect index" uses the anchored-\ac{ANOVA} decomposition to estimate the variance due to a variable and all of its possible interactions with other variables in the system. The calculation of total effect indices is made possible thanks to the total variance theorem \cite{Saltelli}. Unlike the sum of all main effect indices, the sum of all total effect indices is expected to sum to unity only when the model under consideration is purely additive.  
+
+Various methods exist for computing Sobol indices, all of which are based on the Monte Carlo method for estimating the integrals in the variance calculations when the model under consideration is not analytic. The R code package \cite{R} is utilized for calculating Sobol indices for the problem in hand. Specifically, the method of Sobol and Jansen \cite{Saltelli} is used initially to estimate main and total effect indices. The Sobol and Jansen algorithm requires $n(d+2)$ evaluations of the objective function to estimate both sets of indices, where $n$ is the number of Monte Carlo samples to use. Both main and total effect indices for the \ac{RMSE} are displayed in Fig. \ref{fig:rmse_sobol_indices} using $10^5$ Monte Carlo samples and 100 bootstrap samples to obtain $95\%$ confidence intervals. 
+\begin{figure}[!h]
+\caption{\label{fig:rmse_sobol_indices}
+Main and total effect indices for the \ac{RMSE} using the Sobol-Jansen algorithm. A total of $n=10^4$ Monte Carlo samples are used to estimate the indices.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/sobol_indices.png}
+ \end{center}
+\end{figure}
+Note, a total of $10^5$ calculations for the \ac{RMSE} were required to produce the data in Fig. \ref{fig:rmse_sobol_indices}. Without a surrogate model, the Bison code would have to be executed this same number of times, which would be prohibitive. The main effect magnitudes for each of the eight fission gas release parameters is entirely consistent with Fig. \ref{fig:fgr_morris_plot}. The far greatest variance is due to the initial fuel grain radius followed by the temperature and fuel grain radius scaling factors. The intra-granular and vacancy diffusion coefficients have non-zero but relatively small Sobol sensitivity indices. However, $P_f$, $\gamma$, and $b$ contribute trivially to any variability in the \ac{RMSE}. From Fig. \ref{fig:rmse_sobol_indices} it is evident that the parameters with non-trivial main effect indices also have significant total effect indices. Consequently, higher-order parameter interactions play a significant role in determining the \ac{RMSE}. Such a discovery is no surprise given how, for example, tightly coupled the temperature and fuel grain radius are in the \ac{SIFGRS} formulation described in Section \ref{sec:fgrTheory}.
+
+In order to get a sense for which fission gas release parameters are strongly interacting, second-order Sobol indices are calculated in R. As seen in Fig. \ref{fig:rmse_sobol_indices_2nd_order} the highest magnitude interaction effects are between parameters with the largest main effects from Fig. \ref{fig:rmse_sobol_indices}. The largest interaction variance is due to the initial fuel grain radius and temperature scaling factor. Relatively large interactions that contribute to \ac{RMSE} variance are between the initial fuel grain radius and all the other fission gas release parameters. Of particular note is the magnitude of interaction between the vacancy diffusion coefficient and the temperature and initial fuel grain radius.     
+\begin{figure}[!h]
+\caption{\label{fig:rmse_sobol_indices_2nd_order}
+Second order Sobol indices for the \ac{RMSE}. A total of $n=10^4$ Monte Carlo samples are used to estimate the indices.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/sobol_2nd_order.png}
+ \end{center}
+\end{figure}
+A total of $3.7\times 10^5$ \ac{RMSE} calculations were required to produce Fig. \ref{fig:rmse_sobol_indices_2nd_order}. As mentioned previously, such an analysis is only feasible using an efficient surrogate.
+
+
+
+   
+
+
+
+    
 
 
 
