@@ -81,6 +81,33 @@ Second order Sobol indices for the \ac{RMSE}. A total of $n=10^4$ Monte Carlo sa
 \end{figure}
 A total of $3.7\times 10^5$ \ac{RMSE} calculations were required to produce Fig. \ref{fig:rmse_sobol_indices_2nd_order}. As mentioned previously, such an analysis is only feasible using an efficient surrogate.
 
+Given the presence of strong interaction among the fission gas release parameters it is unlikely a global \ac{RMSE} minimum can be found in reasonable time. However, a locally optimal solution can be found using the \ac{COBYLA} algorithm. The \ac{COBYLA} algorithm is of the simplex variety that does not require any gradient information while allowing for constraints to be placed on both the search parameters and objective function. For this problem it is necessary to not allow fission gas parameters that result in negative fission gas release values in predicted time series. Simplex algorithms are based on the fact that parameter constraints act as hyperplanes in d-dimensional space that collectively enclose a convex volume. The optimal objective function value must lay on one of the vertices of the intersection of the hyperplanes \cite{Powell}. 
+
+Since local optimization algorithms such as \ac{COBYLA} are notorious for being sensitive to initial search conditions the algorithm is executed 100 different times, with each execution being seeded by one of the 100 \ac{LHS} used to construct the expansion coefficient surrogates. Such a procedure increases the probability of finding a true minimum \ac{RMSE} and not one existing in a flat space. The minimum \ac{RMSE} found was 0.02941, which corresponded to the predicted time series in Fig. \ref{fig:fgr_best_estimate}. 
+\begin{figure}[!h]
+\caption{\label{fig:fgr_best_estimate}
+Best-estimate fission gas release time series compared to experimental data.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/fgr_best_estimate.png}
+ \end{center}
+\end{figure}
+To identify the locally minimum \ac{RMSE} some $10^5$ instances of the surrogate were required. For each of the 100 seedings the \ac{COBYLA} algorithm was terminated either after $2\times 10^3$ iterations or a relative difference of $10^{-6}$ between two consecutive iterations. While the time series in Fig. \ref{fig:fgr_best_estimate} is certainly an improvement over the time series produced when the mean fission gas parameter values are used in Fig. \ref{fig:riso_fgr}, the predicted fission gas release time series leaves much to be desired. Discrepancies between predicted and experimental values may safely be attributed to the way in which gas release is modeled in \ac{SIFGRS}. The optimal parameter values, with each parameter scaled to the unit hypercube, found for each of the 100 \ac{COBYLA} seedings is summarized in a boxplot in Fig. \ref{fig:optimal_params_boxplot}.    
+\begin{figure}[!h]
+\caption{\label{fig:optimal_params_boxplot}
+Boxplot of optimal parameter combinations for 100 seedings of the \ac{COBYLA} algorithm.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/optimal_params_boxplot.png}
+ \end{center}
+\end{figure}
+The length of the whiskers in Fig. \ref{fig:optimal_params_boxplot} implies strong non-linear interaction effects, as substantiated by the investigation involving Sobol indices. The relative difference between the maximum \ac{RMSE} and minimum \ac{RMSE} among all 100 optimized seedings was only some 35\%. The relatively low differences between the two extremes was achieved using a wide combination of parameter values.  
+
+
+%direct algoritgm also used, optimal values, additional simulations did not improve, limitations in code prevent convergence to experimental data, smoothing the data... results
+
+
+
+ 
+
 
 
    
