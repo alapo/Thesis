@@ -41,7 +41,7 @@ Cross validation of Kriging predictions for \ac{PCA} expansion coefficients usin
 Surprisingly, regardless of the training set size, predictions for the first principal component expansion coefficient are of the highest quality followed by the predictions for the expansion coefficients of the third principal component. It is most important to accurately predict expansion coefficients for the top principal components since they explain the most variance. Accurate prediction of lower principal components offers diminishing returns. Both inverse and logarithmic transforms were applied to the data as suggested in \cite{Jones_Schonlau} although no noticeable improvement was observed in prediction accuracy. Due to the relatively noisy values for the second expansion coefficient in Fig. \ref{fig:xval_45degree} it is anticipated the largest prediction errors will occur from the release jump and onwards since the second principal components attempts to account for a majority of the variance in this area per Fig. \ref{fig:fgrEvecs}.
 
 \subsection{Calibration}
-\label{\subsec:calibration}
+\label{subsec:calibration}
 
 Now that the predictive accuracy of the individual Kriging surrogates for each expansion coefficient have been cross validated it is time to investigate how well the surrogates can perform collectively in predicting Ris\o~AN3 power ramp fission gas release time series. To determine the error between predicted time series the \ac{RMSE} is used as a cost function. Recall that before any two time series are compared each is segmented into 150 identical locations. The objective of calibration is to find a set of fission gas release parameters $R^i$ such that when they are input into Eq. \ref{eq:predicted_mean_fgr_ts} the \ac{RMSE} is minimized. 
 
@@ -101,8 +101,39 @@ Boxplot of optimal parameter combinations for 100 seedings of the \ac{COBYLA} al
 \end{figure}
 The length of the whiskers in Fig. \ref{fig:optimal_params_boxplot} implies strong non-linear interaction effects, as substantiated by the investigation involving Sobol indices. The relative difference between the maximum \ac{RMSE} and minimum \ac{RMSE} among all 100 optimized seedings was only some 35\%. The relatively low differences between the two extremes was achieved using a wide combination of parameter values.  
 
+One path taken to lessen the difference between experimental data and prediction was to smooth the experimental data. As mentioned previously, the measurements taken of fission gas release during the Ris\o~ AN3 power ramp may contain significant error. At some points in the experimental data the total fission gas release actually decreases, which is completely not physical. However, with only a single time series measurement there is no way of assigning uncertainties to fission gas release values measured at different times throughout the power ramp. Also, it would be unfounded to assign an uncertainty of say, 10\% to all measurements taken during the power ramp. Consequently, in an attempt to smooth the experimental data local polynomial regression was applied with the minimal amount of smoothing necessary to make the fission gas release time series strictly monotonically increasing. Using the R "loess" function with linear interpolants and a spanning parameter of 0.17 the desired smoothing was achieved. The smoothed experimental data along with the best-fit surrogate prediction is shown in Fig. \ref{fig:best_estimate_smooth}.  
+\begin{figure}[!h]
+\caption{\label{fig:best_estimate_smooth}
+Best-estimate fission gas release time series compared to experimental data that was smoothed using the local polynomial regression smoothing.}
+ \begin{center}
+  \includegraphics[scale=.75]{./Chapter4/best_estimate_smooth.png}
+ \end{center}
+\end{figure}
+The \ac{RMSE} for the best-estimate time series when compared to the smoothed experimental data was calculated to be 0.02486, which was a 15.5\% reduction in \ac{RMSE} from when raw experimental data was utilized.
 
-%direct algoritgm also used, optimal values, additional simulations did not improve, limitations in code prevent convergence to experimental data, smoothing the data... results
+Comparing Fig. \ref{fig:best_estimate_smooth} with  Fig. \ref{fig:fgr_best_estimate}, it is not clear whether the smoothed experimental data offers any advantages towards finding a set of Bison fission gas release parameters that best predict the available data. Although there are significant discrepancies between predicted and experimental time series, especially in the power burst occurring at hour fifty of the power ramp, the Bison predictions do a good job in predicting end-of-experiment fission gas release values. For the case when raw experimental data is used, as in Fig. \ref{fig:fgr_best_estimate}, there is only a 2.6\% relative error in the end-of-experiment fission gas release prediction. The beginning-of-experiment prediction error in this case is 64.8\%. For the case of smoothed experimental date the prediction results are marginally improved with a beginning-of-experiment prediction error of 57.8\% and an end-of-experiment error of 0.5\%. Note, it's possible to enforce the conditions of matching the predicted beginning-of-experiment and end-of-experiment predictions to their respective experimental values in the \ac{COBYLA} framework. However, the \ac{COBYLA} algorithm is unable to converge to a solution that matches these conditions. Enforcing only one of the conditions to a tolerance of $10^{-3}$ was achievable although the resulting solution grossly over predicted the fission gas release elsewhere in the time series. A table of calibrated fission gas release parameters for both raw and experimental data is summarized in Table \ref{table:optimal_fgr_paramaters}.        
+\begin{table}[!h] 
+\caption{Calibrated fission gas release parameters with respect to raw and smoothed experimental data.}
+\label{table:optimal_fgr_paramaters} 
+\centering
+\begin{tabular}{||c|c|c|c|c||} 
+\hline \hline
+\textbf{Description} & \textbf{Symbol} & \textbf{Smoothed} & \textbf{Raw} & \textbf{Relative Difference} \\ \hline
+Initial Fuel Grain Radius & $r_{g,0}$  & 1.50E-05 & 1.50E-05 & 0.0E+00 \\ \hline
+Fuel Porosity               & $P_f$      & 0.10      & 0.09      & 8.2E-02 \\ \hline
+Surface Tension           & $\gamma$  & 0.50     & 0.50      & 1.4E-04 \\ \hline
+Temperature               & $T$          & 1.02   & 1.02     & 1.8E-04 \\ \hline
+Fuel Grain Radius         & $r_g$       & 1.26     & 1.26      & 5.1E-03 \\ \hline
+Vacancy Diffusion Coef.  & $D_v$      & 7.49      & 7.50     & 3.8E-04 \\ \hline
+Resolution Parameter    & $b$         & 0.10      & 0.19     & 4.8E-01 \\ \hline
+Intra-granular Diffusion Coef. & $D_s$ & 1.02 & 1.05   & 2.7E-02 \\ 
+\hline \hline
+\end{tabular}
+\end{table}
+
+
+
+
 
 
 
