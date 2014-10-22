@@ -1,0 +1,15 @@
+Advances in computing the past decade have motivated scientists and engineers to write computer code that models physical phenomenon using as few approximations as possible. While the predictive capabilities of such codes' simulations improve in representing experimental data, they typically require hours on parallel compute clusters to complete. Indeed, from a statistical vantage point the analysis of computer experiments landscape has not changed. Engineering computer codes are still expensive to execute and therefore, techniques must be used to somehow simplify the codes before analyzing them. Newly available computational power has been spent towards making individual computer codes more accurate and encompassing rather than on easing the ability to perform optimization, calibration and sensitivity analysis in hopes of gleaning insight into the physics at hand. The purpose of this thesis has been to apply and develop so-called surrogate methods towards the statistical analysis of expensive engineering computer codes when the inputs to the codes are uncertain. 
+
+Two surrogate approaches are investigated in this thesis. The first, anchored-\ac{ANOVA} decomposition on Smolyak sparse grids is a relatively new approach researched in the 2000s. Kriging is the second approach taken to analyze the output of computer experiments and has been considered the bread-and-butter of the field since the 1950s. In Kriging, a computer code is treated as a stochastic process. For various inputs, the computer code's outputs are observed and a statistical model is built based on the distance between input sets and the marginal differences in output. Usually \ac{LHS} is used to sample computer codes in an optimal fashion when only a limited number of computer simulations can be afforded. The anchored-\ac{ANOVA} decompositions takes a more deterministic approach towards surrogate building. First, a computer code is sliced into components of first order, second order, and higher order combinations of input variables. For each component a polynomial interpolant is built on a Smolyak sparse grid. In the anchored-\ac{ANOVA} approach one does not have the flexibility to evaluate the computer code at any arbitrary points. Rather, the computer code must be evaluated at points dictated by the collocation set and convergence criteria chosen. Based on the insight that higher order interaction effects are small compared to their first order counterparts, very accurate surrogates can be constructed with relatively few points. 
+
+
+
+
+% Results of applying two surrogate techbiques to dummy problems. Lessons learned. Advantages of each. Differences.
+% Fission gas release problem. Why I went with Kriging to solve it. PCA for time series is novel.
+% Why Bison can't predict experiment very well.  
+% What were the important parameters. Why results can't be generalized to different problems.
+% Need more experimental data
+% Surrogates haven't been applied in nuclear engineering.
+
+  
