@@ -45,14 +45,14 @@ The bubble number density is obtained by solving \ref{eq:bubble_growth}. The pro
 \label{eq:bubble_coalesecence_sat}
  \frac{dN_{gf}}{dt} = -\frac{N_{gf}}{A_{gf}} \frac{dA_{gf}}{dt}.
 \end{equation}
-Only when the saturation condition has been reached can fission gas escape into the rod free volume. Once the saturation condition is met, Eq. \ref{eq:fg_rate} can be used to model the concentration of gas atoms released per unit grain face. 
+Only when the saturation condition has been reached can fission gas escape into the rod free volume. Once the saturation condition is met, Eq. \ref{eq:fgr_rate} can be used to model the concentration of gas atoms released per unit grain face. 
 \begin{equation}
 \label{eq:fgr_rate}
  \frac{d\psi_{thr}}{dt} = n_g \frac{1}{2} \frac{2N_{gf}A_{gf} - 3}{4N_{gf}A_{gf}} \frac{dN_{gf}}{dt}
 \end{equation}      
 where $n_g$ is the number of fission gas atoms per grain face bubble. The authors in \cite{Pastore3} argue that the process of fission gas release works strictly to reduce the bubble gas content and size but not concentration. 
 
-While \ref{eq:fgr_rate} is useful for quantifying fission gas release, a more useful metric is the concentration of gas atoms release per unit fuel volume $C_{thr}$. The metric $C_{thr}$ is related to $\psi_{thr}$ through the proportionality constant equal to the grain surface to volume ratio \cite{Patore2}, as expressed in \ref{eq:fgr_rate_final}.
+While \ref{eq:fgr_rate} is useful for quantifying fission gas release, a more useful metric is the concentration of gas atoms release per unit fuel volume $C_{thr}$. The metric $C_{thr}$ is related to $\psi_{thr}$ through the proportionality constant equal to the grain surface to volume ratio \cite{Pastore2}, as expressed in \ref{eq:fgr_rate_final}.
 \begin{equation}
 \label{eq:fgr_rate_final}
  \frac{dC_{thr}}{dt} = \frac{3}{r_{gr}}\left(1 - P_f\right) \frac{d\psi_{thr}}{dt}
