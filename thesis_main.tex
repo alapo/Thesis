@@ -26,10 +26,10 @@
 \author{Artem Yankov}
 
 % Department
-\department{Nuclear Engineering}
+\department{Nuclear Engineering and Radiological Sciences}
 
 % Year of completion
-\year=2014
+\year=2015
 
 % Frontispiece
 %\frontispiece{\includegraphics[width=4in]{./pics/frontispiece.pdf}}
@@ -38,12 +38,21 @@
 \frontpagestyle{1}
 
 % Dedication
-\dedication{ %
-This dissertation is dedicated to...}
+%\dedication{% 
+%This dissertation is dedicated to...}
 
 % Acknowledgments
 \acknowledgments[6]{ %
-I would like to thank...}
+Foremost, I am foreever indebted to Professor Thomas Downar for taking a risk on an unknown mathematics major coming from a small engineering school in Terre Haute, Indiana. Needless to say, without Prof. Downar's willingness to take me in it is questionable whether I would have ever been given the opportunity to study computation and nuclear engineering with some of the best around. Also, I must thank Dr. Benjamin Collins for providing guidance and mentorship, especially in the first few years of the doctoral program when it is needed most. I am thankful for his patience and for instilling in me confidence in being able to conduct original research.   
+
+The sacrifices and risks made by my family in leaving all they knew in Russia for the chance of a better life in the United States has provided me with inspiration every day. My family has taught me how to be gritty and showed  me how far a little elbow greese can go. I owe everything to my family for giving me the personality traits necessary to complete a Ph.D.    
+
+My wife Kaela deserves an enormous amount of credit for the completion of this dissertation. Ever since our first date as undergraduates my study and organizational habits have miraculously improved. Thank you for putting me in place and supporting all my endeavors.  
+
+I am thankful to all my committee members, Dr. Giovanni Pastore and Dr. Laura Swiler. Discussions with these professionals helped to cement my understanding of concepts that would ultimately be the cornerstone of my thesis. I appreciate their patience in answering all my questions. 
+
+Last but not least, my gratitude is given to anyone who has had desk-space in the "Boiler Room" during my time there. It's highly likely that at one point we took a trip to the Cooley Building to get coffee, a trip that has been invaluable in clearing my mind and putting things in perspective. Thank you for maintaining a light-hearted atmosphere at all times. 
+}
 % This command sets the width of the acknowledgments area as a fraction
 % of the total width of the text area.
 \acknowledgmentswidth{0.8}
@@ -51,10 +60,11 @@ I would like to thank...}
 % Committee
 \committee{ %
 Professor Thomas J. Downar, Chair \\
-Professor John C. Lee \\
-Professor Krzysztof J. Fidkowski \\
+Assistant Adjunct Professor Benjamin S. Collins \\
 Professor Karthik Duraisamy \\ 
-Dr. Benjamin Collins}
+Professor Krzysztof J. Fidkowski \\
+Professor John C. Lee
+}
 
 % Chair must be entered separately for formatting reasons.
 \chair{Thomas J. Downar}
@@ -63,9 +73,9 @@ Dr. Benjamin Collins}
 %\hidelistoftables
 %\showlistofprograms
 %\showlistofappendices
-\hidecopyright
+%\hidecopyright
 \hidededication
-\hideacknowledgments
+%\hideacknowledgments
 %\hideabstract
 
 % Definition of any abbreviations used.
@@ -92,12 +102,12 @@ Dr. Benjamin Collins}
 }
 
 % Abstract
-\abstract{
+\abstract{%
 The relatively recent abundance of computing resources has driven computational scientists to build more complex and approximation-free computer models of physical phenomenon. Often times, multiple high fidelity computer codes are coupled together in hope of improving the predictive powers of simulations with respect to experimental data. To improve the predictive capacity of computer codes experimental data should be folded back into the parameters processed by the codes through optimization and calibration algorithms. However, application of such algorithms may be prohibitive since they generally require thousands of evaluations of computationally expensive, coupled, multiphysics codes. Surrogates models for expensive computer codes have shown promise towards making optimization and calibration feasible.
 
 In this thesis, non-intrusive surrogate building techniques are investigated for their applicability in nuclear engineering applications. Specifically, Kriging and the coupling of the anchored-ANOVA decomposition with collocation are utilized as surrogate building approaches. Initially, these approaches are applied and naively tested on simple reactor applications with analytic solutions. Ultimately, Kriging is applied to construct a surrogate to analyze fission gas release during the Ris\o~AN3 power ramp experiment using the fuel performance modeling code Bison. To this end, Kriging is extended from building surrogates for scalar quantities to entire time series using principal component analysis. A surrogate model is built for fission gas kinetics time series and the true values of relevant parameters are inferred by folding experimental data with the surrogate. Sensitivity analysis is also performed on the fission gas release parameters to gain insight into the underlying physics. 
 }
-\hideabstractpagenumber
+%\hideabstractpagenumber
 
 %% DOCUMENT AREA
 \begin{document}
@@ -118,7 +128,7 @@ In this thesis, non-intrusive surrogate building techniques are investigated for
 %\chapter{Ongoing Work} \label{chap:ongoing_work}
 %\input{./Ongoing_Work/ongoing_work}
 
-% Application to Fission Gas Relase Model
+% Application to Fission Gas Release Model
 \chapter{Application to Fission Gas Release} \label{chap:fgr}
 \input{./Chapter4/chapter4_main}
 

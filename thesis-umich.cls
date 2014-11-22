@@ -307,7 +307,7 @@
  % Use single-spaced lines for the title page.
  \begin{singlespace} %
   % Move down the page slightly.
-  \hbox{\vspace{0.3in}} %
+  \hbox{\vspace{1.0in}} % 0.3 originally
   % Center the title page as well.
   \begin{center} %
    % Put the title itself in 1.5-spaced format.
@@ -545,7 +545,7 @@
     % Move up a bit.
     \ \\[-4ex] %
     % Line above
-    \rule[1.4ex]{\textwidth}{1pt} %
+    %\rule[1.4ex]{\textwidth}{1pt} % undooooooooo
     % Required to use 1.5-spacing for dissertation.
     \if@umich@thesis %
      \onehalfspacing %
@@ -553,7 +553,7 @@
     % Insert the text.
     \sloppy #1 \\ %
     % Line below
-    \rule{\textwidth}{1pt} %
+    %\rule{\textwidth}{1pt} % undooooooo
    \end{minipage} %
   \end{center} %
   % Vertical rubber space
@@ -1256,7 +1256,7 @@
  % Add this page to the table of contents.
  \phantomsection\addcontentsline{toc}{chapter}{Abstract} %
  % Extra vertical space
- \begin{minipage}{0.8\textwidth} \vspace{1in} \end{minipage} \\ %
+ \begin{minipage}{0.9\textwidth} \vspace{1in} \end{minipage} \\ %
  % Center the title area.
  \begin{center} %
   % Formatting
@@ -1264,39 +1264,29 @@
   % Add the heading.
   ABSTRACT \\[5ex] %
   % Add the title of the dissertation.
-  \normalsize %
-  \inserttitle \\[2ex] %
+  %\normalsize %
+  %\inserttitle \\[2ex] %
   % Add the word 'by'
-  by \\[2ex]
+  %by \\[2ex]
   % Add the author.
-  \insertauthor
+  %\insertauthor
  \end{center} %
- % Vertical rubber space
- \vspace*{\stretch{2}} %
- % Insert the chair info
- \ifthenelse{\equal{\@cochair}{}}{
-  % No co-chairs; insert the chair.
-  {\bf Chair: \insertchair} %
- }{ %
-  % Use co-chairs.
-  {\bf Co-Chairs: \insertcochairs}} %
- % Vertical rubber space
- \vspace*{\stretch{2}} %
  % Insert the text in a centered minipage.
- \begin{center} %
-  \begin{minipage}{0.9\textwidth} %
+% \begin{center} %
+%  \begin{minipage}{0.9\textwidth} %
    % Double-spaced lines required by Rackham
    \doublespacing %
    % Insert the text.
    \insertabstract %
-  \end{minipage} %
- \end{center} %
+%  \end{minipage} %
+% \end{center} %
  % Vertical rubber space
- \vspace*{\stretch{1}} %
+% \vspace*{\stretch{1}} %
 }
 
 % Format the abstract page.
 \newcommand{\abstractmorepage}{ %
+%  \phantomsection\addcontentsline{toc}{chapter}{Abstract}
  % Set the page formatting.
  \frntpg %
  % Whether or not to hide the page number
@@ -1310,6 +1300,12 @@
    % Double-spaced lines required by Rackham
    \doublespacing %
    % Insert the text.
+    \begin{center} 
+  % Formatting
+  \large \bfseries
+  % Add the heading.
+  ABSTRACT \\[5ex] 
+ \end{center}
    \insertabstractmore %
   \end{minipage} %
  \end{center} %
@@ -1504,6 +1500,12 @@
  % Add the word 'Chapter' to the table of contents.
  \addtocontents{toc}{\vspace{1.3ex}\noindent %
  {\bf Chapter}\vspace{1.3ex}} %
+ % Add the word 'Table' to the list of tables.
+ \addtocontents{lot}{\addvspace{1.3ex}\noindent %
+ {\bf Table}\addvspace{1.3ex}{}} %
+% Add the word 'Figure' to the list of figures.
+ \addtocontents{lof}{\addvspace{1.3ex}\noindent %
+ {\bf Figure}\addvspace{1.3ex}} %
  % Use the correct formatting.
  \if@umich@thesis %
   % Use 1.5 spacing
