@@ -11,11 +11,11 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes, arrows, positioning}
 
-\title[]{A Surrogate Approach Towards Validation and Uncertainty Quantification of Multiphysics Reactor Simulation Codes}
-\subtitle[]{Thesis Prospectus}
+\title[]{Analysis of Reactor Simulations \\ Using Surrogate Models}
+\subtitle[]{Thesis Defense}
 \author[]{Artem Yankov}
 \institute[]{University of Michigan}
-\date{April 17, 2014}
+\date{December 8, 2014}
 
 % have this if you'd like a recurring outline
 \AtBeginSection[]  % "Beamer, do the following at the start of every section"
@@ -150,10 +150,10 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Modeling Ris\o~AN3 Experiment with BISON}
+\frametitle{Modeling Ris\o~AN3 Experiment with Bison}
 
 \begin{itemize}
-  \item BISON is a finite-element fuel performance modeling code that utilizes the SIFGRS model.
+  \item Bison is a finite-element fuel performance modeling code that utilizes the SIFGRS model.
   \item SIFGRS parameters are quite generic and uncertain. 
 \end{itemize}
 
@@ -173,28 +173,13 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Modeling Ris\o~AN3 Experiment with BISON/MPACT}
+\frametitle{Modeling Ris\o~AN3 Experiment with Bison}
 
 \begin{itemize}
-  \item No sense in comparing the output of a computer simulation to
-experimental data unless the computer simulation is of high fidelity and capable
-of reproducing the pertinent physics.
-  \item MPACT is a neutronics code that provides detailed intrapin and azimuthally dependent
-neutronics data in the fuel elements. 
-  \item The two-way coupling scheme provided by BISON and MPACT provides the most accurate fuel performance modeling available for a nuclear reactor.
-  \item Expensive! 
-\end{itemize}
-
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Modeling Ris\o~AN3 Experiment with BISON/MPACT}
-
-\begin{itemize}
-  \item BISON predictions of FGR and temperature fields stand to be improved by calibrating FGR parameters to experimental data.
-  \item Calibration studies require $\mathcal{O}(10^3)$ function evaluations, which in this case are the coupled BISON/MPACT computer codes.
-  \item Each simulation of the Ris\o~AN3 experiment will take a few hours.
-  \item It's necessary to construct a surrogate for the calibration study!   
+  \item Bison predictions of FGR and temperature fields stand to be improved by calibrating FGR parameters to experimental data.
+  \item Calibration studies require $\mathcal{O}(10^3)$ function evaluations, which in this is the Bison computer code.
+  \item Each simulation of the Ris\o~AN3 experiment will take a few hours on multiple processors.
+  \item It's necessary to construct a surrogate for the calibration study. 
 \end{itemize}
 
 \end{frame}
@@ -1307,42 +1292,14 @@ $\alpha_c$   &  8.4387E-04 &  8.4387E-04 &  8.7194E-04 \\ \hline
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% CLOSING REMARKS
-\section{Closing Remarks}
+% Application to FGR
+\section{Application to Fission Gas Release}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Original Contributions of Research}
+% What is FGR
+\input{./what_is_fgr}
 
-\begin{itemize}
-  \item Surrogate use to replace expensive nuclear fuel performance simulations for calibration, optimization and inference.
-  \item Folding in fuel performance experimental data with surrogate simulations to improve predictive capabilities of fuel performance codes.  
-  \item Use of the anchored-ANOVA decomposition coupled with collocation in nuclear engineering applications.
-  \item Application of surrogate methods to multiphysics code systems. 
-  \item Use of dimension reduction techniques along with Kriging never before applied to nuclear fuel performance modeling.   
-\end{itemize}
-
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Work Left to be Completed}
-
-\begin{itemize}
-  \item Apply methods described here to construct surrogate for Ris\o~AN3 fission gas release model in BISON using DAKOTA framework.
-  \item Use surrogate to infer "true" value of fission gas release parameters by folding in  data from power ramp experiment.
-  \item Replace BISON with coupled BISON/MPACT and repeat to study effects building a surrogate on a multiphysics code system.        
-\end{itemize}
-
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{The End}
-
-\centering
-Thank you
-
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameter Calibration
+\input{./parameter_calibration}
 
 % EXTRAS
 \section{Extras}
