@@ -1,0 +1,81 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary of Calibration Results}
+
+\begin{itemize}
+  \item There are significant discrepancies between predicted and experimental time series, especially in the power burst occurring at hour fifty of the power ramp.
+  \item For the case when raw experimental data is used there is only a 2.6\% relative error in the EOE FGR prediction. The BOE prediction error is 64.8\%. 
+  \item For the case of smoothed experimental date the prediction results are marginally improved with a BOE prediction error of 57.8\% and an EOE error of 0.5\%. 
+  \item It's possible to enforce the conditions of matching the predicted BOE and EOE predictions to their respective experimental values in the COBYLA framework. 
+  \item Enforcing only one of the conditions to a tolerance of $10^{-3}$ was achievable although the resulting solution grossly over predicted the fission gas release elsewhere in the time series.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Differences Between Prediction and Experiment}
+
+\begin{itemize}
+  \item There are apparent and irreconcilable differences between Bison's FGR predictions and the experimental data. 
+  \item Some of these differences can be attributed to several fission gas release aspects not explicitly modeled in Bison. 
+  \item Namely, burst fission gas release due to micro-cracking and the effect of measuring fission gas release using pressure transducers. 
+  \item Uncertainty in SIFGRS parameters not modeled in this research.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Insights From Sensitivity Analysis}
+
+\begin{itemize}
+  \item The fuel grain radius and fuel temperature had the highest sensitivity indices and produced the largest non-linear interaction effects with the other parameters. 
+  \item While sensitivity coefficients were calculated for the Ris\o~AN3 problem, it is not certain that the same parameter conclusions would generalize to other fission gas kinetics problems. 
+  \item The same type of analysis as conducted here would likely have to be replicated for each unique problem. 
+  \item The lack of generalization is likely due to the unique profundity of physics in play for each type of problem. 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why Kriging?}
+
+\begin{itemize}
+  \item Non-linearity of fission gas release models coupled with large uncertainties implied the need for modeling higher-order interaction effects. 
+  \item Modeling such higher-order effects with anchored-ANOVA and Smolyak sparse grids can get very expensive, with no clear limit of how many objective function simulations will be needed. 
+  \item Transparency of Kriging appealing when considering each Bison fission gas release simulation would have to be performed in parallel.
+  \item If simulations fail to converge or experiences an error, the correction process is straight forward. Contrarily, there are a lot of moving pieces in the anchored-ANOVA surrogate approach. 
+  \item Clear extension to time series. 
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Original Contributions of Research}
+
+\begin{itemize}
+  \item Construction of a surrogate model for the fuel performance code Bison and subsequent calibration of fission gas release parameters to experimental data from the FUMEX database. 
+  \item Extension of Kriging to construct surrogates for entire time series through PCA. 
+  \item Application of anchored-ANOVA decomposition and Smolyak sparse grids to construct surrogates for classic nuclear engineering problems.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Questions?}
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
