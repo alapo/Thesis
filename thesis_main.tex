@@ -7,6 +7,8 @@
 \usepackage{algpseudocode}
 \usepackage{algorithm}
 \usepackage{array}
+\usepackage{longtable}
+\usepackage{fancyvrb}
 
 % Define block styles for tikz
 \tikzstyle{decision} = [diamond, draw, fill=blue!20, 
@@ -45,7 +47,7 @@
 \acknowledgments[6]{ %
 Foremost, I am foreever indebted to Professor Thomas Downar for taking a risk on an unknown mathematics major coming from a small engineering school in Terre Haute, Indiana. Needless to say, without Prof. Downar's willingness to take me in it is questionable whether I would have ever been given the opportunity to study computation and nuclear engineering with some of the best around. Also, I must thank Dr. Benjamin Collins for providing guidance and mentorship, especially in the first few years of the doctoral program when it is needed most. I am thankful for his patience and for instilling in me confidence in being able to conduct original research.   
 
-The sacrifices and risks made by my family in leaving all they knew in Russia for the chance of a better life in the United States has provided me with inspiration every day. My family has taught me how to be gritty and showed  me how far a little elbow greese can go. I owe everything to my family for giving me the personality traits necessary to complete a Ph.D.    
+The sacrifices and risks made by my family in leaving all they knew in Russia for the chance of a better life in the United States has provided me with inspiration every day. My family has taught me how to be gritty and showed  me how far a little elbow grease can go. I owe everything to my family for giving me the personality traits necessary to complete a Ph.D.    
 
 My wife Kaela deserves an enormous amount of credit for the completion of this dissertation. Ever since our first date as undergraduates my study and organizational habits have miraculously improved. Thank you for putting me in place and supporting all my endeavors.  
 
@@ -60,7 +62,7 @@ Last but not least, my gratitude is given to anyone who has had desk-space in th
 % Committee
 \committee{ %
 Professor Thomas J. Downar, Chair \\
-Assistant Adjunct Professor Benjamin S. Collins \\
+Reactor Physics Nuclear Engineer Benjamin S. Collins, ORNL \\
 Professor Karthik Duraisamy \\ 
 Professor Krzysztof J. Fidkowski \\
 Professor John C. Lee
@@ -72,7 +74,7 @@ Professor John C. Lee
 % Commands to hide or show lists of figures, tables, etc.
 %\hidelistoftables
 %\showlistofprograms
-%\showlistofappendices
+\showlistofappendices
 %\hidecopyright
 \hidededication
 %\hideacknowledgments
@@ -135,6 +137,20 @@ In this thesis, non-intrusive surrogate building techniques are investigated for
 % Conclusion
 \chapter{Summary and Conclusion} \label{chap:conclusion}
 \input{./Chapter5/chapter5_main}
+
+% Appendix
+\appendix
+
+\chapter{Bison Input File} 
+\label{app:bison_riso_input}
+The following input file was developed at Idaho National Laboratory. The input models Ris\o~ AN3 and attempts to mimic the actual conditions of the test fuel rod during the experimental power ramp and its preceding irradiation history. The same input file is packaged with the Bison code as a validation case.  
+\VerbatimInput[fontsize=\tiny]{/Users/yankovai/Documents/Research/FGR/Bison_Input_Files/riso_an3.i}
+
+\chapter{Bison Operational Input Values}
+\label{app:bison_operating_conds}
+The parameter values below are inputs to the Ris\o~ AN3 input file described in Appendix \ref{app:bison_riso_input}. Specifically, the values in the "Clad Temperature" column are input, along with the time, into the csv file named "riso\_an3\_clad\_bc.csv". The values in the "Power History" column are input, along with the time, into the csv file named "riso\_an3\_power\_history.csv". Finally, the values in the "Fast Flux Multiplier" column are input, along with the time, into the csv file named "riso\_an3\_fast\_flux.csv". Bison uses the fast flux multiplier, power history, and an additional scaling factor to determine the fast neutron flux.     
+   
+\input{/Users/yankovai/Documents/Research/FGR/Bison_Input_Files/input_data}
 
 % Bibliography
 \bibliographystyle{plain}

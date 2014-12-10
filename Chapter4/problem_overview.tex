@@ -3,7 +3,7 @@ In the previous chapters collocation-based and Kriging surrogates were applied t
 Calibration studies involving the fuel performance code Bison have already been conducted by Swiler et. al. in \cite{Swiler2}. In \cite{Swiler2}, an optimal fuel relocation activation parameter is identified by an aggregated calibration to experimental observations of several Halden fuel rods. Surrogates were not required for the calibration study due to the relative simplicity of the fuel rod model used. The Dakota \cite{dakota} framework was used to complete the calibration study.       
 
 For the proposed thesis research the application of interest arises from the extensive validation base for fuel performance modeling found in the Fumex-II database \cite{fumex2}. 
-Specifically, the application involves calibrating fission gas parameters involved in modeling the Ris\o~ AN3 experiment since these parameters are notoriously uncertain. The Ris\o~ AN3 experiment consists of a base irradiation of four reactor cycles, as shown in Fig. \ref{fig:riso_base_irradiation} followed by a power ramp. The base irradiation takes place in the Biblis A pressurized water reactor \cite{fumex2}. 
+Specifically, the application involves calibrating fission gas parameters involved in modeling the Ris\o~ AN3 experiment since these parameters are notoriously uncertain. The Ris\o~ AN3 experiment consists of a base irradiation of four reactor cycles up to some 41 GWd/t, as shown in Fig. \ref{fig:riso_base_irradiation}, followed by a power ramp. The base irradiation takes place in the Biblis A pressurized water reactor \cite{fumex2}. 
 \begin{figure}
 \caption{\label{fig:riso_base_irradiation}
 Base irradiation history for the Ris\o~ AN3 experiment.}
@@ -11,7 +11,7 @@ Base irradiation history for the Ris\o~ AN3 experiment.}
   \includegraphics[scale=.75]{./Chapter4/base_irrad.png}
  \end{center}
 \end{figure}     
-After the base irradiation period, a fuel rod is extracted and refabricated to a shorter length before undergoing the power ramp in Fig. \ref{fig:riso_power_ramp}. The refabricated fuel rod is outfitted with various instrumentation such that fuel centerline temperature, fission gas release and rod internal pressure measurements can be obtained.  
+After the base irradiation period, a fuel rod is extracted and refabricated to a shorter length before undergoing the power ramp in Fig. \ref{fig:riso_power_ramp}. The refabricated fuel rod was outfitted with various instrumentation such that fuel centerline temperature, fission gas release and rod internal pressure measurements could be obtained.  
 \begin{figure}
 \caption{\label{fig:riso_power_ramp}
 Power ramp experiment for the the Ris\o~ AN3 experiment.}
@@ -19,8 +19,41 @@ Power ramp experiment for the the Ris\o~ AN3 experiment.}
   \includegraphics[scale=.75]{./Chapter4/power_ramp.png}
  \end{center}
 \end{figure} 
+The Ris\o~ AN3 test rod specifications are summarized in Table \ref{table:riso_specs}. The reader is encouraged to consult \cite{Perez2} for more in-depth specifications and modeling details.  
 
-The Ris\o~ AN3 experiment was modeled using solely Bison in \cite{Perez}. To model fission gas release the \ac{SIFGRS} model is utilized. Bison's prediction of fission gas release during the power ramp is displayed alongside the corresponding experimental results in Fig. \ref{fig:riso_fgr}.  
+\begin{table} 
+\caption{Ris\o~ AN3 test configurations and operating conditions.}
+\label{table:riso_specs} 
+\centering
+\begin{tabular}{||c|c|c||} 
+\hline \hline
+\textbf{Description} & \textbf{Units} & \textbf{Value} \\ \hline
+Overall fuel rod length & m  & 0.39058 \\ \hline
+Fuel stack length        & m &  0.286 \\ \hline
+Nominal plenum height  & mm & 61.0  \\ \hline
+Pre-ramp rod fill gas composition & & He \\ \hline
+Pre-ramp rod fill gas pressure & MPa & 2.31 \\ \hline
+Refabfricated rod fill gas composition & & He \\ \hline
+Refabfricated rod fill gas pressure & MPa & 1.57 \\ \hline
+Fuel material    & & UO$_2$ \\ \hline
+Fuel enrichment & \% & 2.95 \\ \hline
+Fuel density      & \% & 93.74 \\ \hlineFuel inner diameter   & mm & 2.5 \\ \hline
+Fuel outer diameter   & mm & 9.053 \\ \hline
+Pellet dish diameter   & cm & 0.665 \\ \hline
+Pellet dish depth       & cm & 0.013 \\ \hline
+Pellet chamfer width  & cm & 0.046 \\ \hline
+Pellet chamfer depth  & cm & 0.016 \\ \hline
+Cladding material          &  & Zr-4 \\ \hlineCladding outer diameter  & mm & 10.81 \\ \hline
+Cladding inner diameter   & mm & 9.258 \\ \hline
+Cladding wall thickness   & mm &  0.776 \\ \hline
+Base irradiation coolant inlet temperature & C & 287.7 \\ \hline
+Base irradiation coolant pressure & MPa & 15.52  \\ \hline 
+Power ramp coolant pressure & MPa & 15.3  \\ 
+\hline \hline
+\end{tabular}
+\end{table}
+
+The Ris\o~ AN3 experiment was modeled using solely Bison in \cite{Perez} and is included as a validation case for the Bison code. The relevant Bison input file and pertinent operating conditions, as utilized in this thesis, are included in Appendices \ref{app:bison_riso_input}, \ref{app:bison_operating_conds}. Note, the Bison Ris\o~ AN3 model is based upon the conditions and specifications in Table \ref{table:riso_specs} and \cite{Perez2}. To model fission gas release the \ac{SIFGRS} model is utilized in Bison. Bison's prediction of fission gas release during the power ramp is displayed alongside the corresponding experimental results in Fig. \ref{fig:riso_fgr}.  
 \begin{figure}
 \caption{\label{fig:riso_fgr}
 Comparison of Bison fission gas release prediction to experimental results during the Ris\o~ AN3 power ramp.}
