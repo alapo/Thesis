@@ -1,0 +1,55 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>{ 
+\usetheme{Rochester} 
+}
+
+\usepackage{cancel}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows, positioning}
+
+\title[]{Analysis of Reactor Simulations \\ Using Surrogate Models}
+\subtitle[]{Thesis Defense}
+\author[]{Artem Yankov}
+\institute[]{University of Michigan}
+\date{December 8, 2014}
+
+% have this if you'd like a recurring outline
+\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+{
+\begin{frame}<beamer> 
+\frametitle{Outline} % make a frame titled "Outline"
+\tableofcontents[currentsection]  % show TOC and highlight current section
+\end{frame}
+}
+
+\begin{document}
+
+% this prints title, author etc. info from above
+\begin{frame}
+\titlepage
+\end{frame}
+
+% MOTIVATION
+\section{Motivation}
+\input{./motivation}
+
+% SURROGATE CONSTRUCTION
+\section{Surrogate Models}
+\input{./surrogates}
+
+% Application to FGR
+\section{Application to Fission Gas Release}
+% What is FGR
+\input{./what_is_fgr}
+% Parameter Calibration
+\input{./parameter_calibration}
+
+% Conclusion
+\section{Conclusions}
+\input{./conclusion}
+
+\end{document}
