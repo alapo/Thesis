@@ -22,7 +22,7 @@ Top three principal components for the point kinetics time series as calculated 
 \end{figure}
 For deterministic computer codes, as those investigated in this thesis, the shapes of the principal components are expected to remain relatively static with training set size. Contrarily, the magnitudes of the principal components are expected to change as each principal component is expected to account for more variance introduced with increased training size. Indeed, such a phenomenon is observed in Fig. \ref{fig:pk_eigenvectors}. The first principal component in this problem closely follows the normalized reactor power while the second and third principal components correspond to the variance presented following the decrease in power once the sawtooth reactivity insertion ends.
 
-To analyze how well the kriging surrogates are capable of predicting the principal component coefficients, the actual expansion coefficients are plotted against the predicted coefficients in Fig. \ref{fig:pk_45degree} for various training set sizes. As the training set size increases in Fig. \ref{fig:pk_45degree} the relationship between predicted and true expansion coefficients is gradually rotated to 45$^\circ$.      
+To analyze how well the kriging surrogates are capable of predicting the principal component coefficients, the actual expansion coefficients are plotted against the predicted coefficients in Fig. \ref{fig:pk_45degree} for various training set sizes. The test set in this case consists of 50 \ac{LHS} sampled independently of those using the training sets. Note, the same test set is used for all proceeding analyses. As the training set size increases in Fig. \ref{fig:pk_45degree} the relationship between predicted and true expansion coefficients is gradually rotated to 45$^\circ$.      
 \begin{figure}[!h]
 \caption{\label{fig:pk_45degree}
 Comparison of predicted and true principal component expansion coefficients for the point kinetics problem using 45$^\circ$ plots.}
@@ -30,7 +30,35 @@ Comparison of predicted and true principal component expansion coefficients for 
   \includegraphics[scale=.7]{./Chapter4/pk_45degree.png}
  \end{center}
 \end{figure}
-For relatively low training sizes the predicted expansion coefficients are nearly zero, the mean value of the kriging surrogate. Part of the reason for this is the algorithm utilized for optimizing the $\theta$ values in the kriging construction. Although a global optimizer should be used a local optimization algorithm is generally used in R \cite{R} and Python statistical packages for efficiency. Regardless of the sample size in Fig. \ref{fig:pk_45degree} the surrogates struggle with predicting extreme expansion coefficients, which for this problem have magnitudes in the regions of -0.08 and 0.08. Since the expansion coefficients are normally distributed, there simply are not as many training samples in these regions to provide accurate predictions. However, the kriging formulation is aware of this situation and accounts for the problem by outputting a relatively large uncertainty for these extreme expansion coefficients.   
+For relatively low training sizes the predicted expansion coefficients are nearly zero, the mean value of the kriging surrogate. Part of the reason for this is the algorithm utilized for optimizing the $\theta$ values in the kriging construction. Although a global optimizer should be used a local optimization algorithm is generally used in R \cite{R} and Python statistical packages for efficiency. Regardless of the sample size in Fig. \ref{fig:pk_45degree} the surrogates struggle with predicting extreme expansion coefficients, which for this problem have magnitudes in the regions of -0.08 and 0.08. Since the expansion coefficients are normally distributed, as in Fig. \ref{fig:pk_coeff_distributions}, there simply are not as many training samples in these regions to provide accurate predictions. However, the kriging formulation is aware of this situation and accounts for the problem by outputting a relatively large uncertainty for these extreme expansion coefficients. 
+\begin{figure}[!h]
+\caption{\label{fig:pk_coeff_distributions}
+Distributions of point kinetics principal component expansion coefficients for a training size of 500 samples.}
+ \begin{center}
+  \includegraphics[scale=.5]{./Chapter4/pk_coeff_distributions.png}
+ \end{center}
+\end{figure} 
 
+The performance of the time series kriging formulation, with uncertainties for the expansion coefficients accounted for, is gaged in Fig. \ref{fig:pk_stdzd_xval_residuals} by utilizing the standardized cross-validated residual in Eq. \ref{eq:stnd_xval_residual}.   
+\begin{equation}
+\label{eq:stnd_xval_residual}
+ \frac{ p_{ij} - \hat{p}_{ij} }{ \sigma_{\hat{p}_{ij}} } . 
+\end{equation}  
+Since the expansion coefficients are normally distributed, some 99\% of the values' standardized values should lay between -3 and +3. From Fig. \ref{fig:pk_stdzd_xval_residuals} points lay outside the bounds only for the small train sizes consisting of 15 and 20 samples. Indeed, for small train set sizes the uncertainty predictions are likely to be misrepresented. Recall, kriging predictions are initialized by the mean of the objective function in the training set and then error terms are added based on the proximity of the desired inputs to those in the training set.  
+\begin{figure}[!h]
+\caption{\label{fig:pk_stdzd_xval_residuals}
+Cross validation of the point kinetics time series surrogate by examining standardized cross-validated residuals.}
+ \begin{center}
+  \includegraphics[scale=.7]{./Chapter4/pk_stdzd_xval_residuals.png}
+ \end{center}
+\end{figure} 
+As expected, the standardized residuals decrease with increasing train set size. To visualize this trend better the absolute value of the standardized residuals are plotted against train set size in Fig. \ref{fig:pk_average_zscore}. After some 100 samples in the training set there appears to be only marginal gains in test set performance. Fig. \ref{fig:pk_average_zscore} indicates that the first principal component for the point kinetics time series surrogate is predicted best followed by the third and second principal components. Since each successive principal component captures less variance than its predecessors it is most important to accurately predict the principal components corresponding to the largest eigenvalues. 
+\begin{figure}[!h]
+\caption{\label{fig:pk_average_zscore}
+Average absolute value of standardized cross-validated residuals for the point kinetics time series surrogate for various train set sizes.}
+ \begin{center}
+  \includegraphics[scale=.7]{./Chapter4/pk_average_zscore.png}
+ \end{center}
+\end{figure}
  
-
+  
