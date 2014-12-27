@@ -1,4 +1,26 @@
-In Section \ref{subsec:fgrPCA} \ac{PCA} was used used to show that three eigenvectors are sufficient to capture over 99\% of the variance in Bison's simulated Ris\o~ AN3 power ramp fission gas release time series. The variation is caused by perturbations in the fission gas release parameters although they are not explicit in the \ac{PCA} framework. The Dakota code is used to create the 100 time series in the previous section. In accordance with each parameter's uniform distribution described in Table \ref{table:fgr_params}, Dakota made 100 sets of perturbations to the parameters using the \ac{LHS} method. Each of the 100 samples was then propagated through Bison and a time series of fission gas release was output. \ac{PCA} was then performed on the covariance matrix of the 100 samples. Consequently, there is a clear mapping from a set of eight fission gas release parameters to a time series. More specifically, there is a mapping from the i$^{th}$ set of eight parameters $R^{i}$ to the three expansion coefficients $\lbrace p_{i1}, p_{i2}, p_{i3} \rbrace$ that are capable of reproducing the time series, as described in Eq. \ref{eq:pcaExpCoeffs}. In order to predict new time series for a set of fission gas release parameters not in the set used to derive the three principal components this mapping must be generated. Kriging is used achieve the mapping.  
+In Section \ref{subsec:fgrPCA} \ac{PCA} was used used to show that three eigenvectors are sufficient to capture over 99\% of the variance in Bison's simulated Ris\o~ AN3 power ramp fission gas release time series. The variation is caused by perturbations in the fission gas release parameters although they are not explicit in the \ac{PCA} framework. The Dakota code is used to create the 100 time series in the previous section. In accordance with each parameter's uniform distribution described in Table \ref{table:fgr_params}, Dakota made 100 sets of perturbations to the parameters using the \ac{LHS} method. Each of the 100 samples was then propagated through Bison and a time series of fission gas release was output. \ac{PCA} was then performed on the covariance matrix of the 100 samples. Consequently, there is a clear mapping from a set of eight fission gas release parameters to a time series. More specifically, there is a mapping from the i$^{th}$ set of eight parameters $R^{i}$ to the three expansion coefficients $\lbrace p_{i1}, p_{i2}, p_{i3} \rbrace$ that are capable of reproducing the time series, as described in Eq. \ref{eq:pcaExpCoeffs}. In order to predict new time series for a set of fission gas release parameters not in the set used to derive the three principal components this mapping must be generated. Kriging is used to achieve the mapping using the procedure summarized in Fig. \ref{fig:ts_surrogate_procedure}. The procedure in Fig. \ref{fig:ts_surrogate_procedure} is an adaptation of the traditional surrogate construction process for scalar outputs of expensive computer codes summarized in Fig. \ref{fig:surrogate_process} and is one of the original contributions of this thesis.
+\begin{figure}
+\caption{\label{fig:ts_surrogate_procedure}
+Flow diagram for constructing a time series surrogate using \ac{PCA} and kriging for an expensive computer code.}
+\begin{tikzpicture}[node distance = 2.5cm, auto]
+\tikzstyle{every node}=[font=\small, align=left]
+\node[block, label=right:(Identify input variables of interest and respective probability\\ distributions)] (identify_vars) {Identify Variables};
+\node[block, below of= identify_vars, label=right:(Create LHS plan for inputs)] (lhs) {LHS};
+\node[block, below of= lhs, label=right:(Propagate sampling plan through expensive computer code)] (propagate) {Propagate Sampling Plan};
+\node[block, below of= propagate, label=right:(Perform PCA on output time series)] (pca) {Perform PCA};
+\node[block, below of= pca, label=right:(Identify number of eigenvalues needed to account for at least 99\% \\ of the time series variance)] (var_proj) {Variance Projection};
+\node[block, below of= var_proj, label=right:(Construct kriging surrogates for expansion coefficients of primary\\ principal components determined from previous step)] (kriging) {Kriging Surrogates for Expansion Coefficients};
+\node[block, below of= kriging, label=right:(Cross validate surrogate performance on test cases)] (xvalidation) {Cross Validation};
+\node[block, below of= xvalidation, label=right:(Use surrogate to perform analyses)] (analysis) {Use Surrogate for Analysis};
+\path [line] (identify_vars.south) -- (lhs.north);
+\path [line] (lhs.south) -- (propagate.north);
+\path [line] (propagate.south) -- (pca.north);
+\path [line] (pca.south) -- (var_proj.north);
+\path [line] (var_proj.south) -- (kriging.north);
+\path [line] (kriging.south) -- (xvalidation.north);
+\path [line] (xvalidation.south) -- (analysis.north);
+\end{tikzpicture}  
+\end{figure}
 
 To start, using the Kriging description in Section \ref{sec:kriging} a surrogate is constructed for each of the expansion coefficients related to the three principal components responsible for over 99\% of the variance. Each of these surrogates $\hat{p}_{ij}$ for $j\in\left(1,2,3\right)$ accepts a set of fission gas release parameters and outputs a scalar expansion coefficient for the principal component $X_j$. In accordance with Eq. \ref{eq:pcaExpCoeffs} the predicted fission gas release time series is,
 \begin{equation}

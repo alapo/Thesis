@@ -35,11 +35,19 @@ where $k$ is Boltzman's constant and $T$ is temperature. The pressure $p_{eq}$ a
 \end{equation} 
 where $R_{gf}$ is the bubble radius of curvature. The factor $\gamma$ is the surface tension, which is also commonly referred to as the UO$_2$/gas specific surface energy. The surface tension parameter strongly affects the kinetics of bubble growth \cite{Swiler3}. To solve for the vacancy number in Eq. \ref{eq:vacancy_change} the grain boundary diffusion layer thickness $\delta_g$ is needed in addition to the vacancy diffusion coefficient $D_v$. The factor $s$ in Eq. \ref{eq:vacancy_change} is closely related to the grain face fractional coverage \cite{Pastore1}. At this point all the elements are in place to model bubble growth using Eq. \ref{eq:bubble_growth}.  
 
-As bubbles increase in size along grain boundaries they will eventually run into each other and coalesce. Under the premise of conservation of total bubble volume, the relationship between bubble number density $N_{gf}$ and the projected bubble area along the grain face $A_{gf}$ can be expressed as \cite{Pastore3},
+As bubbles increase in size along grain boundaries they will eventually run into each other and coalesce, as exemplified in Fig. \ref{fig:bubble_coalesce}. Under the premise of conservation of total bubble volume, the relationship between bubble number density $N_{gf}$ and the projected bubble area along the grain face $A_{gf}$ can be expressed as \cite{Pastore3},
 \begin{equation}
 \label{eq:bubble_coalesecence}
  \frac{dN_{gf}}{dt} = -\frac{6N_{gf}^2}{3+4n_{gf}A_{gf}} \frac{dA_{gf}}{dt}.
 \end{equation}
+
+\begin{figure}
+\caption{\label{fig:bubble_coalesce}
+Bubble coalesce on a fuel grain face from the AGR/Halden Ramp Test Programme\cite{White}.}
+ \begin{center}
+  \includegraphics[scale=1.]{./Slides/fgr_1.png}
+ \end{center}
+\end{figure}
 The bubble number density is obtained by solving \ref{eq:bubble_growth}. The processes of bubble growth and coalescences along fuel grain boundaries lead to fission gas release once certain saturation criteria have been met. Let $F_c = N_{gf}A_{gf}$ denote the fraction of a grain face covered by bubbles. The saturation condition holds when the time rate of change of $F_c$ is static. When the saturation condition holds, the relation between bubble number density and projected grain face area can be reformulated as,
 \begin{equation}
 \label{eq:bubble_coalesecence_sat}
